@@ -11,7 +11,7 @@ from matplotlib import cm
 from matplotlib import pyplot as plt
 # import plotly.graph_objects as go
 
-
+# create our own small color maps for positive good and positive bad
 TURNIP8_COLORMAP = cm.get_cmap('PiYG', 8)
 TURNIP8_COLORMAP_R = cm.get_cmap('PiYG_r', 8)
 
@@ -24,6 +24,31 @@ def colorize_by_std_deviations (norm_df):
   norm_df.style.background_gradient(cmap=TURNIP8_COLORMAP, axis=None, vmin=-4.0, vmax=4.0)
 
 
+def draw_pos_good_legend (pos_ax):
+  "Draw a colormap legend for the case where positive values are good."
+  make_legend_on_axis(pos_ax, TURNIP8_COLORMAP)
+
+
+def draw_pos_bad_legend (neg_ax):
+  "Draw a colormap legend for the case where positive values are bad."
+  make_legend_on_axis(neg_ax, TURNIP8_COLORMAP_R)
+
+
+def make_legend_on_axis (ax, cmap):
+  """
+  Draws a legend on the given axis using the given colormap.
+  """
+  box_rng = np.arange(8)
+  ticklabels = ['-4.0', '-3.0', '-2.0', '-1.0', '1.0', '2.0', '3.0', '4.0']
+  label_title = 'Green Values are Better'
+  im = ax.imshow([box_rng], cmap)
+  ax.set_xticks(box_rng)
+  ax.set_xticklabels(ticklabels)
+  ax.set_yticks([])
+  ax.set_yticklabels([])
+  ax.set_title(label_title)
+
+
 def normalize_to_zscores (qm_df):
   "Apply Z-score by column to every column except the BIDS name column."
   bids_names = qm_df['bids_name']
@@ -31,41 +56,20 @@ def normalize_to_zscores (qm_df):
   return pd.concat([bids_names, z_df], axis=1)
 
 
-def show_pos_good_legend ():
-  "Draw a colormap legend for the case where positive values are good."
-  # TODO: how to return some legend (subplot?) that can be plotted later
-  return plt.imshow([[0, 1, 2, 3, 4, 5, 6, 7]], cmap=TURNIP8_COLORMAP)
+# # Argument is: 1) QA file
+# # Example:  norm_z.py group_T1w.tsv
+# #
+# # qm_file = sys.argv[1]
+# qm_file = '../test/resources/gtest.tsv'
+# qm_df = pd.read_csv(qm_file, sep='\t')
+# norm_df = normalize_to_zscores(qm_df)
+# # print(norm_df)
+# # print(norm_df[['aor', 'dummy_trs', 'fber', 'fd_num']])
 
-
-def show_pos_bad_legend ():
-  "Draw a colormap legend for the case where positive values are bad."
-  # TODO: how to return some legend (subplot?) that can be plotted later
-  return plt.imshow([[0, 1, 2, 3, 4, 5, 6, 7]], cmap=TURNIP8_COLORMAP_R)
-
-
-# Argument is: 1) QA file
-# Example:  norm_z.py group_T1w.tsv
-# qa_file = sys.argv[1]
-qa_file = "../../data/gtest.tsv"
-# print("qa_file is", qa_file)
-
-qa_df = pd.read_csv(qa_file, sep="\t")
-# print("qa_df is a:", type(qa_df))
-# print(qa_df)
-
-# try with the data frame itself:
-# print("z_df is a:", type(z_df))
-# print(z_df)
-
-# print("bids_names is a:", type(bids_names))
-# print(bids_names)
-
-print(norm_df)
-# print(norm_df[['aor', 'dummy_trs', 'fber', 'fd_num']])
-
-# create our own limited color map
-turnip8 = cm.get_cmap('PiYG', 8)
-
-# set cell backgrounds from a colormap based on standard deviations
-# plt.imshow(z_df, cmap=turnip8)
+# # Plot the legend and the table
+# fig, axes = plt.subplots(2, 1)
+# legend_ax, table_ax = axes
+# draw_pos_good_legend(legend_ax)
+# colorize_by_std_deviations(norm_df)
+# # table_ax.imshow(norm_df)
 # plt.show()
