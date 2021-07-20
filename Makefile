@@ -2,6 +2,7 @@
 TOPLVL=${PWD}
 INPUTS=${TOPLVL}/inputs
 RPTS=${TOPLVL}/reports
+TESTDIR=${TOPLVL}/test
 
 ARGS=
 APP_ROOT=/qmview
@@ -17,10 +18,10 @@ TARG=/qmview
 TSTIMG=qmview:test
 
 
-.PHONY: help bash cleancache cleanrpts docker dockert down exec run runt runt1 runtc runtep stop up watch
+.PHONY: help bash cleancache cleanrpts docker dockert down exec run runt runt1 runtc runtep stop test up watch
 
 help:
-	@echo "Make what? Try: bash, cleancache, cleanrpts, docker, dockert, down, run, runt, runt1, runtc, runtep, stop, up, watch"
+	@echo "Make what? Try: bash, cleancache, cleanrpts, docker, dockert, down, run, runt, runt1, runtc, runtep, stop, test, up, watch"
 	@echo '  where:'
 	@echo '     help      - show this help message'
 	@echo '     bash      - run Bash in a ${PROG} container (for development)'
@@ -35,6 +36,7 @@ help:
 	@echo '     runtc     - run all tests and code coverage in a container'
 	@echo '     runtep    - run a test container with alternate entrypoint (CLI: EP=entrypoint, ARGS=args)'
 	@echo '     stop      - stop a running container'
+	@echo '     test      - run one or all tests in the test directory (CLI: TEST=single_test_file)'
 	@echo '     watch     - show logfile for a running container'
 
 bash:
@@ -73,6 +75,9 @@ runtc:
 
 stop:
 	docker stop ${NAME}
+
+test:
+	pytest -vv ${TESTDIR}/${TEST} --cov-report term-missing --cov
 
 watch:
 	docker logs -f ${NAME}
