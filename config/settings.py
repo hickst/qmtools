@@ -10,3 +10,6 @@ LOG_LEVEL = 'INFO'  # CRITICAL / ERROR / WARNING / INFO / DEBUG
 
 # Name of this program: used programmatically so keeping it lower case.
 PROGRAM_NAME = 'qmview'
+
+# Path to the output reports directory inside the container.
+REPORTS_DIR = 'reports'

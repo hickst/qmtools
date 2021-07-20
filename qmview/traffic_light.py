@@ -3,13 +3,15 @@
 #          representation in a traffic-light table.
 # Last Modified: Add methods to load TSV and write HTML file.
 
-# import os
+import os
 import numpy as np
 import pandas as pd
 import scipy.stats as stats
 
 from matplotlib import cm
 from matplotlib import pyplot as plt
+
+from config.settings import REPORTS_DIR
 
 # create our own small color maps for positive good and positive bad
 TURNIP8_COLORMAP = cm.get_cmap('PiYG', 8)
@@ -36,7 +38,28 @@ def draw_pos_bad_legend (neg_ax):
 
 
 def load_tsv (tsv_path):
+  "Read the specified TSV file and return a Pandas dataframe from it."
   return pd.read_csv(tsv_path, sep='\t')
+
+
+def make_legends (dirpath=REPORTS_DIR):
+  """
+  Generate and save a positive-good legend and a positive-bad legend
+  as .png files in the reports directory.
+  """
+  make_a_legend("pos_good.png", TURNIP8_COLORMAP, dirpath)
+  make_a_legend("pos_bad.png", TURNIP8_COLORMAP_R, dirpath)
+
+
+def make_a_legend (filename, colormap, dirpath=REPORTS_DIR):
+  """
+  Make a legend with the given colormap and save it with the given filename
+  in the optionally specified reports directory.
+  """
+  fig = plt.figure()
+  ax = fig.add_axes([0, 0, 1, 1])
+  make_legend_on_axis(ax, colormap)
+  write_figure_to_file(fig, filename)
 
 
 def make_legend_on_axis (ax, cmap):
@@ -55,10 +78,22 @@ def make_legend_on_axis (ax, cmap):
 
 
 def normalize_to_zscores (qm_df):
-  "Apply Z-score by column to every column except the BIDS name column."
+  """
+  Apply Z-score by column to every column except the BIDS name column.
+  """
   bids_names = qm_df['bids_name']
   z_df = qm_df.iloc[:, 1:].apply(stats.zscore)
   return pd.concat([bids_names, z_df], axis=1)
+
+
+def write_figure_to_file (fig, filename, dirpath=REPORTS_DIR):
+  """
+  Write the given matplotlib figure to a file with the given filename
+  in the reports directory. The output format is determined by the file
+  extension (.png is the default).
+  """
+  filepath = os.path.join(dirpath, filename)
+  fig.savefig(filepath, bbox_inches='tight')    # .png is default
 
 
 def write_table_to_html (styler, filepath):
