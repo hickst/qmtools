@@ -132,3 +132,5 @@ test_data/*
 # project local excludes:
 EXTRAS/
 .vscode/
+inputs/
+reports/
