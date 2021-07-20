@@ -1,11 +1,11 @@
 # Tests of the traffic-light table code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/19/2021.
-#   Last Modified: Reformatted file. Added test for normalize_to_zscores.
+#   Last Modified: Update for tests directory rename.
 #
 import numpy
 import pandas
 import pytest
-from test import TEST_RESOURCES_DIR
+from tests import TEST_RESOURCES_DIR
 import qmview.traffic_light as traf
 
 class TestTrafficLight(object):

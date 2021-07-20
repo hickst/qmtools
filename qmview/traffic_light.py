@@ -103,22 +103,3 @@ def write_table_to_html (styler, filepath):
   """
   with open(filepath, "w") as outfyl:
     outfyl.writelines(styler.render())
-
-
-# # Argument is: 1) QA file
-# # Example:  norm_z.py group_T1w.tsv
-# #
-# # qm_file = sys.argv[1]
-# qm_file = '../test/resources/gtest.tsv'
-# qm_df = pd.read_csv(qm_file, sep='\t')
-# norm_df = normalize_to_zscores(qm_df)
-# # print(norm_df)
-# # print(norm_df[['aor', 'dummy_trs', 'fber', 'fd_num']])
-
-# # Plot the legend and the table
-# fig, axes = plt.subplots(2, 1)
-# legend_ax, table_ax = axes
-# draw_pos_good_legend(legend_ax)
-# colorize_by_std_deviations(norm_df)
-# # table_ax.imshow(norm_df)
-# plt.show()

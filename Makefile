@@ -2,7 +2,7 @@
 TOPLVL=${PWD}
 INPUTS=${TOPLVL}/inputs
 RPTS=${TOPLVL}/reports
-TESTDIR=${TOPLVL}/test
+TESTDIR=${TOPLVL}/tests
 
 ARGS=
 APP_ROOT=/qmview
@@ -32,11 +32,11 @@ help:
 	@echo '     exec      - exec into running development server (CLI arg: NAME=containerID)'
 	@echo '     run       - start a container (CLI: ARGS=args)'
 	@echo '     runt      - run the main program in a test container'
-	@echo '     runt1     - run a test/test-dir in a container (CLI: TARG=testpath)'
+	@echo '     runt1     - run a tests/test-dir in a container (CLI: TARG=testpath)'
 	@echo '     runtc     - run all tests and code coverage in a container'
 	@echo '     runtep    - run a test container with alternate entrypoint (CLI: EP=entrypoint, ARGS=args)'
 	@echo '     stop      - stop a running container'
-	@echo '     test      - run one or all tests in the test directory (CLI: TEST=single_test_file)'
+	@echo '     test      - run one or all tests in the tests directory (CLI: TEST=single_test_file)'
 	@echo '     watch     - show logfile for a running container'
 
 bash:
@@ -52,7 +52,7 @@ docker:
 	docker build -t ${IMG} .
 
 dockert:
-	docker build --build-arg TESTS=test -t ${TSTIMG} .
+	docker build --build-arg TESTS=tests -t ${TSTIMG} .
 
 exec:
 	docker cp .bash_env ${NAME}:${ENVLOC}

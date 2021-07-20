@@ -21,7 +21,6 @@ def main (argv=None):
 
   traf.make_legends()
 
-  #  qm_df = traf.load_tsv('test/resources/group_bold.tsv')
   qm_df = traf.load_tsv('inputs/gtest.tsv')
   norm_df = traf.normalize_to_zscores(qm_df)
   styler = traf.colorize_by_std_deviations(norm_df)
