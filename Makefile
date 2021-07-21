@@ -14,7 +14,8 @@ IMG=qmview:devel
 NAME=qmview
 PROG=qmview
 SHELL=/bin/bash
-TARG=/qmview
+SCOPE=qmview
+TEST=tests
 TSTIMG=qmview:test
 
 
@@ -32,7 +33,7 @@ help:
 	@echo '     exec      - exec into running development server (CLI arg: NAME=containerID)'
 	@echo '     run       - start a container (CLI: ARGS=args)'
 	@echo '     runt      - run the main program in a test container'
-	@echo '     runt1     - run a tests/test-dir in a container (CLI: TARG=testpath)'
+	@echo '     runt1     - run a tests/test-dir in a container (CLI: TEST=testpath)'
 	@echo '     runtc     - run all tests and code coverage in a container'
 	@echo '     runtep    - run a test container with alternate entrypoint (CLI: EP=entrypoint, ARGS=args)'
 	@echo '     stop      - stop a running container'
@@ -68,16 +69,16 @@ runtep:
 	@docker run -it --rm --name ${NAME} -v ${INPUTS}:${CONINPUTS}:ro -v ${RPTS}:${CONRPTS} --entrypoint ${EP} ${TSTIMG} ${ARGS}
 
 runt1:
-	docker run -it --rm --name ${NAME} -v ${INPUTS}:${CONINPUTS}:ro  -v ${RPTS}:${CONRPTS} --entrypoint pytest ${TSTIMG} -vv ${TARG}
+	docker run -it --rm --name ${NAME} -v ${INPUTS}:${CONINPUTS}:ro  -v ${RPTS}:${CONRPTS} --entrypoint pytest ${TSTIMG} -vv ${TEST}
 
 runtc:
-	docker run -it --rm --name ${NAME} -v ${INPUTS}:${CONINPUTS}:ro  -v ${RPTS}:${CONRPTS} --entrypoint pytest ${TSTIMG} -vv --cov-report term-missing --cov ${TARG}
+	docker run -it --rm --name ${NAME} -v ${INPUTS}:${CONINPUTS}:ro  -v ${RPTS}:${CONRPTS} --entrypoint pytest ${TSTIMG} -vv --cov-report term-missing --cov ${SCOPE}
 
 stop:
 	docker stop ${NAME}
 
 test:
-	pytest -vv ${TESTDIR}/${TEST} --cov-report term-missing --cov
+	pytest -vv ${TEST} --cov-report term-missing --cov ${SCOPE}
 
 watch:
 	docker logs -f ${NAME}
