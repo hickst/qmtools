@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: To convert an mriqc output file to normalized scores for
 #          representation in a traffic-light table.
-# Last Modified: Add methods to load TSV and write HTML file.
+# Last Modified: Fix write figure to dirpath problem. Cleanup unused functions.
 
 import os
 import numpy as np
@@ -27,16 +27,6 @@ def colorize_by_std_deviations (norm_df):
   return norm_df.style.background_gradient(cmap=TURNIP8_COLORMAP, axis=None, vmin=-4.0, vmax=4.0)
 
 
-def draw_pos_good_legend (pos_ax):
-  "Draw a colormap legend for the case where positive values are good."
-  make_legend_on_axis(pos_ax, TURNIP8_COLORMAP)
-
-
-def draw_pos_bad_legend (neg_ax):
-  "Draw a colormap legend for the case where positive values are bad."
-  make_legend_on_axis(neg_ax, TURNIP8_COLORMAP_R)
-
-
 def load_tsv (tsv_path):
   "Read the specified TSV file and return a Pandas dataframe from it."
   return pd.read_csv(tsv_path, sep='\t')
@@ -59,7 +49,7 @@ def make_a_legend (filename, colormap, dirpath=REPORTS_DIR):
   fig = plt.figure()
   ax = fig.add_axes([0, 0, 1, 1])
   make_legend_on_axis(ax, colormap)
-  write_figure_to_file(fig, filename)
+  write_figure_to_file(fig, filename, dirpath)
 
 
 def make_legend_on_axis (ax, cmap):
