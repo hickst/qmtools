@@ -68,10 +68,10 @@ runtep:
 	@docker run -it --rm --name ${NAME} -v ${INPUTS}:${CONINPUTS}:ro -v ${RPTS}:${CONRPTS} --entrypoint ${EP} ${TSTIMG} ${ARGS}
 
 runt1:
-	docker run -it --rm --name ${NAME} -v ${INPUTS}:${CONINPUTS}:ro  --entrypoint pytest ${TSTIMG} -vv ${TARG}
+	docker run -it --rm --name ${NAME} -v ${INPUTS}:${CONINPUTS}:ro  -v ${RPTS}:${CONRPTS} --entrypoint pytest ${TSTIMG} -vv ${TARG}
 
 runtc:
-	docker run -it --rm --name ${NAME} -v ${INPUTS}:${CONINPUTS}:ro  --entrypoint pytest ${TSTIMG} -vv --cov-report term-missing --cov ${TARG}
+	docker run -it --rm --name ${NAME} -v ${INPUTS}:${CONINPUTS}:ro  -v ${RPTS}:${CONRPTS} --entrypoint pytest ${TSTIMG} -vv --cov-report term-missing --cov ${TARG}
 
 stop:
 	docker stop ${NAME}
