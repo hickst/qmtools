@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: To convert an mriqc output file to normalized scores for
 #          representation in a traffic-light table.
-# Last Modified: Fix write figure to dirpath problem. Cleanup unused functions.
+# Last Modified: Added reports dir default to write_table_to_html method.
 
 import os
 import numpy as np
@@ -86,10 +86,11 @@ def write_figure_to_file (fig, filename, dirpath=REPORTS_DIR):
   fig.savefig(filepath, bbox_inches='tight')    # .png is default
 
 
-def write_table_to_html (styler, filepath):
+def write_table_to_html (styler, filename, dirpath=REPORTS_DIR):
   """
   Render the given pandas.io.formats.style.Styler object as
   HTML and write the HTML to the given filepath.
   """
+  filepath = os.path.join(dirpath, filename)
   with open(filepath, "w") as outfyl:
     outfyl.writelines(styler.render())
