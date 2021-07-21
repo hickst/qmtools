@@ -1,6 +1,6 @@
 # Tests of the traffic-light table code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/19/2021.
-#   Last Modified: Added test for colorize_by_std_deviations.
+#   Last Modified: Add/use test constants. Added test for write_table_to_html.
 #
 import os
 import matplotlib
@@ -17,6 +17,10 @@ from tests import TEST_RESOURCES_DIR
 class TestTrafficLight(object):
 
   gtest_tstfyl  = f"{TEST_RESOURCES_DIR}/gtest.tsv"
+  html_min_size = 100000        # magic number for HTML report file (# bytes)
+  legend_min_size = 6000        # magic number for legend (# bytes) in a .png file
+  df_cell_count = 855           # size of test zscore dataframe
+  df_shape = (19, 45)           # shape of test zscore dataframe
 
 
   def test_colorize_by_std_deviations(self):
@@ -39,8 +43,8 @@ class TestTrafficLight(object):
     print(qm_df)
     assert qm_df is not None
     assert type(qm_df) == pandas.core.frame.DataFrame
-    assert qm_df.size == 855
-    assert qm_df.shape == (19, 45)
+    assert qm_df.size == self.df_cell_count
+    assert qm_df.shape == self.df_shape
 
 
   def test_make_legends_rpts(self):
@@ -52,7 +56,7 @@ class TestTrafficLight(object):
     assert len(files) == 2
     for fyl in files:
       fpath = os.path.join(REPORTS_DIR, fyl)
-      assert os.path.getsize(fpath) > 0
+      assert os.path.getsize(fpath) >= self.legend_min_size
 
 
   def test_make_legends(self):
@@ -67,28 +71,32 @@ class TestTrafficLight(object):
       assert len(files) == 2
       for fyl in files:
         fpath = os.path.join(tmpdir, fyl)
-        assert os.path.getsize(fpath) > 0
+        assert os.path.getsize(fpath) > self.legend_min_size
 
 
   def test_normalize_to_zscores(self):
     qm_df = traf.load_tsv(self.gtest_tstfyl)
     norm_df = traf.normalize_to_zscores(qm_df)
     assert type(norm_df) == pandas.core.frame.DataFrame
-    assert norm_df.size == 855
-    assert norm_df.shape == (19, 45)
+    assert norm_df.size == self.df_cell_count
+    assert norm_df.shape == self.df_shape
     print(type(norm_df['bids_name'][0]))
     assert type(norm_df['bids_name'][0]) == str
     print(type(norm_df.iloc[0, 1]))
     assert type(norm_df.iloc[0, 1]) == numpy.float64
 
 
-    # hdrs = None
-    # with fits.open(self.m13_tstfyl) as hdus:
-    #     hdrs = utils.get_header_fields(hdus)
-    # print(hdrs)
-    # assert hdrs is not None
-    # assert len(hdrs) > 0
-    # assert len(hdrs) == 18
-    # assert 'CTYPE1' in hdrs
-    # assert 'SIMPLE' in hdrs
-    # assert 'COMMENT' not in hdrs
+  def test_write_table_to_html(self):
+    with tempfile.TemporaryDirectory() as tmpdir:
+      print(f"tmpdir={tmpdir}")
+      qm_df = traf.load_tsv(self.gtest_tstfyl)
+      norm_df = traf.normalize_to_zscores(qm_df)
+      styler = traf.colorize_by_std_deviations(norm_df)
+      traf.write_table_to_html(styler, "table.html", dirpath=tmpdir)
+      files = os.listdir(tmpdir)
+      print(f"FILES={files}")
+      assert files is not None
+      assert len(files) == 1
+      for fyl in files:
+        fpath = os.path.join(tmpdir, fyl)
+        assert os.path.getsize(fpath) > self.html_min_size
