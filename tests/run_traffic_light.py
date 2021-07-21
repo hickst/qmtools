@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 
 import qmview.traffic_light as traf
 from qmview.traffic_light import TURNIP8_COLORMAP, TURNIP8_COLORMAP_R
-from config.settings import REPORTS_DIR
+# from config.settings import REPORTS_DIR
 
 
 def main (argv=None):
@@ -24,7 +24,7 @@ def main (argv=None):
   qm_df = traf.load_tsv('inputs/gtest.tsv')
   norm_df = traf.normalize_to_zscores(qm_df)
   styler = traf.colorize_by_std_deviations(norm_df)
-  traf.write_table_to_html(styler, f"{REPORTS_DIR}/table.html")
+  traf.write_table_to_html(styler, "table.html")
 
 
 
