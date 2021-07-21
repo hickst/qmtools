@@ -1,12 +1,17 @@
 # Tests of the traffic-light table code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/19/2021.
-#   Last Modified: Update for tests directory rename.
+#   Last Modified: Added tests for make_legends.
 #
+import os
 import numpy
 import pandas
 import pytest
-from tests import TEST_RESOURCES_DIR
+import tempfile
+from pathlib import Path
+
 import qmview.traffic_light as traf
+from config.settings import REPORTS_DIR
+from tests import TEST_RESOURCES_DIR
 
 class TestTrafficLight(object):
 
@@ -19,6 +24,33 @@ class TestTrafficLight(object):
     assert type(qm_df) == pandas.core.frame.DataFrame
     assert qm_df.size == 855
     assert qm_df.shape == (19, 45)
+
+
+  def test_make_legends_rpts(self):
+    traf.make_legends()
+    # os.system(f"ls -lH {REPORTS_DIR} >/tmp/DEBUGRPTS")
+    files = os.listdir(REPORTS_DIR)
+    print(f"FILES={files}")
+    assert files is not None
+    assert len(files) == 2
+    for fyl in files:
+      fpath = os.path.join(REPORTS_DIR, fyl)
+      assert os.path.getsize(fpath) > 0
+
+
+  def test_make_legends(self):
+    with tempfile.TemporaryDirectory() as tmpdir:
+      print(f"type(tmpdir)={type(tmpdir)}")
+      print(f"tmpdir={tmpdir}")
+      traf.make_legends(tmpdir)
+      # os.system(f"ls -lH {tmpdir} >/tmp/DEBUG")
+      files = os.listdir(tmpdir)
+      print(f"FILES={files}")
+      assert files is not None
+      assert len(files) == 2
+      for fyl in files:
+        fpath = os.path.join(tmpdir, fyl)
+        assert os.path.getsize(fpath) > 0
 
 
   def test_normalize_to_zscores(self):
