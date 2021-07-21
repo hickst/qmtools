@@ -1,8 +1,9 @@
 # Tests of the traffic-light table code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/19/2021.
-#   Last Modified: Added tests for make_legends.
+#   Last Modified: Added test for colorize_by_std_deviations.
 #
 import os
+import matplotlib
 import numpy
 import pandas
 import pytest
@@ -16,6 +17,22 @@ from tests import TEST_RESOURCES_DIR
 class TestTrafficLight(object):
 
   gtest_tstfyl  = f"{TEST_RESOURCES_DIR}/gtest.tsv"
+
+
+  def test_colorize_by_std_deviations(self):
+    df = pandas.DataFrame({'aor':[-4.01, -3.01, -2.01, -1.001, -0.01, 0.0, 0.01, 1.01, 2.01, 3.01, 4.01]})
+    styler = traf.colorize_by_std_deviations(df)
+    assert styler is not None
+    assert type(styler) == pandas.io.formats.style.Styler
+    params = styler.export()[0][2]    # get some attributes from styler in a dict
+    assert params is not None
+    assert params['cmap'] is not None
+    assert type(params['cmap']) == matplotlib.colors.LinearSegmentedColormap
+    assert params['vmax'] is not None
+    assert params['vmax'] == 4.0
+    assert params['vmin'] is not None
+    assert params['vmin'] == -4.0
+
 
   def test_load_tsv(self):
     qm_df = traf.load_tsv(self.gtest_tstfyl)
