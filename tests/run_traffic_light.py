@@ -20,11 +20,7 @@ def main (argv=None):
       argv = sys.argv[1:]                 # then fetch the arguments from the system
 
   traf.make_legends()
-
-  qm_df = traf.load_tsv('inputs/gtest.tsv')
-  norm_df = traf.normalize_to_zscores(qm_df)
-  styler = traf.colorize_by_std_deviations(norm_df)
-  traf.write_table_to_html(styler, "table.html")
+  traf.make_traffic_light_table('inputs/gtest.tsv', 'bold')
 
 
 
