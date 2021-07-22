@@ -135,7 +135,7 @@ bids_meta.SequenceName	bids_meta.MagneticFieldStrength	bids_meta.ManufacturersMo
     - anat_hi_good = ['cnr', 'snr_csf', 'snr_gm', 'snr_total', 'snr_wm', 'snrd_csf', 'snrd_gm', 'snrd_total','snrd_wm', 'tpm_overlap_csf', 'tpm_overlap_gm', 'tpm_overlap_wm']
     - anat_low_good = ['cjv', 'rpve_csf', 'rpve_gm', 'rpve_wm', 'fwhm_x', 'fwhm_y', 'fwhm_z', 'inu_med', 'inu_range', 'qi_1', 'qi_2']
     - func_hi_good = ['fber', 'snr', 'tsnr'] 
-    - func_low_good = ['aor', 'aqi', 'dummy_trs, 'dvars_nstd', 'dvars_std', 'dvars_vstd', 'efc', 'fd_mean', 'fd_num', 'fd_perc', 'fwhm_avg', 'gcor', 'gsr_x', 'gsr_y]
+    - func_low_good = ['aor', 'aqi', 'dummy_trs', 'dvars_nstd', 'dvars_std', 'dvars_vstd', 'efc', 'fd_mean', 'fd_num', 'fd_perc', 'fwhm_avg', 'gcor', 'gsr_x', 'gsr_y']
 3. Generate an MRIQC-like report in HTML and/or PDF format: 
   - This should include violin plots for all measures and 
   - a traffic-light table for the user data.
