@@ -20,7 +20,7 @@ def main (argv=None):
       argv = sys.argv[1:]                 # then fetch the arguments from the system
 
   traf.make_legends()
-  traf.make_traffic_light_table('inputs/gtest.tsv', 'bold')
+  traf.make_traffic_light_table('inputs/bold_test.tsv', 'bold')
 
 
 
