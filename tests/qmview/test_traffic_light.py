@@ -1,6 +1,6 @@
 # Tests of the traffic-light table code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/19/2021.
-#   Last Modified: Add tests for pos_neg_split. Add/use modality test files & constants.
+#   Last Modified: Add tests for making HTML table for both modalities. Cleaned reports after tests.
 #
 import os
 import matplotlib
@@ -19,8 +19,8 @@ class TestTrafficLight(object):
   bold_test_fyl  = f"{TEST_RESOURCES_DIR}/bold_test.tsv"
   struct_test_fyl  = f"{TEST_RESOURCES_DIR}/struct_test.tsv"
 
-  html_min_size = 100000        # magic number for HTML report file (# bytes)
-  legend_min_size = 6000        # magic number for legend (# bytes) in a .png file
+  html_min_size = 10000         # min bytes for all HTML report files
+  legend_min_size = 6000        # min bytes for legend in a .png file
   df_cell_count = 855           # size of test zscore dataframe
   df_shape = (19, 45)           # shape of test zscore dataframe
 
@@ -69,9 +69,13 @@ class TestTrafficLight(object):
     for fyl in files:
       fpath = os.path.join(REPORTS_DIR, fyl)
       assert os.path.getsize(fpath) >= self.legend_min_size
+    # remove test output files
+    for fyl in files:
+      fpath = os.path.join(REPORTS_DIR, fyl)
+      os.remove(fpath)
 
 
-  def test_make_legends(self):
+  def test_make_legends_tmp(self):
     with tempfile.TemporaryDirectory() as tmpdir:
       print(f"type(tmpdir)={type(tmpdir)}")
       print(f"tmpdir={tmpdir}")
@@ -84,6 +88,66 @@ class TestTrafficLight(object):
       for fyl in files:
         fpath = os.path.join(tmpdir, fyl)
         assert os.path.getsize(fpath) > self.legend_min_size
+
+
+  def test_make_traffic_light_table_bold_rpts(self):
+    traf.make_traffic_light_table(self.bold_test_fyl, 'bold')
+    # os.system(f"ls -lH {tmpdir} >/tmp/DEBUG")
+    files = os.listdir(REPORTS_DIR)
+    print(f"FILES={files}")
+    assert files is not None
+    assert len(files) == 2
+    for fyl in files:
+      fpath = os.path.join(REPORTS_DIR, fyl)
+      assert os.path.getsize(fpath) > self.html_min_size
+    for fyl in files:
+      fpath = os.path.join(REPORTS_DIR, fyl)
+      os.remove(fpath)
+
+
+  def test_make_traffic_light_table_struct_rpts(self):
+    traf.make_traffic_light_table(self.struct_test_fyl, 't1w')
+    # os.system(f"ls -lH {tmpdir} >/tmp/DEBUG")
+    files = os.listdir(REPORTS_DIR)
+    print(f"FILES={files}")
+    assert files is not None
+    assert len(files) == 2
+    for fyl in files:
+      fpath = os.path.join(REPORTS_DIR, fyl)
+      assert os.path.getsize(fpath) > self.html_min_size
+    for fyl in files:
+      fpath = os.path.join(REPORTS_DIR, fyl)
+      os.remove(fpath)
+
+
+  def test_make_traffic_light_table_bold_tmp(self):
+    with tempfile.TemporaryDirectory() as tmpdir:
+      print(f"type(tmpdir)={type(tmpdir)}")
+      print(f"tmpdir={tmpdir}")
+      traf.make_traffic_light_table(self.bold_test_fyl, 'bold', tmpdir)
+      # os.system(f"ls -lH {tmpdir} >/tmp/DEBUG")
+      files = os.listdir(tmpdir)
+      print(f"FILES={files}")
+      assert files is not None
+      assert len(files) == 2
+      for fyl in files:
+        fpath = os.path.join(tmpdir, fyl)
+        assert os.path.getsize(fpath) > self.html_min_size
+
+
+  def test_make_traffic_light_table_struct_tmp(self):
+    with tempfile.TemporaryDirectory() as tmpdir:
+      print(f"type(tmpdir)={type(tmpdir)}")
+      print(f"tmpdir={tmpdir}")
+      traf.make_traffic_light_table(self.struct_test_fyl, 't1w', tmpdir)
+      # os.system(f"ls -lH {tmpdir} >/tmp/DEBUG")
+      files = os.listdir(tmpdir)
+      print(f"FILES={files}")
+      assert files is not None
+      assert len(files) == 2
+      for fyl in files:
+        fpath = os.path.join(tmpdir, fyl)
+        assert os.path.getsize(fpath) > self.html_min_size
 
 
   def test_normalize_to_zscores(self):
