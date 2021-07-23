@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: To convert an mriqc output file to normalized scores for
 #          representation in a traffic-light table.
-# Last Modified: Split QM table by pos good/bad, separately colorize both tables.
+# Last Modified: Document call to generate HTML table. Remove dummy trs column.
 
 import os
 import numpy as np
@@ -35,7 +35,7 @@ STRUCTURAL_POS_BAD_COLUMNS = [
 # functional columns whose values are better when positive, or negative
 BOLD_POS_GOOD_COLUMNS = ['bids_name', 'fber', 'snr', 'tsnr']
 BOLD_POS_BAD_COLUMNS = [
-  'bids_name', 'aor', 'aqi', 'dummy_trs', 'dvars_nstd', 'dvars_std', 'dvars_vstd',
+  'bids_name', 'aor', 'aqi', 'dvars_nstd', 'dvars_std', 'dvars_vstd',
   'efc', 'fd_mean', 'fd_num', 'fd_perc', 'fwhm_avg', 'gcor', 'gsr_x', 'gsr_y'
 ]
 
@@ -101,6 +101,12 @@ def make_legend_on_axis (ax, cmap):
 
 
 def make_traffic_light_table (tsvfile, modality, dirpath=REPORTS_DIR):
+  """
+  Given a TSV file of QM metrics, generate and save two traffic light HTML
+  tables: one for positive values better and another for negative values better.
+  The modality string specifies which columns will be selected and must be
+  one of: 'T1w', 'T2w', or 'bold'.
+  """
   qm_df = load_tsv(tsvfile)
   (pos_good_df, pos_bad_df) = pos_neg_split(qm_df, modality)
   gen_traffic_light_table(pos_good_df, POS_GOOD_FLAG, f"pos_good_{modality}.html", dirpath)
@@ -123,7 +129,7 @@ def pos_neg_split (qm_df, modality):
   are better and the other where negative values are better.
   Return a tuple of the positive good and positive bad dataframes.
   """
-  if (modality.lower() in ['t1w', 't2w']):
+  if (modality.lower() in ['t1w', 't2w', 't1', 't2']):
     pos_good_df = qm_df[STRUCTURAL_POS_GOOD_COLUMNS]
     pos_bad_df = qm_df[STRUCTURAL_POS_BAD_COLUMNS]
   else:
