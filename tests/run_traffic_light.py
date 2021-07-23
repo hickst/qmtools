@@ -21,6 +21,7 @@ def main (argv=None):
 
   traf.make_legends()
   traf.make_traffic_light_table('inputs/bold_test.tsv', 'bold')
+  traf.make_traffic_light_table('inputs/struct_test.tsv', 'T1w')
 
 
 
