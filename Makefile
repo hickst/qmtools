@@ -19,10 +19,10 @@ TEST=tests
 TSTIMG=qmview:test
 
 
-.PHONY: help bash cleancache cleanrpts docker dockert down exec run runt runt1 runtc runtep stop test up watch
+.PHONY: help bash cleancache cleanrpts docker dockert down exec run runt runt1 runtc runtep stop tests up watch
 
 help:
-	@echo "Make what? Try: bash, cleancache, cleanrpts, docker, dockert, down, run, runt, runt1, runtc, runtep, stop, test, up, watch"
+	@echo "Make what? Try: bash, cleancache, cleanrpts, docker, dockert, down, run, runt, runt1, runtc, runtep, stop, tests, up, watch"
 	@echo '  where:'
 	@echo '     help      - show this help message'
 	@echo '     bash      - run Bash in a ${PROG} container (for development)'
@@ -33,11 +33,11 @@ help:
 	@echo '     exec      - exec into running development server (CLI arg: NAME=containerID)'
 	@echo '     run       - start a container (CLI: ARGS=args)'
 	@echo '     runt      - run the main program in a test container'
-	@echo '     runt1     - run a tests/test-dir in a container (CLI: TEST=testpath)'
+	@echo '     runt1     - run a test or tests in a container (CLI: TEST=testpath)'
 	@echo '     runtc     - run all tests and code coverage in a container'
 	@echo '     runtep    - run a test container with alternate entrypoint (CLI: EP=entrypoint, ARGS=args)'
 	@echo '     stop      - stop a running container'
-	@echo '     test      - run one or all tests in the tests directory (CLI: TEST=single_test_file)'
+	@echo '     tests     - run one or all tests in the tests directory (CLI: TEST=single_test_file)'
 	@echo '     watch     - show logfile for a running container'
 
 bash:
@@ -47,7 +47,7 @@ cleancache:
 	find . -name __pycache__ -print | grep -v .venv | xargs rm -rf
 
 cleanrpts:
-	@rm ${RPTS}/*
+	@rm -f ${RPTS}/*
 
 docker:
 	docker build -t ${IMG} .
@@ -77,7 +77,7 @@ runtc:
 stop:
 	docker stop ${NAME}
 
-test:
+tests:
 	pytest -vv ${TEST} --cov-report term-missing --cov ${SCOPE}
 
 watch:
