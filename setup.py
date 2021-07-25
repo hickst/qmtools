@@ -9,7 +9,7 @@ setup(
     install_requires=[],
     entry_points={
         'console_scripts': [
-            'test_traffic    = test.test_traffic_light:main'
+            'run_traffic  = tests.run_traffic_light:main'
         ]
     },
 )
