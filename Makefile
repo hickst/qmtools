@@ -41,7 +41,7 @@ help:
 	@echo '     watch     - show logfile for a running container'
 
 bash:
-	docker run -it --rm --name ${NAME} -v ${INPUTS}:${CONINPUTS}:ro -v ${RPTS}:/${CONRPTS} --entrypoint ${SHELL} ${TSTIMG} ${ARGS}
+	docker run -it --rm --name ${NAME} -v ${INPUTS}:${CONINPUTS}:ro -v ${RPTS}:${CONRPTS} --entrypoint ${SHELL} ${TSTIMG} ${ARGS}
 
 cleancache:
 	find . -name __pycache__ -print | grep -v .venv | xargs rm -rf
