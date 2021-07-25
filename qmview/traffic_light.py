@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: To convert an mriqc output file to normalized scores for
 #          representation in a traffic-light table.
-# Last Modified: Document call to generate HTML table. Remove dummy trs column.
+# Last Modified: Add/use write_table_to_tsv; add file extensions in writers.
 
 import os
 import numpy as np
@@ -55,6 +55,7 @@ def gen_traffic_light_table (qm_df, iam_pos_good, outfilename, dirpath=REPORTS_D
   as an HTML table, in the named output file.
   """
   norm_df = normalize_to_zscores(qm_df)
+  write_table_to_tsv(norm_df, outfilename, dirpath)
   which_cmap = TURNIP8_COLORMAP if iam_pos_good else TURNIP8_COLORMAP_R
   styler = colorize_by_std_deviations(norm_df, cmap=which_cmap)
   write_table_to_html(styler, outfilename, dirpath)
@@ -109,8 +110,8 @@ def make_traffic_light_table (tsvfile, modality, dirpath=REPORTS_DIR):
   """
   qm_df = load_tsv(tsvfile)
   (pos_good_df, pos_bad_df) = pos_neg_split(qm_df, modality)
-  gen_traffic_light_table(pos_good_df, POS_GOOD_FLAG, f"pos_good_{modality}.html", dirpath)
-  gen_traffic_light_table(pos_bad_df, POS_BAD_FLAG, f"pos_bad_{modality}.html", dirpath)
+  gen_traffic_light_table(pos_good_df, POS_GOOD_FLAG, f"pos_good_{modality}", dirpath)
+  gen_traffic_light_table(pos_bad_df, POS_BAD_FLAG, f"pos_bad_{modality}", dirpath)
 
 
 def normalize_to_zscores (qm_df):
@@ -149,11 +150,20 @@ def write_figure_to_file (fig, filename, dirpath=REPORTS_DIR):
   fig.savefig(filepath, bbox_inches='tight')    # .png is default
 
 
+def write_table_to_tsv (norm_df, filename, dirpath=REPORTS_DIR):
+  """
+  Write the given normalized dataframe into the named TSV file
+  in the optionally specified directory.
+  """
+  filepath = os.path.join(dirpath, f"{filename}.tsv")
+  norm_df.to_csv(filepath, index=False, sep='\t')
+
+
 def write_table_to_html (styler, filename, dirpath=REPORTS_DIR):
   """
   Render the given pandas.io.formats.style.Styler object as
   HTML and write the HTML to the given filepath.
   """
-  filepath = os.path.join(dirpath, filename)
+  filepath = os.path.join(dirpath, f"{filename}.html")
   with open(filepath, "w") as outfyl:
     outfyl.writelines(styler.render())
