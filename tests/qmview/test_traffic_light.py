@@ -36,9 +36,9 @@ class TestTrafficLight(object):
   struct_pos_bad_df_shape = (19, len(traf.STRUCTURAL_POS_BAD_COLUMNS))
 
 
-  def test_colorize_by_std_deviations(self):
+  def test_style_table_by_std_deviations(self):
     df = pandas.DataFrame({'aor':[-4.01, -3.01, -2.01, -1.001, -0.01, 0.0, 0.01, 1.01, 2.01, 3.01, 4.01]})
-    styler = traf.colorize_by_std_deviations(df)
+    styler = traf.style_table_by_std_deviations(df)
     assert styler is not None
     assert type(styler) == pandas.io.formats.style.Styler
     params = styler.export()[0][2]    # get some attributes from styler in a dict
@@ -179,7 +179,7 @@ class TestTrafficLight(object):
       print(f"tmpdir={tmpdir}")
       qm_df = traf.load_tsv(self.bold_test_fyl)
       norm_df = traf.normalize_to_zscores(qm_df)
-      styler = traf.colorize_by_std_deviations(norm_df)
+      styler = traf.style_table_by_std_deviations(norm_df)
       traf.write_table_to_html(styler, "table", dirpath=tmpdir)
       files = os.listdir(tmpdir)
       print(f"FILES={files}")

@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: To convert an mriqc output file to normalized scores for
 #          representation in a traffic-light table.
-# Last Modified: Add/use write_table_to_tsv; add file extensions in writers.
+# Last Modified: Set style properties on generated HTML. Load .pngs directly.
 
 import os
 import numpy as np
@@ -40,15 +40,6 @@ BOLD_POS_BAD_COLUMNS = [
 ]
 
 
-def colorize_by_std_deviations (norm_df, cmap=TURNIP8_COLORMAP):
-  """
-  Set the cell backgrounds of the given z-score normalized dataframe
-  using the given or default colormap.
-  Returns a pandas.io.formats.style.Styler object.
-  """
-  return norm_df.style.background_gradient(cmap=cmap, axis=None, vmin=-4.0, vmax=4.0)
-
-
 def gen_traffic_light_table (qm_df, iam_pos_good, outfilename, dirpath=REPORTS_DIR):
   """
   Normalize to Z-scores, stylize, and write the given QM dataframe
@@ -57,7 +48,7 @@ def gen_traffic_light_table (qm_df, iam_pos_good, outfilename, dirpath=REPORTS_D
   norm_df = normalize_to_zscores(qm_df)
   write_table_to_tsv(norm_df, outfilename, dirpath)
   which_cmap = TURNIP8_COLORMAP if iam_pos_good else TURNIP8_COLORMAP_R
-  styler = colorize_by_std_deviations(norm_df, cmap=which_cmap)
+  styler = style_table_by_std_deviations(norm_df, cmap=which_cmap)
   write_table_to_html(styler, outfilename, dirpath)
 
 
@@ -138,6 +129,24 @@ def pos_neg_split (qm_df, modality):
     pos_bad_df = qm_df[BOLD_POS_BAD_COLUMNS]
 
   return (pos_good_df, pos_bad_df)
+
+
+def style_table_by_std_deviations (norm_df, cmap=TURNIP8_COLORMAP):
+  """
+  Set the cell backgrounds of the given z-score normalized dataframe
+  using the given or default colormap.
+  Returns a pandas.io.formats.style.Styler object.
+  """
+  clean_font = {
+    'selector': 'table, table, th, td',
+    'props': [
+      ('font-family', 'Arial, Helvetica, sans-serif'),
+      ('padding', '4px 6px')
+    ]
+  }
+  styler = norm_df.style.background_gradient(cmap=cmap, axis=None, vmin=-4.0, vmax=4.0)
+  styler.set_table_styles([clean_font], overwrite=False)
+  return styler
 
 
 def write_figure_to_file (fig, filename, dirpath=REPORTS_DIR):
