@@ -1,6 +1,6 @@
 # Tests of the traffic-light table code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/19/2021.
-#   Last Modified: Remove tests to reports dir. Add tests for write_table_to_tsv.
+#   Last Modified: Added tests of validate_modality. Re-sort some methods.
 #
 import os
 import matplotlib
@@ -34,21 +34,6 @@ class TestTrafficLight(object):
   struct_pos_good_df_shape = (19, len(traf.STRUCTURAL_POS_GOOD_COLUMNS))
   struct_pos_bad_df_cell_count = 19 * len(traf.STRUCTURAL_POS_BAD_COLUMNS)
   struct_pos_bad_df_shape = (19, len(traf.STRUCTURAL_POS_BAD_COLUMNS))
-
-
-  def test_style_table_by_std_deviations(self):
-    df = pandas.DataFrame({'aor':[-4.01, -3.01, -2.01, -1.001, -0.01, 0.0, 0.01, 1.01, 2.01, 3.01, 4.01]})
-    styler = traf.style_table_by_std_deviations(df)
-    assert styler is not None
-    assert type(styler) == pandas.io.formats.style.Styler
-    params = styler.export()[0][2]    # get some attributes from styler in a dict
-    assert params is not None
-    assert params['cmap'] is not None
-    assert type(params['cmap']) == matplotlib.colors.LinearSegmentedColormap
-    assert params['vmax'] is not None
-    assert params['vmax'] == 4.0
-    assert params['vmin'] is not None
-    assert params['vmin'] == -4.0
 
 
   def test_load_tsv(self):
@@ -156,6 +141,48 @@ class TestTrafficLight(object):
     assert type(pos_bad_df) == pandas.core.frame.DataFrame
     assert pos_bad_df.size == self.struct_pos_bad_df_cell_count
     assert pos_bad_df.shape == self.struct_pos_bad_df_shape
+
+
+  def test_style_table_by_std_deviations(self):
+    df = pandas.DataFrame({'aor':[-4.01, -3.01, -2.01, -1.001, -0.01, 0.0, 0.01, 1.01, 2.01, 3.01, 4.01]})
+    styler = traf.style_table_by_std_deviations(df)
+    assert styler is not None
+    assert type(styler) == pandas.io.formats.style.Styler
+    params = styler.export()[0][2]    # get some attributes from styler in a dict
+    assert params is not None
+    assert params['cmap'] is not None
+    assert type(params['cmap']) == matplotlib.colors.LinearSegmentedColormap
+    assert params['vmax'] is not None
+    assert params['vmax'] == 4.0
+    assert params['vmin'] is not None
+    assert params['vmin'] == -4.0
+
+
+  def test_validate_modality_good(self):
+    assert traf.validate_modality('bold') == 'bold'
+    assert traf.validate_modality('t1w') == 't1w'
+    assert traf.validate_modality('t2w') == 't2w'
+    assert traf.validate_modality('Bold') == 'bold'
+    assert traf.validate_modality('T1w') == 't1w'
+    assert traf.validate_modality('T2w') == 't2w'
+    assert traf.validate_modality('BOLD') == 'bold'
+    assert traf.validate_modality('T1W') == 't1w'
+    assert traf.validate_modality('T2W') == 't2w'
+    assert traf.validate_modality('BoLd') == 'bold'
+
+
+  def test_validate_modality_fail(self):
+    with pytest.raises(ValueError, match='Modality argument must be one of'):
+      traf.validate_modality('')
+
+    with pytest.raises(ValueError, match='Modality argument must be one of'):
+      traf.validate_modality('BAD argument')
+
+    with pytest.raises(ValueError, match='Modality argument must be one of'):
+      traf.validate_modality('T1')
+
+    with pytest.raises(ValueError, match='Modality argument must be one of'):
+      traf.validate_modality('t1')
 
 
   def test_write_table_to_tsv(self):

@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: To convert an mriqc output file to normalized scores for
 #          representation in a traffic-light table.
-# Last Modified: Set style properties on generated HTML. Load .pngs directly.
+# Last Modified: Add/use validate_modality. Moved make_traffic_light_table to top.
 
 import os
 import numpy as np
@@ -12,6 +12,8 @@ from matplotlib import cm
 from matplotlib import pyplot as plt
 
 from config.settings import REPORTS_DIR
+
+ALLOWED_MODALITIES = ['bold', 't1w', 't2w']
 
 # Constants to "mark" a dataframe as having positive good values or positive bad values
 POS_GOOD_FLAG = True
@@ -38,6 +40,20 @@ BOLD_POS_BAD_COLUMNS = [
   'bids_name', 'aor', 'aqi', 'dvars_nstd', 'dvars_std', 'dvars_vstd',
   'efc', 'fd_mean', 'fd_num', 'fd_perc', 'fwhm_avg', 'gcor', 'gsr_x', 'gsr_y'
 ]
+
+
+def make_traffic_light_table (tsvfile, modality, dirpath=REPORTS_DIR):
+  """
+  Given a TSV file of QM metrics, generate and save two traffic light HTML
+  tables: one for positive values better and another for negative values better.
+  The modality string specifies which columns will be selected and must be
+  one of: 'T1w', 'T2w', or 'bold'.
+  """
+  modality = validate_modality(modality)
+  qm_df = load_tsv(tsvfile)
+  (pos_good_df, pos_bad_df) = pos_neg_split(qm_df, modality)
+  gen_traffic_light_table(pos_good_df, POS_GOOD_FLAG, f"pos_good_{modality}", dirpath)
+  gen_traffic_light_table(pos_bad_df, POS_BAD_FLAG, f"pos_bad_{modality}", dirpath)
 
 
 def gen_traffic_light_table (qm_df, iam_pos_good, outfilename, dirpath=REPORTS_DIR):
@@ -92,19 +108,6 @@ def make_legend_on_axis (ax, cmap):
   ax.set_title(label_title)
 
 
-def make_traffic_light_table (tsvfile, modality, dirpath=REPORTS_DIR):
-  """
-  Given a TSV file of QM metrics, generate and save two traffic light HTML
-  tables: one for positive values better and another for negative values better.
-  The modality string specifies which columns will be selected and must be
-  one of: 'T1w', 'T2w', or 'bold'.
-  """
-  qm_df = load_tsv(tsvfile)
-  (pos_good_df, pos_bad_df) = pos_neg_split(qm_df, modality)
-  gen_traffic_light_table(pos_good_df, POS_GOOD_FLAG, f"pos_good_{modality}", dirpath)
-  gen_traffic_light_table(pos_bad_df, POS_BAD_FLAG, f"pos_bad_{modality}", dirpath)
-
-
 def normalize_to_zscores (qm_df):
   """
   Normalize every non-string column of the given QM dataframe by Z-score.
@@ -147,6 +150,19 @@ def style_table_by_std_deviations (norm_df, cmap=TURNIP8_COLORMAP):
   styler = norm_df.style.background_gradient(cmap=cmap, axis=None, vmin=-4.0, vmax=4.0)
   styler.set_table_styles([clean_font], overwrite=False)
   return styler
+
+
+def validate_modality (modality):
+  """
+   Check the validity of the given modality string which must be one
+   of the elements of the ALLOWED_MODALITIES list.
+   Returns the canonicalized modality string or raises ValueError if
+   given an invalid modality string.
+  """
+  mode = modality.lower()
+  if (mode in ALLOWED_MODALITIES):
+    return mode
+  raise ValueError(f"Modality argument must be one of: {ALLOWED_MODALITIES}")
 
 
 def write_figure_to_file (fig, filename, dirpath=REPORTS_DIR):
