@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to convert an MRIQC output file to normalized scores
 #          for representation in an HTML "traffic-light" report.
-# Last Modified: Redo check_input_file to produce same error for 2 checks.
+# Last Modified: Add/use input file exit code constant.
 
 import argparse
 import sys
@@ -11,6 +11,7 @@ from qmview.traffic_light import ALLOWED_MODALITIES
 from qmview.file_utils import good_file_path
 
 PROG_NAME = 'qmview'
+INPUT_FILE_EXIT_CODE = 10
 
 
 def check_input_file (input_file):
@@ -22,7 +23,7 @@ def check_input_file (input_file):
     errMsg = "({}): ERROR: {} Exiting...".format(PROG_NAME,
       "A readable, MRIQC group output file (.tsv) must be specified.")
     print(errMsg, file=sys.stderr)
-    sys.exit(1)
+    sys.exit(INPUT_FILE_EXIT_CODE)
 
 
 def main (argv=None):
@@ -63,13 +64,8 @@ def main (argv=None):
     help=f"Modality of the MRIQC group output file. Must be one of: {ALLOWED_MODALITIES}"
   )
 
-# actually parse the arguments from the command line
+  # actually parse the arguments from the command line
   args = vars(parser.parse_args(argv))
-
-  # if debugging, set verbose and echo input arguments
-  # if (args.get('debug')):
-  #     args['verbose'] = True         # if debug turn on verbose too
-  #     print("({}.main): ARGS={}".format(PROG_NAME, args), file=sys.stderr)
 
   # check modality for validity: assumes arg parse provides valid value
   modality = traf.validate_modality(args.get('modality'))
@@ -78,6 +74,7 @@ def main (argv=None):
   group_filepath = args.get('group_file')
   check_input_file(group_filepath)   # if check fails exits here does not return!
 
+  # generate the various files for the traffic light report
   try:
     traf.make_legends()
     traf.make_traffic_light_table(group_filepath, modality)
