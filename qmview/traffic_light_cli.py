@@ -1,27 +1,92 @@
+# Author: Tom Hicks and Dianne Patterson.
+# Purpose: CLI program to convert an MRIQC output file to normalized scores
+#          for representation in an HTML "traffic-light" report.
+# Last Modified: Enhance CLI program: arguments, arg checking, and errors.
+
+import argparse
 import sys
 
-from matplotlib import cm
-from matplotlib import pyplot as plt
-
 import qmview.traffic_light as traf
-from qmview.traffic_light import TURNIP8_COLORMAP, TURNIP8_COLORMAP_R
-# from config.settings import REPORTS_DIR
+from qmview.traffic_light import ALLOWED_MODALITIES
+from qmview.file_utils import good_file_path
+
+PROG_NAME = 'qmview'
+
+
+def check_input_file (input_file):
+  """
+  If an input file path is given, check that it is a good path. If not, then exit
+  the entire program here with the specified (or default) system exit code.
+  """
+  if (input_file):                        # if input file given, check it
+    if (not good_file_path(input_file)):
+      errMsg = "({}): ERROR: {} Exiting...".format(PROG_NAME,
+        "A readable, MRIQC group output file (.tsv) must be specified.")
+      print(errMsg, file=sys.stderr)
+      sys.exit(1)
 
 
 def main (argv=None):
   """
-  The main method for the tool. This method is called from the command line,
-  processes the command line arguments and calls into the ImdTk library to do its work.
-  This main method takes no arguments so it can be called by setuptools.
+  The main method for the QMView. This method is called from the command line,
+  processes the command line arguments and calls into the qmview library to do
+  its work.
+  This main method takes no arguments so it can be called by setuptools but
+  the program expects two arguments from the command line:
+    1) path to the MRIQC group output file in TSV format,
+    2) the modality of the input file (one of 'bold', 't1w', or 't2w')
   """
-
   # the main method takes no arguments so it can be called by setuptools
-  if (argv is None):                      # if called by setuptools
-      argv = sys.argv[1:]                 # then fetch the arguments from the system
+  if (argv is None):                   # if called by setuptools
+    argv = sys.argv[1:]                # then fetch the arguments from the system
 
-  traf.make_legends()
-  traf.make_traffic_light_table('inputs/bold_test.tsv', 'bold')
-  traf.make_traffic_light_table('inputs/struct_test.tsv', 'T1w')
+  # setup command line argument parsing and add shared arguments
+  parser = argparse.ArgumentParser(
+    prog=PROG_NAME,
+    formatter_class=argparse.RawTextHelpFormatter,
+    description='Normalize an MRIQC group output file and produce HTML reports.'
+  )
+
+  parser.add_argument(
+    '-v', '--verbose', dest='verbose', action='store_true',
+    default=False,
+    help='Print informational messages during processing [default: False (non-verbose mode)].'
+  )
+
+  parser.add_argument(
+    '-i', '--input-file', dest='group_file', required=True, metavar='filepath',
+    help='Full path to an MRIQC group output file (.tsv) to process.'
+  )
+
+  parser.add_argument(
+    '-m', '--modality', dest='modality', required=True,
+    choices=ALLOWED_MODALITIES,
+    help=f"Modality of the MRIQC group output file. Must be one of: {ALLOWED_MODALITIES}"
+  )
+
+# actually parse the arguments from the command line
+  args = vars(parser.parse_args(argv))
+
+  # if debugging, set verbose and echo input arguments
+  # if (args.get('debug')):
+  #     args['verbose'] = True         # if debug turn on verbose too
+  #     print("({}.main): ARGS={}".format(PROG_NAME, args), file=sys.stderr)
+
+  # check modality for validity: assumes arg parse provides valid value
+  modality = traf.validate_modality(args.get('modality'))
+
+  # if input file path given, check the file path for validity
+  group_filepath = args.get('group_file')
+  check_input_file(group_filepath)     # may exit here and not return!
+
+  try:
+    traf.make_legends()
+    traf.make_traffic_light_table(group_filepath, modality)
+  except Exception as err:
+    errMsg = "({}): ERROR: Processing Error ({}): {}".format(
+      PROG_NAME, err.error_code, err.message)
+    print(errMsg, file=sys.stderr)
+    sys.exit(err.error_code)
 
 
 
