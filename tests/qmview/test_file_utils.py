@@ -1,6 +1,6 @@
 # Tests for the file utilities module.
 #   Written by: Tom Hicks. 5/22/2020.
-#   Last Modified: Port to qmview project.
+#   Last Modified: Canonicalize test file names.
 #
 import os
 from pathlib import Path
@@ -17,8 +17,8 @@ class TestFileUtils(object):
     fylPath = '/tmp/HiGhLy_UnLiKeLy'
     fylLink = '/tmp/linkToHiGhLy_UnLiKeLy'
 
-    empty_tstfyl     = f"{TEST_RESOURCES_DIR}/empty.txt"
-    bold_test_tstfyl = f"{TEST_RESOURCES_DIR}/bold_test.tsv"
+    empty_test_fyl     = f"{TEST_RESOURCES_DIR}/empty.txt"
+    bold_test_fyl = f"{TEST_RESOURCES_DIR}/bold_test.tsv"
 
 
     def test_filename_core(self):
@@ -39,7 +39,7 @@ class TestFileUtils(object):
 
 
     def test_gather_file_info(self):
-        finfo = utils.gather_file_info(self.empty_tstfyl)
+        finfo = utils.gather_file_info(self.empty_test_fyl)
         assert finfo is not None
         assert finfo != {}
         assert len(finfo) == 3
@@ -206,16 +206,16 @@ class TestFileUtils(object):
         testpaths = [ '.', '/', '/NoSuch',
                       self.tmpPath,
                       '/tmp/NoSuch',
-                      self.empty_tstfyl,
-                      self.bold_test_tstfyl,
+                      self.empty_test_fyl,
+                      self.bold_test_fyl,
                       '/images/JADES/NONE.fits',
                       '', None ]
         pathlst = utils.validate_path_strings(testpaths, FILE_EXTENTS)
         print("PATHLIST={}".format(pathlst))
         assert len(pathlst) == 4
         assert self.tmpPath in pathlst
-        assert self.empty_tstfyl in pathlst
-        assert self.bold_test_tstfyl not in pathlst
+        assert self.empty_test_fyl in pathlst
+        assert self.bold_test_fyl not in pathlst
         assert '/images/JADES/NONE.fits' not in pathlst
 
 
@@ -224,14 +224,14 @@ class TestFileUtils(object):
         testpaths = [ '.', '/', '/NoSuch',
                       self.tmpPath,
                       '/tmp/NoSuch',
-                      self.empty_tstfyl,
-                      self.bold_test_tstfyl,
+                      self.empty_test_fyl,
+                      self.bold_test_fyl,
                       '/images/JADES/NONE.fits',
                       '', None ]
         pathlst = utils.validate_path_strings(testpaths, FILE_EXTENTS)
         print("PATHLIST={}".format(pathlst))
         assert len(pathlst) >= 1
         assert self.tmpPath in pathlst
-        assert self.bold_test_tstfyl in pathlst
+        assert self.bold_test_fyl in pathlst
         assert '/images/JADES/NONE.fits' not in pathlst
-        assert self.empty_tstfyl not in pathlst
+        assert self.empty_test_fyl not in pathlst
