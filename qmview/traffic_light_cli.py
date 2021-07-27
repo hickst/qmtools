@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to convert an MRIQC output file to normalized scores
 #          for representation in an HTML "traffic-light" report.
-# Last Modified: Enhance CLI program: arguments, arg checking, and errors.
+# Last Modified: Redo check_input_file to produce same error for 2 checks.
 
 import argparse
 import sys
@@ -18,12 +18,11 @@ def check_input_file (input_file):
   If an input file path is given, check that it is a good path. If not, then exit
   the entire program here with the specified (or default) system exit code.
   """
-  if (input_file):                        # if input file given, check it
-    if (not good_file_path(input_file)):
-      errMsg = "({}): ERROR: {} Exiting...".format(PROG_NAME,
-        "A readable, MRIQC group output file (.tsv) must be specified.")
-      print(errMsg, file=sys.stderr)
-      sys.exit(1)
+  if (input_file is None or (not good_file_path(input_file))):
+    errMsg = "({}): ERROR: {} Exiting...".format(PROG_NAME,
+      "A readable, MRIQC group output file (.tsv) must be specified.")
+    print(errMsg, file=sys.stderr)
+    sys.exit(1)
 
 
 def main (argv=None):
@@ -77,7 +76,7 @@ def main (argv=None):
 
   # if input file path given, check the file path for validity
   group_filepath = args.get('group_file')
-  check_input_file(group_filepath)     # may exit here and not return!
+  check_input_file(group_filepath)   # if check fails exits here does not return!
 
   try:
     traf.make_legends()
