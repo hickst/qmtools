@@ -1,6 +1,6 @@
 # Tests of the traffic-light CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/27/2021.
-#   Last Modified: Add missing argument tests for main method.
+#   Last Modified: Remove unneeded test of readonly dir.
 #
 import os
 import matplotlib
@@ -72,13 +72,6 @@ class TestTrafficLightCLI(object):
       cli.check_reports_dir(self.default_dir)
     except SystemExit as se:
       assert False, "check_input_file unexpectedly exited when given default reports dir"
-
-
-  def test_check_reports_dir_readonly(self):
-    os.mkdir('/tmp/readonly', mode=0o444)
-    with pytest.raises(SystemExit) as se:
-      cli.check_reports_dir('/tmp/readonly')
-    assert se.value.code == cli.REPORTS_DIR_EXIT_CODE
 
 
   def test_main_noargs(self, capsys):
