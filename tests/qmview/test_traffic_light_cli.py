@@ -1,6 +1,6 @@
 # Tests of the traffic-light CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/27/2021.
-#   Last Modified: Added test for successful run of main method.
+#   Last Modified: Added test for verbose processing messages.
 #
 import os
 import matplotlib
@@ -127,3 +127,15 @@ class TestTrafficLightCLI(object):
       assert 2 == len(list(filter(lambda f: str(f).endswith('.html'),files)))
       assert 2 == len(list(filter(lambda f: str(f).endswith('.tsv'),files)))
       assert 2 == len(list(filter(lambda f: str(f).endswith('.png'),files)))
+
+
+  def test_main_verbose(self, capsys):
+    with tempfile.TemporaryDirectory() as tmpdir:
+      print(f"type(tmpdir)={type(tmpdir)}")
+      print(f"tmpdir={tmpdir}")
+      sys.argv = ['qmview', '-v', '-i', self.bold_test_fyl, '-m', 'bold', '-r', tmpdir]
+      cli.main()
+      sysout, syserr = capsys.readouterr()
+      print(f"CAPTURED SYS.ERR:\n{syserr}")
+      assert 'Processing MRIQC group file' in syserr
+      assert 'Produced reports in reports directory' in syserr

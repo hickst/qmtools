@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to convert an MRIQC output file to normalized scores
 #          for representation in an HTML "traffic-light" report.
-# Last Modified: Add/use optional reports directory argument.
+# Last Modified: Added some verbose processing messages.
 
 import argparse
 import sys
@@ -94,22 +94,30 @@ def main (argv=None):
   modality = traf.validate_modality(args.get('modality'))
 
   # if input file path given, check the file path for validity
-  group_filepath = args.get('group_file')
-  check_input_file(group_filepath)   # if check fails exits here does not return!
+  group_file = args.get('group_file')
+  check_input_file(group_file)   # if check fails exits here does not return!
 
   # if reports directory path given, check the path for validity
   reports_dir = args.get('reports_dir', REPORTS_DIR)
   check_reports_dir(reports_dir)     # if check fails exits here does not return!
 
+  if (args.get('verbose')):
+    print(f"({PROG_NAME}): Processing MRIQC group file '{group_file}' with modality '{modality}'.",
+      file=sys.stderr)
+
   # generate the various files for the traffic light report
   try:
     traf.make_legends(reports_dir)
-    traf.make_traffic_light_table(group_filepath, modality, reports_dir)
+    traf.make_traffic_light_table(group_file, modality, reports_dir)
   except Exception as err:
     errMsg = "({}): ERROR: Processing Error ({}): {}".format(
       PROG_NAME, err.error_code, err.message)
     print(errMsg, file=sys.stderr)
     sys.exit(err.error_code)
+
+  if (args.get('verbose')):
+    print(f"({PROG_NAME}): Produced reports in reports directory '{reports_dir}'.",
+      file=sys.stderr)
 
 
 
