@@ -11,6 +11,7 @@ import sys
 import tempfile
 from pathlib import Path
 
+from config.settings import REPORTS_DIR
 import qmview.traffic_light_cli as cli
 from tests import TEST_RESOURCES_DIR
 
@@ -22,6 +23,10 @@ class TestTrafficLightCLI(object):
   struct_test_fyl  = f"{TEST_RESOURCES_DIR}/struct_test.tsv"
   empty_test_fyl   = f"{TEST_RESOURCES_DIR}/empty.txt"
   nosuch_test_fyl = f"{TEST_RESOURCES_DIR}/NO_SUCH.tsv"
+
+  nosuch_dir = f"{TEST_RESOURCES_DIR}/NO_SUCH_DIR"
+  default_dir = REPORTS_DIR
+  tmp_dir = '/tmp'
 
 
   def test_check_input_file_noarg(self):
@@ -48,6 +53,32 @@ class TestTrafficLightCLI(object):
       cli.check_input_file(self.bold_test_fyl)
     except SystemExit as se:
       assert False, "check_input_file unexpectedly exited when given valid bold test file"
+
+
+  def test_check_reports_dir_noarg(self):
+    with pytest.raises(SystemExit) as se:
+      cli.check_reports_dir(None)
+    assert se.value.code == cli.REPORTS_DIR_EXIT_CODE
+
+
+  def test_check_reports_dir_nosuchdir(self):
+    with pytest.raises(SystemExit) as se:
+      cli.check_reports_dir(self.nosuch_dir)
+    assert se.value.code == cli.REPORTS_DIR_EXIT_CODE
+
+
+  def test_check_reports_dir_default(self):
+    try:
+      cli.check_reports_dir(self.default_dir)
+    except SystemExit as se:
+      assert False, "check_input_file unexpectedly exited when given default reports dir"
+
+
+  def test_check_reports_dir_readonly(self):
+    os.mkdir('/tmp/readonly', mode=0o444)
+    with pytest.raises(SystemExit) as se:
+      cli.check_reports_dir('/tmp/readonly')
+    assert se.value.code == cli.REPORTS_DIR_EXIT_CODE
 
 
   def test_main_noargs(self, capsys):
