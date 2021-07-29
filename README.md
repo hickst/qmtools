@@ -51,7 +51,7 @@ Rename provenance_ to provenance.
 The mriqception dataset only preserves these bids_meta fields:
 bids_meta.SequenceName	bids_meta.MagneticFieldStrength	bids_meta.ManufacturersModelName	bids_meta.modality	bids_meta.run_id	bids_meta.task_id	bids_meta.TaskName	bids_meta.Manufacturer	bids_meta.FlipAngle	bids_meta.EchoTime	bids_meta.subject_id	bids_meta.RepetitionTime	provenance.md5sum	provenance.settings.fd_thres	provenance.settings.hmc_fsl	provenance.version	provenance.software	_links.self.title	_links.self.href	bids_meta.session_id	bids_meta.ConversionSoftware	bids_meta.EffectiveEchoSpacing	bids_meta.PhaseEncodingDirection	bids_meta.ScanningSequence	bids_meta.CogAtlasID	bids_meta.SliceEncodingDirection	bids_meta.ParallelReductionFactorInPlane	bids_meta.PulseSequenceType	bids_meta.TotalReadoutTime
 
-# Plans
+# QMFetcher
 1. Query the WebAPI instead of using canned outputs
   - Example of a retrieval URL: https://mriqc.nimh.nih.gov/api/v1/bold?max_results=100&where=bids_meta.MultibandAccelerationFactor%3E2
   - Convert the JSON returned by the WebAPI into a CSV: 
@@ -125,20 +125,10 @@ bids_meta.SequenceName	bids_meta.MagneticFieldStrength	bids_meta.ManufacturersMo
     - TransmitCoilName	string
     - VariableFlipAngleFlag	string
     - TaskName*	string
-2. Include a traffic-light table of the User's input (subjects or images in rows and IQMs in columns)
-  - Coloring per field is red (bad) to green (good): 
-    - See `/Volumes/Main/Working/mriqception_test/iqm_descriptions_and_direction.csv`  
-  - Generate normalized data (see norm_z.py)
-    - See https://plotly.com/python/table/#cell-color-based-on-variable
-  - Display the data in 4 tables using traffic-light coloring for the cells: z-scores from -4 to 4 with 0 at the center and 9 categories:  
-    < -3.5, -3.5 to -2.5, -2.5 to < -1.5, -1.5 to < -0.5, -0.5 to 0.5, >0.5 to 1.5, >1.5 to 2.5, >2.5 to 3.5, >3.5
-    - anat_hi_good = ['cnr', 'snr_csf', 'snr_gm', 'snr_total', 'snr_wm', 'snrd_csf', 'snrd_gm', 'snrd_total','snrd_wm', 'tpm_overlap_csf', 'tpm_overlap_gm', 'tpm_overlap_wm']
-    - anat_low_good = ['cjv', 'rpve_csf', 'rpve_gm', 'rpve_wm', 'fwhm_x', 'fwhm_y', 'fwhm_z', 'inu_med', 'inu_range', 'qi_1', 'qi_2']
-    - func_hi_good = ['fber', 'snr', 'tsnr'] 
-    - func_low_good = ['aor', 'aqi', 'dummy_trs', 'dvars_nstd', 'dvars_std', 'dvars_vstd', 'efc', 'fd_mean', 'fd_num', 'fd_perc', 'fwhm_avg', 'gcor', 'gsr_x', 'gsr_y']
-3. Generate an MRIQC-like report in HTML and/or PDF format: 
-  - This should include violin plots for all measures and 
-  - a traffic-light table for the user data.
-  - Output the z-score normalized tsv file as well.
-  - Output the api dataset used for comparison in tsv format.
-4. Dockerize the project so the user just has to mount the directory with the group*.tsv, and enter some criteria for the comparison dataset.
+2. Desiderada
+   1. Run from Docker
+   2. Query to filter records by field values
+   3. Use parameter file to specify query fields
+      1. Create a TOML config file for the user's query parameters
+      2. Push back development of a DSL till later.
+   4. Save query results to a TSV file for later reuse.
