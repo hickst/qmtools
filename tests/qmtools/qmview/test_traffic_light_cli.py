@@ -1,6 +1,6 @@
 # Tests of the traffic-light CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/27/2021.
-#   Last Modified: Added test for verbose processing messages.
+#   Last Modified: Update for refactoring.
 #
 import os
 import matplotlib
@@ -12,7 +12,7 @@ import tempfile
 from pathlib import Path
 
 from config.settings import REPORTS_DIR
-import qmview.traffic_light_cli as cli
+import qmtools.qmview.traffic_light_cli as cli
 from tests import TEST_RESOURCES_DIR
 
 SYSEXIT_ERROR_CODE = 2                 # seems to be error exit code from argparse
@@ -85,7 +85,7 @@ class TestTrafficLightCLI(object):
 
   def test_main_help(self, capsys):
     with pytest.raises(SystemExit) as se:
-      sys.argv = ['qmview', '-h']
+      sys.argv = ['qmtools', '-h']
       cli.main()
     assert se.value.code == 0          # help is not an error for parseargs
     sysout, syserr = capsys.readouterr()
@@ -95,7 +95,7 @@ class TestTrafficLightCLI(object):
 
   def test_main_no_inputfile(self, capsys):
     with pytest.raises(SystemExit) as se:
-      sys.argv = ['qmview', '-m', 'bold']
+      sys.argv = ['qmtools', '-m', 'bold']
       cli.main()
     assert se.value.code == SYSEXIT_ERROR_CODE
     sysout, syserr = capsys.readouterr()
@@ -105,7 +105,7 @@ class TestTrafficLightCLI(object):
 
   def test_main_no_modality(self, capsys):
     with pytest.raises(SystemExit) as se:
-      sys.argv = ['qmview', '-i', self.bold_test_fyl]
+      sys.argv = ['qmtools', '-i', self.bold_test_fyl]
       cli.main()
     assert se.value.code == SYSEXIT_ERROR_CODE
     sysout, syserr = capsys.readouterr()
@@ -117,7 +117,7 @@ class TestTrafficLightCLI(object):
     with tempfile.TemporaryDirectory() as tmpdir:
       print(f"type(tmpdir)={type(tmpdir)}")
       print(f"tmpdir={tmpdir}")
-      sys.argv = ['qmview', '-i', self.bold_test_fyl, '-m', 'bold', '-r', tmpdir]
+      sys.argv = ['qmtools', '-i', self.bold_test_fyl, '-m', 'bold', '-r', tmpdir]
       cli.main()
       files = os.listdir(tmpdir)
       print(f"FILES={files}")
@@ -133,7 +133,7 @@ class TestTrafficLightCLI(object):
     with tempfile.TemporaryDirectory() as tmpdir:
       print(f"type(tmpdir)={type(tmpdir)}")
       print(f"tmpdir={tmpdir}")
-      sys.argv = ['qmview', '-v', '-i', self.bold_test_fyl, '-m', 'bold', '-r', tmpdir]
+      sys.argv = ['qmtools', '-v', '-i', self.bold_test_fyl, '-m', 'bold', '-r', tmpdir]
       cli.main()
       sysout, syserr = capsys.readouterr()
       print(f"CAPTURED SYS.ERR:\n{syserr}")

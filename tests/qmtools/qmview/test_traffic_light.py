@@ -1,6 +1,6 @@
 # Tests of the traffic-light table code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/19/2021.
-#   Last Modified: Added tests of validate_modality. Re-sort some methods.
+#   Last Modified: Update for refactoring.
 #
 import os
 import matplotlib
@@ -10,7 +10,7 @@ import pytest
 import tempfile
 from pathlib import Path
 
-import qmview.traffic_light as traf
+import qmtools.qmview.traffic_light as traf
 from config.settings import REPORTS_DIR
 from tests import TEST_RESOURCES_DIR
 

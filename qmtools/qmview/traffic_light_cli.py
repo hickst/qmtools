@@ -1,15 +1,15 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to convert an MRIQC output file to normalized scores
 #          for representation in an HTML "traffic-light" report.
-# Last Modified: Added some verbose processing messages.
+# Last Modified: Update for refactoring.
 
 import argparse
 import sys
 
 from config.settings import REPORTS_DIR
-import qmview.traffic_light as traf
-from qmview.traffic_light import ALLOWED_MODALITIES
-from qmview.file_utils import good_file_path, good_dir_path
+import qmtools.qmview.traffic_light as traf
+from qmtools.qmview.traffic_light import ALLOWED_MODALITIES
+from qmtools.file_utils import good_file_path, good_dir_path
 
 PROG_NAME = 'qmview'
 INPUT_FILE_EXIT_CODE = 10

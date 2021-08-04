@@ -5,18 +5,18 @@ RPTS=${TOPLVL}/reports
 TESTDIR=${TOPLVL}/tests
 
 ARGS=
-APP_ROOT=/qmview
+APP_ROOT=/qmtools
 CONINPUTS=${APP_ROOT}/inputs
 CONRPTS=${APP_ROOT}/reports
 ENVLOC=/etc/trhenv
 EP=/bin/bash
-IMG=qmview:devel
-NAME=qmview
-PROG=qmview
+IMG=qmtools:devel
+NAME=qmtools
+PROG=qmtools
 SHELL=/bin/bash
-SCOPE=qmview
+SCOPE=qmtools
 TEST=tests
-TSTIMG=qmview:test
+TSTIMG=qmtools:test
 
 
 .PHONY: help bash cleancache cleanrpts docker dockert down exec run runt runt1 runtc runtep stop tests up watch

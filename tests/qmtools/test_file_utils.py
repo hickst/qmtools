@@ -1,11 +1,11 @@
 # Tests for the file utilities module.
 #   Written by: Tom Hicks. 5/22/2020.
-#   Last Modified: Canonicalize test file names.
+#   Last Modified: Update for refactoring.
 #
 import os
 from pathlib import Path
 
-import qmview.file_utils as utils
+import qmtools.file_utils as utils
 from tests import TEST_RESOURCES_DIR
 
 

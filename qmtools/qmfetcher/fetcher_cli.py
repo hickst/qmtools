@@ -1,16 +1,16 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to query the MRIQC server and download query result records
 #          into a file for further processing
-# Last Modified: Initial skeleton, ported from qmview.
+# Last Modified: Update for refactoring.
 
 import argparse
 import os
 import sys
 
 from config.settings import REPORTS_DIR
-import qmview.traffic_light as traf
-from qmview.traffic_light import ALLOWED_MODALITIES
-from qmview.file_utils import good_file_path, good_dir_path
+import qmtools.qmview.traffic_light as traf
+from qmtools.qmview.traffic_light import ALLOWED_MODALITIES
+from qmtools.file_utils import good_file_path, good_dir_path
 
 PROG_NAME = 'qmfetcher'
 OUTPUT_FILE_EXIT_CODE = 20

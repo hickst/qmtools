@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: To convert an mriqc output file to normalized scores for
 #          representation in a traffic-light table.
-# Last Modified: Add/use validate_modality. Moved make_traffic_light_table to top.
+# Last Modified: Update for refactoring.
 
 import os
 import numpy as np
