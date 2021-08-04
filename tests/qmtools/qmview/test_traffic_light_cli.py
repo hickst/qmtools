@@ -1,6 +1,6 @@
 # Tests of the traffic-light CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/27/2021.
-#   Last Modified: Update for refactoring.
+#   Last Modified: Add test fixture to reset argv between tests.
 #
 import os
 import matplotlib
@@ -16,6 +16,12 @@ import qmtools.qmview.traffic_light_cli as cli
 from tests import TEST_RESOURCES_DIR
 
 SYSEXIT_ERROR_CODE = 2                 # seems to be error exit code from argparse
+
+
+@pytest.fixture
+def clear_argv():
+  sys.argv = []
+
 
 class TestTrafficLightCLI(object):
 
@@ -74,7 +80,7 @@ class TestTrafficLightCLI(object):
       assert False, "check_input_file unexpectedly exited when given default reports dir"
 
 
-  def test_main_noargs(self, capsys):
+  def test_main_noargs(self, capsys, clear_argv):
     with pytest.raises(SystemExit) as se:
       cli.main()
     assert se.value.code == SYSEXIT_ERROR_CODE
@@ -83,7 +89,7 @@ class TestTrafficLightCLI(object):
     assert f"usage: {cli.PROG_NAME}" in syserr
 
 
-  def test_main_help(self, capsys):
+  def test_main_help(self, capsys, clear_argv):
     with pytest.raises(SystemExit) as se:
       sys.argv = ['qmtools', '-h']
       cli.main()
@@ -93,7 +99,7 @@ class TestTrafficLightCLI(object):
     assert f"usage: {cli.PROG_NAME}" in sysout
 
 
-  def test_main_no_inputfile(self, capsys):
+  def test_main_no_inputfile(self, capsys, clear_argv):
     with pytest.raises(SystemExit) as se:
       sys.argv = ['qmtools', '-m', 'bold']
       cli.main()
@@ -103,7 +109,7 @@ class TestTrafficLightCLI(object):
     assert 'the following arguments are required: -i/--input-file' in syserr
 
 
-  def test_main_no_modality(self, capsys):
+  def test_main_no_modality(self, capsys, clear_argv):
     with pytest.raises(SystemExit) as se:
       sys.argv = ['qmtools', '-i', self.bold_test_fyl]
       cli.main()
@@ -113,7 +119,7 @@ class TestTrafficLightCLI(object):
     assert 'the following arguments are required: -m/--modality' in syserr
 
 
-  def test_main(self, capsys):
+  def test_main(self, capsys, clear_argv):
     with tempfile.TemporaryDirectory() as tmpdir:
       print(f"type(tmpdir)={type(tmpdir)}")
       print(f"tmpdir={tmpdir}")
@@ -129,7 +135,7 @@ class TestTrafficLightCLI(object):
       assert 2 == len(list(filter(lambda f: str(f).endswith('.png'),files)))
 
 
-  def test_main_verbose(self, capsys):
+  def test_main_verbose(self, capsys, clear_argv):
     with tempfile.TemporaryDirectory() as tmpdir:
       print(f"type(tmpdir)={type(tmpdir)}")
       print(f"tmpdir={tmpdir}")
