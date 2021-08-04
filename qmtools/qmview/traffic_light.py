@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: To convert an mriqc output file to normalized scores for
 #          representation in a traffic-light table.
-# Last Modified: Update for refactoring.
+# Last Modified: Move allowed modalities constant.
 
 import os
 import numpy as np
@@ -12,8 +12,7 @@ from matplotlib import cm
 from matplotlib import pyplot as plt
 
 from config.settings import REPORTS_DIR
-
-ALLOWED_MODALITIES = ['bold', 't1w', 't2w']
+from qmtools import ALLOWED_MODALITIES
 
 # Constants to "mark" a dataframe as having positive good values or positive bad values
 POS_GOOD_FLAG = True

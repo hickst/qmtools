@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to query the MRIQC server and download query result records
 #          into a file for further processing
-# Last Modified: Update for refactoring.
+# Last Modified: Move allowed modalities constant.
 
 import argparse
 import os
@@ -9,7 +9,7 @@ import sys
 
 from config.settings import REPORTS_DIR
 import qmtools.qmview.traffic_light as traf
-from qmtools.qmview.traffic_light import ALLOWED_MODALITIES
+from qmtools import ALLOWED_MODALITIES
 from qmtools.file_utils import good_file_path, good_dir_path
 
 PROG_NAME = 'qmfetcher'
