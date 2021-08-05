@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: To convert an mriqc output file to normalized scores for
 #          representation in a traffic-light table.
-# Last Modified: Move allowed modalities constant.
+# Last Modified: Refactor shared functions.
 
 import os
 import numpy as np
@@ -13,6 +13,7 @@ from matplotlib import pyplot as plt
 
 from config.settings import REPORTS_DIR
 from qmtools import ALLOWED_MODALITIES
+from qmtools.qm_utils import load_tsv, validate_modality
 
 # Constants to "mark" a dataframe as having positive good values or positive bad values
 POS_GOOD_FLAG = True
@@ -65,11 +66,6 @@ def gen_traffic_light_table (qm_df, iam_pos_good, outfilename, dirpath=REPORTS_D
   which_cmap = TURNIP8_COLORMAP if iam_pos_good else TURNIP8_COLORMAP_R
   styler = style_table_by_std_deviations(norm_df, cmap=which_cmap)
   write_table_to_html(styler, outfilename, dirpath)
-
-
-def load_tsv (tsv_path):
-  "Read the specified TSV file and return a Pandas dataframe from it."
-  return pd.read_csv(tsv_path, sep='\t')
 
 
 def make_legends (dirpath=REPORTS_DIR):
@@ -149,19 +145,6 @@ def style_table_by_std_deviations (norm_df, cmap=TURNIP8_COLORMAP):
   styler = norm_df.style.background_gradient(cmap=cmap, axis=None, vmin=-4.0, vmax=4.0)
   styler.set_table_styles([clean_font], overwrite=False)
   return styler
-
-
-def validate_modality (modality):
-  """
-   Check the validity of the given modality string which must be one
-   of the elements of the ALLOWED_MODALITIES list.
-   Returns the canonicalized modality string or raises ValueError if
-   given an invalid modality string.
-  """
-  mode = modality.lower()
-  if (mode in ALLOWED_MODALITIES):
-    return mode
-  raise ValueError(f"Modality argument must be one of: {ALLOWED_MODALITIES}")
 
 
 def write_figure_to_file (fig, filename, dirpath=REPORTS_DIR):

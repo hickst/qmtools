@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to convert an MRIQC output file to normalized scores
 #          for representation in an HTML "traffic-light" report.
-# Last Modified: Refactor shared constants.
+# Last Modified: Refactor shared functions.
 
 import argparse
 import sys
@@ -10,6 +10,7 @@ from config.settings import REPORTS_DIR
 import qmtools.qmview.traffic_light as traf
 from qmtools import ALLOWED_MODALITIES, INPUT_FILE_EXIT_CODE, REPORTS_DIR_EXIT_CODE
 from qmtools.file_utils import good_file_path, good_dir_path
+from qmtools.qm_utils import validate_modality
 
 PROG_NAME = 'qmview'
 
@@ -89,7 +90,7 @@ def main (argv=None):
   args = vars(parser.parse_args(argv))
 
   # check modality for validity: assumes arg parse provides valid value
-  modality = traf.validate_modality(args.get('modality'))
+  modality = validate_modality(args.get('modality'))
 
   # if input file path given, check the file path for validity
   group_file = args.get('group_file')
