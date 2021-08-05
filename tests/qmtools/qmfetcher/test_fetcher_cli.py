@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/4/2021.
-#   Last Modified: Initial creation.
+#   Last Modified: Update for refactoring shared constants.
 #
 import os
 import matplotlib
@@ -12,6 +12,7 @@ import tempfile
 from pathlib import Path
 
 from config.settings import REPORTS_DIR
+from qmtools import REPORTS_DIR_EXIT_CODE
 import qmtools.qmfetcher.fetcher_cli as cli
 from tests import TEST_RESOURCES_DIR
 
@@ -32,13 +33,13 @@ class TestFetcherCLI(object):
   def test_check_reports_dir_noarg(self):
     with pytest.raises(SystemExit) as se:
       cli.check_reports_dir(None)
-    assert se.value.code == cli.REPORTS_DIR_EXIT_CODE
+    assert se.value.code == REPORTS_DIR_EXIT_CODE
 
 
   def test_check_reports_dir_nosuchdir(self):
     with pytest.raises(SystemExit) as se:
       cli.check_reports_dir(self.nosuch_dir)
-    assert se.value.code == cli.REPORTS_DIR_EXIT_CODE
+    assert se.value.code == REPORTS_DIR_EXIT_CODE
 
 
   def test_check_reports_dir_default(self):

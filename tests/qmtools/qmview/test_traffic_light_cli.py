@@ -1,6 +1,6 @@
 # Tests of the traffic-light CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/27/2021.
-#   Last Modified: Add test fixture to reset argv between tests.
+#   Last Modified: Update for refactoring shared constants.
 #
 import os
 import matplotlib
@@ -12,6 +12,7 @@ import tempfile
 from pathlib import Path
 
 from config.settings import REPORTS_DIR
+from qmtools import INPUT_FILE_EXIT_CODE, REPORTS_DIR_EXIT_CODE
 import qmtools.qmview.traffic_light_cli as cli
 from tests import TEST_RESOURCES_DIR
 
@@ -38,13 +39,13 @@ class TestTrafficLightCLI(object):
   def test_check_input_file_noarg(self):
     with pytest.raises(SystemExit) as se:
       cli.check_input_file(None)
-    assert se.value.code == cli.INPUT_FILE_EXIT_CODE
+    assert se.value.code == INPUT_FILE_EXIT_CODE
 
 
   def test_check_input_file_nosuchfile(self):
     with pytest.raises(SystemExit) as se:
       cli.check_input_file(self.nosuch_test_fyl)
-    assert se.value.code == cli.INPUT_FILE_EXIT_CODE
+    assert se.value.code == INPUT_FILE_EXIT_CODE
 
 
   def test_check_input_file_empty(self):
@@ -64,13 +65,13 @@ class TestTrafficLightCLI(object):
   def test_check_reports_dir_noarg(self):
     with pytest.raises(SystemExit) as se:
       cli.check_reports_dir(None)
-    assert se.value.code == cli.REPORTS_DIR_EXIT_CODE
+    assert se.value.code == REPORTS_DIR_EXIT_CODE
 
 
   def test_check_reports_dir_nosuchdir(self):
     with pytest.raises(SystemExit) as se:
       cli.check_reports_dir(self.nosuch_dir)
-    assert se.value.code == cli.REPORTS_DIR_EXIT_CODE
+    assert se.value.code == REPORTS_DIR_EXIT_CODE
 
 
   def test_check_reports_dir_default(self):
