@@ -1,21 +1,20 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to query the MRIQC server and download query result records
-#          into a file for further processing
-# Last Modified: Move allowed modalities constant.
+#          into a file for further processing.
+# Last Modified: Refactor shared constants and functions. Do skeleton logic.
 
 import argparse
 import os
+import pandas as pd
 import sys
-import requests as req
 
 from config.settings import REPORTS_DIR
-import qmtools.qmview.traffic_light as traf
-from qmtools import ALLOWED_MODALITIES
+import qmtools.qmfetcher.fetcher as fetch
+from qmtools import ALLOWED_MODALITIES, OUTPUT_FILE_EXIT_CODE, REPORTS_DIR_EXIT_CODE
 from qmtools.file_utils import good_file_path, good_dir_path
+from qmtools.qm_utils import validate_modality
 
 PROG_NAME = 'qmfetcher'
-OUTPUT_FILE_EXIT_CODE = 20
-REPORTS_DIR_EXIT_CODE = 11
 
 
 def check_output_file (output_file):
@@ -25,9 +24,9 @@ def check_output_file (output_file):
   """
   output_dir = os.path.dirname(output_file)
   if (output_dir is None or (not good_dir_path(output_dir, writeable=True))):
-    errMsg = "({}): ERROR: {} Exiting...".format(PROG_NAME,
+    err_msg = "({}): ERROR: {} Exiting...".format(PROG_NAME,
       "The directory for the specified output file must be writeable.")
-    print(errMsg, file=sys.stderr)
+    print(err_msg, file=sys.stderr)
     sys.exit(OUTPUT_FILE_EXIT_CODE)
 
 
@@ -103,7 +102,7 @@ def main (argv=None):
   args = vars(parser.parse_args(argv))
 
   # check modality for validity: assumes arg parse provides valid value
-  modality = traf.validate_modality(args.get('modality'))
+  modality = validate_modality(args.get('modality'))
 
   # if output file path given, check the file path for validity
   output_file = args.get('output_file')
@@ -126,14 +125,31 @@ def main (argv=None):
     # while more pages:
     #  read each page into df
     #  drop unwanted columns: df.drop('col2', axis=1, inplace=True)
-    #  ?? drop rows with no md5sum and duplicate rows ??
+    #  ?? drop rows with no md5sum ?? 
+    #  ?? and duplicate rows ??
     #  ?? other data checking/cleaning ??
     #  concatenate df onto master df
     print(f"ARGS={args}")              # REMOVE LATER
     # url_root = 'https://mriqc.nimh.nih.gov/api/v1/{modality}?{query}'
     # url_root = 'https://mriqc.nimh.nih.gov/api/v1/bold?max_results=100'
     # req.get(url_root)
-    
+
+    # list of all records gathered so far
+    all_recs = []
+    page_num = args.get('page_num', 0)
+
+    while True:
+      jitems = fetch.query_for_next_page(page_num)
+      if (not jitems):
+        break
+      else:
+        page_num += 1
+      # clean the most recent batch of records:
+      cleaned = fetch.clean_records(jitems)
+      if (cleaned):
+        all_recs.append(cleaned)
+
+    df = pd.DataFrame(all_recs)
 
   except Exception as err:
     errMsg = "({}): ERROR: Processing Error ({}): {}".format(
