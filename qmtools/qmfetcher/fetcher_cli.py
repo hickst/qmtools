@@ -6,6 +6,7 @@
 import argparse
 import os
 import sys
+import requests as req
 
 from config.settings import REPORTS_DIR
 import qmtools.qmview.traffic_light as traf
@@ -122,7 +123,17 @@ def main (argv=None):
   # query the MRIQC server and output or save the results
   try:
     # TODO: something
+    # while more pages:
+    #  read each page into df
+    #  drop unwanted columns: df.drop('col2', axis=1, inplace=True)
+    #  ?? drop rows with no md5sum and duplicate rows ??
+    #  ?? other data checking/cleaning ??
+    #  concatenate df onto master df
     print(f"ARGS={args}")              # REMOVE LATER
+    # url_root = 'https://mriqc.nimh.nih.gov/api/v1/{modality}?{query}'
+    # url_root = 'https://mriqc.nimh.nih.gov/api/v1/bold?max_results=100'
+    # req.get(url_root)
+    
 
   except Exception as err:
     errMsg = "({}): ERROR: Processing Error ({}): {}".format(
