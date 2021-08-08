@@ -133,4 +133,5 @@ test_data/*
 EXTRAS/
 .vscode/
 inputs/
+notebooks/
 reports/
