@@ -1,6 +1,6 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: Methods to query the MRIQC server and download query result records.
-# Last Modified: Continue developing fetcher logic.
+# Last Modified: Flesh out and test extract_records.
 
 import os
 import pandas as pd
@@ -25,19 +25,19 @@ def build_query (modality, page_num=None, query_params=None):
   return url_str
 
 
-def clean_records (recs):
+def clean_records (json_recs):
   # TODO: IMPLEMENT LATER
-  return recs
+  return json_recs
 
 
 def do_query (query_str):
   # TODO: IMPLEMENT LATER
-  json_str = ''                        # REMOVE LATER
-  return json_str                      # return empty result string
+  json_recs = {"_items": []}           # REMOVE LATER
+  return json_recs                     # return fake empty query result dictionary
 
 
-def extract_records (query_result):
-  return []                            # return empty list of dictionaries
+def extract_records (json_query_result):
+  return json_query_result['_items']
 
 
 def query_for_page (modality, page_num=1, query_params=None):
@@ -51,7 +51,7 @@ def query_for_page (modality, page_num=1, query_params=None):
   """
   validate_modality(modality)          # validates or raises ValueError
   query = build_query(modality, page_num, query_params)
-  query_result = do_query(query)
-  jrecs = extract_records(query_result)
-  cleaned = clean_records(jrecs)
+  json_query_result = do_query(query)
+  json_recs = extract_records(json_query_result)
+  cleaned = clean_records(json_recs)
   return cleaned

@@ -1,7 +1,8 @@
 # Tests of the MRIQC data fetcher library code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/7/2021.
-#   Last Modified: Initial creation.
+#   Last Modified: Test extract records.
 #
+import json
 import os
 import pandas
 import pytest
@@ -18,6 +19,10 @@ from tests import TEST_RESOURCES_DIR
 SYSEXIT_ERROR_CODE = 2                 # seems to be error exit code from argparse
 
 class TestFetcher(object):
+
+  empty_results_fyl = f"{TEST_RESOURCES_DIR}/no_results.json"
+  page1_results_fyl = f"{TEST_RESOURCES_DIR}/reptime1.json"
+  page1_results_cnt = 25
 
   def test_build_query_bad_modality(self):
     with pytest.raises(ValueError) as ve:
@@ -42,6 +47,27 @@ class TestFetcher(object):
     assert qstr == f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=1"
     qstr = fetch.build_query('bold', 999)
     assert qstr == f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=999"
+
+
+  def test_extract_records_empty(self):
+    with open(self.empty_results_fyl) as jfyl:
+      results = json.load(jfyl)
+    print(type(results))
+    print(results)
+    recs = fetch.extract_records(results)
+    assert recs is not None
+    assert recs == []
+
+
+  def test_extract_records_page1(self):
+    with open(self.page1_results_fyl) as jfyl:
+      results = json.load(jfyl)
+    print(type(results))
+    print(results)
+    recs = fetch.extract_records(results)
+    assert recs is not None
+    assert recs != []
+    assert len(recs) == self.page1_results_cnt
 
 
   def test_query_for_page_bad_modality(self):
