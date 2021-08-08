@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/4/2021.
-#   Last Modified: Update for refactoring shared constants.
+#   Last Modified: Fixup test stub for testing main method.
 #
 import os
 import matplotlib
@@ -84,9 +84,9 @@ class TestFetcherCLI(object):
       print(f"tmpdir={tmpdir}")
       sys.argv = ['qmtools', '-m', 'bold', '-r', tmpdir]
       cli.main()
-      files = os.listdir(tmpdir)
-      print(f"FILES={files}")
-      assert files is not None
+      # files = os.listdir(tmpdir)
+      # print(f"FILES={files}")
+      # assert files is not None
       # assert len(files) == 6
       # # count how many files of each type written (expect: 2 html, 2 tsv, 2 png)
       # assert 2 == len(list(filter(lambda f: str(f).endswith('.html'),files)))

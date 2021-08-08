@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to query the MRIQC server and download query result records
 #          into a file for further processing.
-# Last Modified: Refactor shared constants and functions. Do skeleton logic.
+# Last Modified: Simplify main method logic. Fix bad call to query_for_page.
 
 import argparse
 import os
@@ -114,6 +114,10 @@ def main (argv=None):
   check_reports_dir(reports_dir)       # if check fails exits here does not return!
 
   num_recs = args.get('num_recs')      # total number of records to fetch
+  # TODO: validate number of records parameter: use argparse type function
+
+  start_page = args.get('start_page', 1)
+  # TODO: validate starting page number: use argparse type function
 
   if (args.get('verbose')):
     print(f"({PROG_NAME}): Querying MRIQC server with modality '{modality}', for {num_recs} records.",
@@ -136,18 +140,13 @@ def main (argv=None):
 
     # list of all records gathered so far
     all_recs = []
-    page_num = args.get('page_num', 0)
-
     while True:
-      jitems = fetch.query_for_next_page(page_num)
-      if (not jitems):
+      jrecs = fetch.query_for_page(modality, start_page)
+      if (not jrecs):
         break
       else:
-        page_num += 1
-      # clean the most recent batch of records:
-      cleaned = fetch.clean_records(jitems)
-      if (cleaned):
-        all_recs.append(cleaned)
+        start_page += 1
+        all_recs.append(jrecs)
 
     df = pd.DataFrame(all_recs)
 
