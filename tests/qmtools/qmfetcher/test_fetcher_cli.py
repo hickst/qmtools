@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/4/2021.
-#   Last Modified: Fixup test stub for testing main method.
+#   Last Modified: Expanded test coverage.
 #
 import os
 import matplotlib
@@ -12,7 +12,7 @@ import tempfile
 from pathlib import Path
 
 from config.settings import REPORTS_DIR
-from qmtools import REPORTS_DIR_EXIT_CODE
+from qmtools import ALLOWED_MODALITIES, OUTPUT_FILE_EXIT_CODE, REPORTS_DIR_EXIT_CODE
 import qmtools.qmfetcher.fetcher_cli as cli
 from tests import TEST_RESOURCES_DIR
 
@@ -28,6 +28,19 @@ class TestFetcherCLI(object):
   nosuch_dir = f"{TEST_RESOURCES_DIR}/NO_SUCH_DIR"
   default_dir = REPORTS_DIR
   tmp_dir = '/tmp'
+
+
+  def test_check_output_dir_nosuch(self):
+    with pytest.raises(SystemExit) as se:
+      cli.check_output_dir(f"{self.nosuch_dir}/afile")
+    assert se.value.code == OUTPUT_FILE_EXIT_CODE
+
+
+  def test_check_output_dir_good(self):
+    try:
+      cli.check_output_dir(f"{self.tmp_dir}/outfile")
+    except Exception as ex:
+      pytest.fail(f"test_check_output_dir_good: unexpected SystemExit: {repr(ex)}")
 
 
   def test_check_reports_dir_noarg(self):
@@ -94,13 +107,13 @@ class TestFetcherCLI(object):
       # assert 2 == len(list(filter(lambda f: str(f).endswith('.png'),files)))
 
 
-  # def test_main_verbose(self, capsys):
-  #   with tempfile.TemporaryDirectory() as tmpdir:
-  #     print(f"type(tmpdir)={type(tmpdir)}")
-  #     print(f"tmpdir={tmpdir}")
-  #     sys.argv = ['qmtools', '-v', '-i', self.bold_test_fyl, '-m', 'bold', '-r', tmpdir]
-  #     cli.main()
-  #     sysout, syserr = capsys.readouterr()
-  #     print(f"CAPTURED SYS.ERR:\n{syserr}")
-  #     assert 'Processing MRIQC group file' in syserr
-  #     assert 'Produced reports in reports directory' in syserr
+  def test_main_verbose(self, capsys):
+    with tempfile.TemporaryDirectory() as tmpdir:
+      print(f"type(tmpdir)={type(tmpdir)}")
+      print(f"tmpdir={tmpdir}")
+      sys.argv = ['qmtools', '-v', '-m', 'bold', '-o', '/tmp/outfile']
+      cli.main()
+      sysout, syserr = capsys.readouterr()
+      print(f"CAPTURED SYS.ERR:\n{syserr}")
+      assert "Querying MRIQC server with modality 'bold'" in syserr
+      assert "Saved query results to '/tmp/outfile'" in syserr

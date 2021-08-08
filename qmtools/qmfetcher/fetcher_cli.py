@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to query the MRIQC server and download query result records
 #          into a file for further processing.
-# Last Modified: Simplify main method logic. Fix bad call to query_for_page.
+# Last Modified: Better name for check_output_dir function.
 
 import argparse
 import os
@@ -17,9 +17,9 @@ from qmtools.qm_utils import validate_modality
 PROG_NAME = 'qmfetcher'
 
 
-def check_output_file (output_file):
+def check_output_dir (output_file):
   """
-  If an output file path is given, check that it is a good, writeable path. If not,
+  If an output file path is given, check that its directory is writeable. If not,
   then exit the entire program here with the specified (or default) system exit code.
   """
   output_dir = os.path.dirname(output_file)
@@ -107,7 +107,7 @@ def main (argv=None):
   # if output file path given, check the file path for validity
   output_file = args.get('output_file')
   if (output_file):                    # if user provided an output filepath, check it
-    check_output_file(output_file)     # if check fails exits here does not return!
+    check_output_dir(output_file)      # if check fails exits here does not return!
 
   # if reports directory path given, check the path for validity
   reports_dir = args.get('reports_dir', REPORTS_DIR)
@@ -149,6 +149,7 @@ def main (argv=None):
         all_recs.append(jrecs)
 
     df = pd.DataFrame(all_recs)
+    # write out the dataframe as a TSV file
 
   except Exception as err:
     errMsg = "({}): ERROR: Processing Error ({}): {}".format(
