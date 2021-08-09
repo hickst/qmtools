@@ -1,6 +1,6 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: Methods to query the MRIQC server and download query result records.
-# Last Modified: Added server health check.
+# Last Modified: Server health check just returns status code.
 
 import os
 import pandas as pd
@@ -80,5 +80,5 @@ def server_health_check ():
   """
   health_check_url = f"{SERVER_URL}/bold?max_results=1"
   resp = req.get(health_check_url)
-  # status = resp.status_code
-  resp.raise_for_status()
+  # resp.raise_for_status()
+  return resp.status_code

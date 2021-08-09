@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher library code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/7/2021.
-#   Last Modified: Run (but not really test) server health check.
+#   Last Modified: Update server health check to check returned status.
 #
 import json
 import os
@@ -104,6 +104,6 @@ class TestFetcher(object):
 
 
   def test_server_health_check(self):
-    "No test assertion: just calls code which always raises status exception"
-    with pytest.raises(req.RequestException) as re:
-      fetch.server_health_check()
+    "No test assertion: just calls code which always returns status code"
+    status = fetch.server_health_check()
+    assert (status == 200 or status == 503)
