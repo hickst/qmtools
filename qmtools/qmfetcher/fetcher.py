@@ -1,7 +1,8 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: Methods to query the MRIQC server and download query result records.
-# Last Modified: Server health check just returns status code.
+# Last Modified: Implemented do_query.
 
+import json
 import os
 import pandas as pd
 import requests as req
@@ -44,9 +45,16 @@ def clean_records (json_recs):
 
 
 def do_query (query_str):
-  # TODO: IMPLEMENT LATER
-  json_recs = {"_items": []}           # REMOVE LATER
-  return json_recs                     # return fake empty query result dictionary
+  """
+  Query the server with the given query string, return the parsed JSON data
+  if successful, otherwise raise a RequestException.
+  """
+  resp = req.get(query_str)
+  if (resp.status_code == req.codes.ok):
+    json_query_result = json.loads(resp.text)
+    return json_query_result
+  else:
+    resp.raise_for_status()
 
 
 def extract_records (json_query_result):

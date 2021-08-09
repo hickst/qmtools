@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher library code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/7/2021.
-#   Last Modified: Update server health check to check returned status.
+#   Last Modified: Add do_query_bad_url test.
 #
 import json
 import os
@@ -73,6 +73,13 @@ class TestFetcher(object):
         assert rec.get(field) is None
 
 
+  def test_do_query_bad_url(self):
+    bad_url = 'https://mriqc.nimh.nih.gov/badjunk?max_records=1'
+    with pytest.raises(req.RequestException) as re:
+      fetch.do_query(bad_url)
+    print(re)
+
+
   def test_extract_records_empty(self):
     with open(self.empty_results_fyl) as jfyl:
       results = json.load(jfyl)
@@ -99,8 +106,10 @@ class TestFetcher(object):
 
   def test_query_for_page_default(self):
     recs = fetch.query_for_page('bold')
+    print(recs)
     assert recs is not None
-    assert recs == []
+    assert type(recs) == list
+    assert len(recs) == SERVER_PAGE_SIZE
 
 
   def test_server_health_check(self):
