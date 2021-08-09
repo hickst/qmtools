@@ -1,6 +1,6 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: Methods to query the MRIQC server and download query result records.
-# Last Modified: Implemented clean_records. Update some function doc strings.
+# Last Modified: Added server health check.
 
 import os
 import pandas as pd
@@ -71,3 +71,14 @@ def query_for_page (modality, page_num=1, query_params=None):
   json_query_result = do_query(query)
   json_recs = extract_records(json_query_result)
   return clean_records(json_recs)
+
+
+def server_health_check ():
+  """
+  Send a minimal request to the server as a health check.
+  Return True is server responds with HTTP 200, else False.
+  """
+  health_check_url = f"{SERVER_URL}/bold?max_results=1"
+  resp = req.get(health_check_url)
+  # status = resp.status_code
+  resp.raise_for_status()

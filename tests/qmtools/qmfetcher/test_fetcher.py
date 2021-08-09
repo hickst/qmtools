@@ -1,11 +1,12 @@
 # Tests of the MRIQC data fetcher library code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/7/2021.
-#   Last Modified: Add tests for clean_records.
+#   Last Modified: Run (but not really test) server health check.
 #
 import json
 import os
 import pandas
 import pytest
+import requests as req
 import sys
 import tempfile
 from pathlib import Path
@@ -100,3 +101,9 @@ class TestFetcher(object):
     recs = fetch.query_for_page('bold')
     assert recs is not None
     assert recs == []
+
+
+  def test_server_health_check(self):
+    "No test assertion: just calls code which always raises status exception"
+    with pytest.raises(req.RequestException) as re:
+      fetch.server_health_check()

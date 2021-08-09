@@ -1,11 +1,12 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to query the MRIQC server and download query result records
 #          into a file for further processing.
-# Last Modified: Better name for check_output_dir function.
+# Last Modified: Test server health, and exit if not up.
 
 import argparse
 import os
 import pandas as pd
+import requests as req
 import sys
 
 from config.settings import REPORTS_DIR
@@ -122,6 +123,16 @@ def main (argv=None):
   if (args.get('verbose')):
     print(f"({PROG_NAME}): Querying MRIQC server with modality '{modality}', for {num_recs} records.",
       file=sys.stderr)
+
+  # test whether the MRIQC server is up, exit out if not
+  try:
+    fetch.server_health_check()
+  except req.RequestException as re:
+    status = re.response.status_code
+    if (status == 503):
+      errMsg = f"({PROG_NAME}): ERROR: MRIQC WebAPI service currently unavailable ({status})."
+      print(errMsg, file=sys.stderr)
+      sys.exit(status)
 
   # query the MRIQC server and output or save the results
   try:
