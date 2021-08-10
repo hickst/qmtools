@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/4/2021.
-#   Last Modified: Expanded test coverage.
+#   Last Modified: Add tests for check_num_recs.
 #
 import os
 import matplotlib
@@ -28,6 +28,18 @@ class TestFetcherCLI(object):
   nosuch_dir = f"{TEST_RESOURCES_DIR}/NO_SUCH_DIR"
   default_dir = REPORTS_DIR
   tmp_dir = '/tmp'
+
+
+  def test_check_num_recs_zero(self):
+    with pytest.raises(SystemExit) as se:
+      cli.check_num_recs(0)
+    assert se.value.code == cli.NUM_RECS_EXIT_CODE
+
+
+  def test_check_num_recs_negvalue(self):
+    with pytest.raises(SystemExit) as se:
+      cli.check_num_recs(-1)
+    assert se.value.code == cli.NUM_RECS_EXIT_CODE
 
 
   def test_check_output_dir_nosuch(self):

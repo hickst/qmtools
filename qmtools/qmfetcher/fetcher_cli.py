@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to query the MRIQC server and download query result records
 #          into a file for further processing.
-# Last Modified: Test server health, and exit if not up.
+# Last Modified: Validate num_recs param. Comment out development top-level.
 
 import argparse
 import os
@@ -10,12 +10,24 @@ import requests as req
 import sys
 
 from config.settings import REPORTS_DIR
-import qmtools.qmfetcher.fetcher as fetch
 from qmtools import ALLOWED_MODALITIES, OUTPUT_FILE_EXIT_CODE, REPORTS_DIR_EXIT_CODE
 from qmtools.file_utils import good_file_path, good_dir_path
 from qmtools.qm_utils import validate_modality
+from qmtools.qmfetcher.fetcher import SERVER_PAGE_SIZE
+import qmtools.qmfetcher.fetcher as fetch
+
 
 PROG_NAME = 'qmfetcher'
+NUM_RECS_TO_FETCH = SERVER_PAGE_SIZE
+NUM_RECS_EXIT_CODE = 12
+
+
+def check_num_recs (num_recs):
+  if (num_recs < 1):
+    err_msg = "({}): ERROR: {} Exiting...".format(PROG_NAME,
+      "The total number of records to fetch must be 1 or more.")
+    print(err_msg, file=sys.stderr)
+    sys.exit(NUM_RECS_EXIT_CODE)
 
 
 def check_output_dir (output_file):
@@ -54,7 +66,7 @@ def main (argv=None):
   This main method takes no arguments so it can be called by setuptools but
   the program expects two arguments from the command line:
     1) the modality of the output file (one of 'bold', 't1w', or 't2w')
-    2) number of records to fetch (default: 1000)
+    2) number of records to fetch (default: {NUM_RECS_TO_FETCH})
     3) path to the output file (default: standard output)
     4) path to parameter file (default: query_params.toml)
   """
@@ -83,8 +95,8 @@ def main (argv=None):
 
   parser.add_argument(
     '-n', '--num_recs', dest='num_recs',
-    default=1000,
-    help='Number of records to fetch (maximum) from a query [default: 1000]'
+    default=NUM_RECS_TO_FETCH,
+    help='Number of records to fetch (maximum) from a query [default: {NUM_RECS_TO_FETCH}]'
   )
 
   parser.add_argument(
@@ -108,17 +120,15 @@ def main (argv=None):
   # if output file path given, check the file path for validity
   output_file = args.get('output_file')
   if (output_file):                    # if user provided an output filepath, check it
-    check_output_dir(output_file)      # if check fails exits here does not return!
+    check_output_dir(output_file)      # if check fails exits here, does not return!
 
   # if reports directory path given, check the path for validity
-  reports_dir = args.get('reports_dir', REPORTS_DIR)
-  check_reports_dir(reports_dir)       # if check fails exits here does not return!
+  reports_dir = args.get('reports_dir')
+  check_reports_dir(reports_dir)       # if check fails exits here, does not return!
 
+  # if number of records to fetch is specified, check it for validity
   num_recs = args.get('num_recs')      # total number of records to fetch
-  # TODO: validate number of records parameter: use argparse type function
-
-  start_page = args.get('start_page', 1)
-  # TODO: validate starting page number: use argparse type function
+  check_num_recs(num_recs)             # if check fails exits here, does not return!
 
   if (args.get('verbose')):
     print(f"({PROG_NAME}): Querying MRIQC server with modality '{modality}', for {num_recs} records.",
@@ -136,31 +146,27 @@ def main (argv=None):
 
   # query the MRIQC server and output or save the results
   try:
-    # TODO: something
     # while more pages:
-    #  read each page into df
-    #  drop unwanted columns: df.drop('col2', axis=1, inplace=True)
     #  ?? drop rows with no md5sum ?? 
     #  ?? and duplicate rows ??
-    #  ?? other data checking/cleaning ??
     #  concatenate df onto master df
-    print(f"ARGS={args}")              # REMOVE LATER
+
     # url_root = 'https://mriqc.nimh.nih.gov/api/v1/{modality}?{query}'
     # url_root = 'https://mriqc.nimh.nih.gov/api/v1/bold?max_results=100'
-    # req.get(url_root)
 
     # list of all records gathered so far
-    all_recs = []
-    while True:
-      jrecs = fetch.query_for_page(modality, start_page)
-      if (not jrecs):
-        break
-      else:
-        start_page += 1
-        all_recs.append(jrecs)
+    # all_recs = []
+    # while True:
+    #   jrecs = fetch.query_for_page(modality, start_page)
+    #   if (not jrecs):
+    #     break
+    #   else:
+    #     start_page += 1
+    #     all_recs.append(jrecs)
 
-    df = pd.DataFrame(all_recs)
+    # df = pd.DataFrame(all_recs)
     # write out the dataframe as a TSV file
+    print(f"ARGS={args}")              # REMOVE LATER
 
   except Exception as err:
     errMsg = "({}): ERROR: Processing Error ({}): {}".format(
