@@ -1,7 +1,8 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to query the MRIQC server and download query result records
 #          into a file for further processing.
-# Last Modified: Validate num_recs param. Comment out development top-level.
+# Last Modified: Remove output dir argument. Add output filename argument.
+#                Refactor constants. Move some functions to qm_utils.
 
 import argparse
 import os
@@ -9,17 +10,12 @@ import pandas as pd
 import requests as req
 import sys
 
-from config.settings import REPORTS_DIR
-from qmtools import ALLOWED_MODALITIES, OUTPUT_FILE_EXIT_CODE, REPORTS_DIR_EXIT_CODE
-from qmtools.file_utils import good_file_path, good_dir_path
-from qmtools.qm_utils import validate_modality
-from qmtools.qmfetcher.fetcher import SERVER_PAGE_SIZE
+import qmtools.qm_utils as qmu
 import qmtools.qmfetcher.fetcher as fetch
-
+from qmtools import ALLOWED_MODALITIES, FETCHED_DIR, NUM_RECS_EXIT_CODE
+from qmtools.qmfetcher import SERVER_PAGE_SIZE
 
 PROG_NAME = 'qmfetcher'
-NUM_RECS_TO_FETCH = SERVER_PAGE_SIZE
-NUM_RECS_EXIT_CODE = 12
 
 
 def check_num_recs (num_recs):
@@ -30,34 +26,6 @@ def check_num_recs (num_recs):
     sys.exit(NUM_RECS_EXIT_CODE)
 
 
-def check_output_dir (output_file):
-  """
-  If an output file path is given, check that its directory is writeable. If not,
-  then exit the entire program here with the specified (or default) system exit code.
-  """
-  output_dir = os.path.dirname(output_file)
-  if (output_dir is None or (not good_dir_path(output_dir, writeable=True))):
-    err_msg = "({}): ERROR: {} Exiting...".format(PROG_NAME,
-      "The directory for the specified output file must be writeable.")
-    print(err_msg, file=sys.stderr)
-    sys.exit(OUTPUT_FILE_EXIT_CODE)
-
-
-def check_reports_dir (reports_dir):
-  """
-  Check that the given output directory path is a valid path. If not, then exit
-  the entire program here with the specified (or default) system exit code.
-  """
-  if (reports_dir is None or (not good_dir_path(reports_dir, writeable=True))):
-    helpMsg =  """
-      Unless there is a writeable subdirectory called 'reports',
-      a path to a writeable reports output directory must be specified.")
-      """
-    errMsg = "({}): ERROR: {} Exiting...".format(PROG_NAME, helpMsg)
-    print(errMsg, file=sys.stderr)
-    sys.exit(REPORTS_DIR_EXIT_CODE)
-
-
 def main (argv=None):
   """
   The main method for the QMView. This method is called from the command line,
@@ -66,8 +34,8 @@ def main (argv=None):
   This main method takes no arguments so it can be called by setuptools but
   the program expects two arguments from the command line:
     1) the modality of the output file (one of 'bold', 't1w', or 't2w')
-    2) number of records to fetch (default: {NUM_RECS_TO_FETCH})
-    3) path to the output file (default: standard output)
+    2) optional number of records to fetch (default: {SERVER_PAGE_SIZE})
+    3) optional output filename (default: NONE (one will be generated))
     4) path to parameter file (default: query_params.toml)
   """
   # the main method takes no arguments so it can be called by setuptools
@@ -94,41 +62,36 @@ def main (argv=None):
   )
 
   parser.add_argument(
-    '-n', '--num_recs', dest='num_recs',
-    default=NUM_RECS_TO_FETCH,
-    help='Number of records to fetch (maximum) from a query [default: {NUM_RECS_TO_FETCH}]'
+    '-n', '--num-recs', dest='num_recs',
+    default=SERVER_PAGE_SIZE,
+    help='Number of records to fetch (maximum) from a query [default: {SERVER_PAGE_SIZE}]'
   )
 
   parser.add_argument(
-    '-o', '--output-file', dest='output_file', metavar='filepath',
+    '-o', '--output-filename', dest='output_filename', metavar='filename',
     default=argparse.SUPPRESS,
-    help='Path to a writeable file in which to store query results [default: (standard output)].'
+    help='Optional name of file to hold query results in fetched directory [default: none].'
   )
 
-  parser.add_argument(
-    '-r', '--report-dir', dest='reports_dir', metavar='dirpath',
-    default=REPORTS_DIR,
-    help=f"Path to a writeable directory for reports files [default: {REPORTS_DIR}]"
-  )
+  # TODO: Add/check query parameter file argument.
 
   # actually parse the arguments from the command line
   args = vars(parser.parse_args(argv))
 
   # check modality for validity: assumes arg parse provides valid value
-  modality = validate_modality(args.get('modality'))
+  modality = qmu.validate_modality(args.get('modality'))
 
-  # if output file path given, check the file path for validity
-  output_file = args.get('output_file')
-  if (output_file):                    # if user provided an output filepath, check it
-    check_output_dir(output_file)      # if check fails exits here, does not return!
-
-  # if reports directory path given, check the path for validity
-  reports_dir = args.get('reports_dir')
-  check_reports_dir(reports_dir)       # if check fails exits here, does not return!
+  # check if the fetched directory exists and is writeable or try to create it
+  qmu.ensure_fetched_dir(PROG_NAME)
 
   # if number of records to fetch is specified, check it for validity
   num_recs = args.get('num_recs')      # total number of records to fetch
   check_num_recs(num_recs)             # if check fails exits here, does not return!
+
+  # if output file path given, check the file path for validity
+  output_filename = args.get('output_filename')
+  if (not output_filename):            # if none provided, generate an output filename
+    output_filename = qmu.gen_output_filename(modality)
 
   if (args.get('verbose')):
     print(f"({PROG_NAME}): Querying MRIQC server with modality '{modality}', for {num_recs} records.",
@@ -175,9 +138,8 @@ def main (argv=None):
     sys.exit(err.error_code)
 
   if (args.get('verbose')):
-    if (output_file is not None):
-      print(f"({PROG_NAME}): Saved query results to '{output_file}'.",
-        file=sys.stderr)
+    if (output_filename is not None):
+      print(f"({PROG_NAME}): Saved query results to '{output_filename}'.", file=sys.stderr)
 
 
 
