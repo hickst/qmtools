@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: To convert an mriqc output file to normalized scores for
 #          representation in a traffic-light table.
-# Last Modified: Refactor shared functions.
+# Last Modified: Update for refactored constants.
 
 import os
 import numpy as np
@@ -11,8 +11,7 @@ import scipy.stats as stats
 from matplotlib import cm
 from matplotlib import pyplot as plt
 
-from config.settings import REPORTS_DIR
-from qmtools import ALLOWED_MODALITIES
+from qmtools import ALLOWED_MODALITIES, REPORTS_DIR
 from qmtools.qm_utils import load_tsv, validate_modality
 
 # Constants to "mark" a dataframe as having positive good values or positive bad values

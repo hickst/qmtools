@@ -1,6 +1,6 @@
 # Tests of the traffic-light table code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/19/2021.
-#   Last Modified: Update for refactoring of shared functions.
+#   Last Modified: Update for refactored constants.
 #
 import os
 import matplotlib
@@ -10,10 +10,10 @@ import pytest
 import tempfile
 from pathlib import Path
 
-import qmtools.qmview.traffic_light as traf
+from qmtools import REPORTS_DIR
 from qmtools.qm_utils import load_tsv
-from config.settings import REPORTS_DIR
 from tests import TEST_RESOURCES_DIR
+import qmtools.qmview.traffic_light as traf
 
 class TestTrafficLight(object):
 
