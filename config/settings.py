@@ -10,6 +10,3 @@ LOG_LEVEL = 'INFO'  # CRITICAL / ERROR / WARNING / INFO / DEBUG
 
 # Name of this program: used programmatically so keeping it lower case.
 PROGRAM_NAME = 'qmtools'
-
-# Path to the default output reports directory.
-REPORTS_DIR = 'reports'
