@@ -1,7 +1,6 @@
 # Tests of the MRIQC data fetcher CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/4/2021.
-#   Last Modified: Update for refactored constants. Comment out main tests.
-#                  Remove tests of reports directory.
+#   Last Modified: Get test_main_verbose working again.
 #
 import os
 import matplotlib
@@ -12,7 +11,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-from qmtools import ALLOWED_MODALITIES, OUTPUT_FILE_EXIT_CODE, NUM_RECS_EXIT_CODE
+from qmtools import ALLOWED_MODALITIES, FETCHED_DIR, NUM_RECS_EXIT_CODE
 import qmtools.qmfetcher.fetcher_cli as cli
 from tests import TEST_RESOURCES_DIR
 
@@ -70,13 +69,13 @@ class TestFetcherCLI(object):
     assert 'the following arguments are required: -m/--modality' in syserr
 
 
-  # def test_main_verbose(self, capsys):
-  #   with tempfile.TemporaryDirectory() as tmpdir:
-  #     print(f"type(tmpdir)={type(tmpdir)}")
-  #     print(f"tmpdir={tmpdir}")
-  #     sys.argv = ['qmtools', '-v', '-m', 'bold', '-o', '/tmp/outfile']
-  #     cli.main()
-  #     sysout, syserr = capsys.readouterr()
-  #     print(f"CAPTURED SYS.ERR:\n{syserr}")
-  #     assert "Querying MRIQC server with modality 'bold'" in syserr
-  #     assert "Saved query results to '/tmp/outfile'" in syserr
+  def test_main_verbose(self, capsys):
+    with tempfile.TemporaryDirectory() as tmpdir:
+      os.chdir(tmpdir)
+      print(f"tmpdir={tmpdir}")
+      sys.argv = ['qmtools', '-v', '-m', 'bold']
+      cli.main()
+      sysout, syserr = capsys.readouterr()
+      print(f"CAPTURED SYS.ERR:\n{syserr}")
+      assert "Querying MRIQC server with modality 'bold'" in syserr
+      assert f"Saved query results to '{FETCHED_DIR}/bold_" in syserr
