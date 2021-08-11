@@ -1,8 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to query the MRIQC server and download query result records
 #          into a file for further processing.
-# Last Modified: Remove output dir argument. Add output filename argument.
-#                Refactor constants. Move some functions to qm_utils.
+# Last Modified: Update output file path verbose message.
 
 import argparse
 import os
@@ -139,7 +138,7 @@ def main (argv=None):
 
   if (args.get('verbose')):
     if (output_filename is not None):
-      print(f"({PROG_NAME}): Saved query results to '{output_filename}'.", file=sys.stderr)
+      print(f"({PROG_NAME}): Saved query results to '{FETCHED_DIR}/{output_filename}'.", file=sys.stderr)
 
 
 
