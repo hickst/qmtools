@@ -1,6 +1,6 @@
 # Tests of the traffic-light CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/27/2021.
-#   Last Modified: Update for refactoring shared constants.
+#   Last Modified: Update for fixed reports directory.
 #
 import os
 import matplotlib
@@ -11,8 +11,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-from config.settings import REPORTS_DIR
-from qmtools import INPUT_FILE_EXIT_CODE, REPORTS_DIR_EXIT_CODE
+from qmtools import INPUT_FILE_EXIT_CODE, REPORTS_DIR_EXIT_CODE, REPORTS_DIR
 import qmtools.qmview.traffic_light_cli as cli
 from tests import TEST_RESOURCES_DIR
 
@@ -122,11 +121,11 @@ class TestTrafficLightCLI(object):
 
   def test_main(self, capsys, clear_argv):
     with tempfile.TemporaryDirectory() as tmpdir:
-      print(f"type(tmpdir)={type(tmpdir)}")
+      os.chdir(tmpdir)
       print(f"tmpdir={tmpdir}")
-      sys.argv = ['qmtools', '-i', self.bold_test_fyl, '-m', 'bold', '-r', tmpdir]
+      sys.argv = ['qmtools', '-i', self.bold_test_fyl, '-m', 'bold']
       cli.main()
-      files = os.listdir(tmpdir)
+      files = os.listdir(os.path.join(tmpdir, REPORTS_DIR))
       print(f"FILES={files}")
       assert files is not None
       assert len(files) == 6
@@ -138,9 +137,9 @@ class TestTrafficLightCLI(object):
 
   def test_main_verbose(self, capsys, clear_argv):
     with tempfile.TemporaryDirectory() as tmpdir:
-      print(f"type(tmpdir)={type(tmpdir)}")
+      os.chdir(tmpdir)
       print(f"tmpdir={tmpdir}")
-      sys.argv = ['qmtools', '-v', '-i', self.bold_test_fyl, '-m', 'bold', '-r', tmpdir]
+      sys.argv = ['qmtools', '-v', '-i', self.bold_test_fyl, '-m', 'bold']
       cli.main()
       sysout, syserr = capsys.readouterr()
       print(f"CAPTURED SYS.ERR:\n{syserr}")

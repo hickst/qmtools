@@ -1,16 +1,16 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to convert an MRIQC output file to normalized scores
 #          for representation in an HTML "traffic-light" report.
-# Last Modified: Refactor shared functions.
+# Last Modified: Update for fixed reports directory.
 
 import argparse
 import sys
 
-from config.settings import REPORTS_DIR
-import qmtools.qmview.traffic_light as traf
-from qmtools import ALLOWED_MODALITIES, INPUT_FILE_EXIT_CODE, REPORTS_DIR_EXIT_CODE
+from qmtools import ALLOWED_MODALITIES, INPUT_FILE_EXIT_CODE
+from qmtools import REPORTS_DIR, REPORTS_DIR_EXIT_CODE
 from qmtools.file_utils import good_file_path, good_dir_path
-from qmtools.qm_utils import validate_modality
+from qmtools.qm_utils import ensure_reports_dir, validate_modality
+import qmtools.qmview.traffic_light as traf
 
 PROG_NAME = 'qmview'
 
@@ -80,12 +80,6 @@ def main (argv=None):
     help=f"Modality of the MRIQC group output file. Must be one of: {ALLOWED_MODALITIES}"
   )
 
-  parser.add_argument(
-    '-r', '--report-dir', dest='reports_dir', metavar='dirpath',
-    default=REPORTS_DIR,
-    help=f"Path to a writeable directory for reports files [default: {REPORTS_DIR}]"
-  )
-
   # actually parse the arguments from the command line
   args = vars(parser.parse_args(argv))
 
@@ -96,9 +90,8 @@ def main (argv=None):
   group_file = args.get('group_file')
   check_input_file(group_file)   # if check fails exits here does not return!
 
-  # if reports directory path given, check the path for validity
-  reports_dir = args.get('reports_dir', REPORTS_DIR)
-  check_reports_dir(reports_dir)     # if check fails exits here does not return!
+  # check if the reports directory exists and is writeable or try to create it
+  ensure_reports_dir(PROG_NAME)  # may exit here if unable to create dir
 
   if (args.get('verbose')):
     print(f"({PROG_NAME}): Processing MRIQC group file '{group_file}' with modality '{modality}'.",
@@ -106,8 +99,8 @@ def main (argv=None):
 
   # generate the various files for the traffic light report
   try:
-    traf.make_legends(reports_dir)
-    traf.make_traffic_light_table(group_file, modality, reports_dir)
+    traf.make_legends()
+    traf.make_traffic_light_table(group_file, modality)
   except Exception as err:
     errMsg = "({}): ERROR: Processing Error ({}): {}".format(
       PROG_NAME, err.error_code, err.message)
@@ -115,7 +108,7 @@ def main (argv=None):
     sys.exit(err.error_code)
 
   if (args.get('verbose')):
-    print(f"({PROG_NAME}): Produced reports in reports directory '{reports_dir}'.",
+    print(f"({PROG_NAME}): Produced reports in reports directory '{REPORTS_DIR}'.",
       file=sys.stderr)
 
 
