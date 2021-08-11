@@ -26,7 +26,7 @@ def build_query (modality, page_num=None, query_params=None):
     if (page_num is not None):
       url_str = f"{url_str}&page={page_num}"
     if (query_params is not None):
-      # add the various query parameters
+      # TODO: add the various query parameters
       pass
   return url_str
 
