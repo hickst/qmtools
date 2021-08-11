@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to convert an MRIQC output file to normalized scores
 #          for representation in an HTML "traffic-light" report.
-# Last Modified: Update for fixed reports directory.
+# Last Modified: Update for fixed reports directory (really, this time).
 
 import argparse
 import sys
@@ -25,21 +25,6 @@ def check_input_file (input_file):
       "A readable, MRIQC group output file (.tsv) must be specified.")
     print(errMsg, file=sys.stderr)
     sys.exit(INPUT_FILE_EXIT_CODE)
-
-
-def check_reports_dir (reports_dir):
-  """
-  Check that the given output directory path is a valid path. If not, then exit
-  the entire program here with the specified (or default) system exit code.
-  """
-  if (reports_dir is None or (not good_dir_path(reports_dir, writeable=True))):
-    helpMsg =  """
-      Unless there is a writeable subdirectory called 'reports',
-      a path to a writeable reports output directory must be specified.")
-      """
-    errMsg = "({}): ERROR: {} Exiting...".format(PROG_NAME, helpMsg)
-    print(errMsg, file=sys.stderr)
-    sys.exit(REPORTS_DIR_EXIT_CODE)
 
 
 def main (argv=None):

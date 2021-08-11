@@ -1,6 +1,6 @@
 # Tests of the traffic-light CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/27/2021.
-#   Last Modified: Update for fixed reports directory.
+#   Last Modified: Update for fixed reports directory (again).
 #
 import os
 import matplotlib
@@ -59,25 +59,6 @@ class TestTrafficLightCLI(object):
       cli.check_input_file(self.bold_test_fyl)
     except SystemExit as se:
       assert False, "check_input_file unexpectedly exited when given valid bold test file"
-
-
-  def test_check_reports_dir_noarg(self):
-    with pytest.raises(SystemExit) as se:
-      cli.check_reports_dir(None)
-    assert se.value.code == REPORTS_DIR_EXIT_CODE
-
-
-  def test_check_reports_dir_nosuchdir(self):
-    with pytest.raises(SystemExit) as se:
-      cli.check_reports_dir(self.nosuch_dir)
-    assert se.value.code == REPORTS_DIR_EXIT_CODE
-
-
-  def test_check_reports_dir_default(self):
-    try:
-      cli.check_reports_dir(self.default_dir)
-    except SystemExit as se:
-      assert False, "check_input_file unexpectedly exited when given default reports dir"
 
 
   def test_main_noargs(self, capsys, clear_argv):
