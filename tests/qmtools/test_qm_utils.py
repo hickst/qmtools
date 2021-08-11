@@ -1,6 +1,6 @@
 # Tests of Shared utilities for the QMTools programs.
 #   Written by: Tom Hicks and Dianne Patterson. 8/5/2021.
-#   Last Modified: Added tests for gen_output_filename, ensure_fetched_dir.
+#   Last Modified: Added tests for ensure_reports_dir.
 #
 import os
 import pandas
@@ -8,7 +8,7 @@ import pytest
 import tempfile
 
 from tests import TEST_RESOURCES_DIR
-from qmtools import FETCHED_DIR, FETCHED_DIR_EXIT_CODE
+from qmtools import FETCHED_DIR, FETCHED_DIR_EXIT_CODE, REPORTS_DIR, REPORTS_DIR_EXIT_CODE
 import qmtools.qm_utils as qmu
 
 
@@ -35,6 +35,26 @@ class TestQMUtils(object):
         assert not os.path.isdir(FETCHED_DIR)
         qmu.ensure_fetched_dir('TestQMUtils')
       assert se.value.code == FETCHED_DIR_EXIT_CODE
+    else:
+      assert True
+
+
+  def test_ensure_reports_dir(self):
+    with tempfile.TemporaryDirectory() as tmpdir:
+      os.chdir(tmpdir)
+      assert not os.path.isdir(REPORTS_DIR)
+      qmu.ensure_reports_dir('TestQMUtils')
+      assert os.path.isdir(REPORTS_DIR)
+      assert os.access(REPORTS_DIR, os.W_OK)
+
+
+  def test_ensure_reports_dir_fail(self):
+    if (os.environ.get('RUNNING_IN_CONTAINER') is None):
+      with pytest.raises(SystemExit) as se:
+        os.chdir('/')
+        assert not os.path.isdir(REPORTS_DIR)
+        qmu.ensure_reports_dir('TestQMUtils')
+      assert se.value.code == REPORTS_DIR_EXIT_CODE
     else:
       assert True
 
