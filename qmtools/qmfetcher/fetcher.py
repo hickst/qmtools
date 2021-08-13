@@ -1,6 +1,6 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: Methods to query the MRIQC server and download query result records.
-# Last Modified: Implemented do_query.
+# Last Modified: Added logic to flatten records. Add default fields to remove.
 
 import json
 import os
@@ -12,7 +12,8 @@ from qmtools.qmfetcher import DEFAULT_RESULTS_SIZE, SERVER_PAGE_SIZE
 from qmtools.qm_utils import validate_modality
 
 SERVER_URL = "https://mriqc.nimh.nih.gov/api/v1"
-FIELDS_TO_REMOVE = ['_etag', '_links']
+DEFAULT_FIELDS_TO_REMOVE = ['_etag', 'bids_meta.Instructions',
+                            '_links.self.title', '_links.self.href']
 
 
 def build_query (modality, page_num=None, query_params=None):
@@ -31,16 +32,18 @@ def build_query (modality, page_num=None, query_params=None):
   return url_str
 
 
-def clean_records (json_recs):
+def clean_records (json_recs, fields_to_remove=DEFAULT_FIELDS_TO_REMOVE):
   """
   Remove unwanted fields from each record (dictionary) in the given list and
-  returned the list of cleaned records.
+  return the list of cleaned records.
   Arguments:
     json_recs: a list of records, each one representing metrics for a single image.
+    fields_to_remove: a list of field names to remove when cleaning records.
   """
   for rec in json_recs:
-    for field in FIELDS_TO_REMOVE:
-      rec.pop(field)
+    for field in fields_to_remove:
+      if (field in rec):
+        rec.pop(field)
   return json_recs
 
 
@@ -65,20 +68,53 @@ def extract_records (json_query_result):
   return json_query_result['_items']
 
 
-def query_for_page (modality, page_num=1, query_params=None):
+def flatten_a_record (rec, prefix='', sep='.'):
+  """
+  Flatten the given record (dictionary) into a list of key/value tuples and
+  return the tuple list.
+  Arguments:
+    rec: the dictionary to be flattened.
+    prefix: the prefix key "path" at this level of flattening. If provided, must
+            already include the separator as a suffix.
+    sep: the string to use to separate the levels in the prefix key "path".
+  """
+  entries = []
+  for key, val in rec.items():
+    if (isinstance(val, dict)):
+      new_prefix = f"{prefix}{key}{sep}"
+      entries.extend(flatten_a_record(val, prefix=new_prefix, sep=sep))
+    else:
+      top_key = f"{prefix}{key}"
+      entries.append((top_key, val))
+  return entries
+
+
+def flatten_records (json_recs):
+  """
+  Given a list of records (dictionaries), return a list of flattened dictionaries.
+  Arguments:
+    json_recs: a list of records (dictionaries), each one representing metrics for a single image.
+  """
+  return [dict(flatten_a_record(rec)) for rec in json_recs]
+
+
+def query_for_page (modality, page_num=1, query_params=None,
+                    fields_to_remove=DEFAULT_FIELDS_TO_REMOVE):
   """
   Query for the first (or numbered) page of results from
   the MRIQC server, and clean and return the result records.
   Arguments:
-    modality: the modality to query on (must be one of {ALLOWED_MODALITIES})
-    page_num: page number (one offset) for the page to fetch (default: 1)
-    query_params: dictionary of additional query parameters (default: None)
+    modality: the modality to query on (must be one of {ALLOWED_MODALITIES}).
+    page_num: page number (one offset) for the page to fetch (default: 1).
+    query_params: dictionary of additional query parameters (default: None).
+    fields_to_remove: a list of field names to remove when cleaning records.
   """
   validate_modality(modality)          # validates or raises ValueError
   query = build_query(modality, page_num, query_params)
   json_query_result = do_query(query)
   json_recs = extract_records(json_query_result)
-  return clean_records(json_recs)
+  flat_recs = flatten_records(json_recs)
+  return clean_records(flat_recs, fields_to_remove)
 
 
 def server_health_check ():
