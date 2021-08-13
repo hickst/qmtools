@@ -8,7 +8,7 @@ ENV RUNNING_IN_CONTAINER True
 ENV INSTALL_PATH /qmtools
 
 # create mount points inside container
-RUN mkdir -p $INSTALL_PATH $INSTALL_PATH/scripts /data
+RUN mkdir -p $INSTALL_PATH
 
 WORKDIR $INSTALL_PATH
 
