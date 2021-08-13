@@ -1,6 +1,6 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: Methods to query the MRIQC server and download query result records.
-# Last Modified: Added logic to flatten records. Add default fields to remove.
+# Last Modified: Fetch latest records by default. Check page_num or correct.
 
 import json
 import os
@@ -16,19 +16,24 @@ DEFAULT_FIELDS_TO_REMOVE = ['_etag', 'bids_meta.Instructions',
                             '_links.self.title', '_links.self.href']
 
 
-def build_query (modality, page_num=None, query_params=None):
+def build_query (modality, page_num=1, query_params=None, latest=True):
   """
   Construct and return a query string given the modality, starting page number,
   and optional dictionary of query parameter keys and values.
   """
   validate_modality(modality)          # validates or raises ValueError
-  url_str = f"{SERVER_URL}/{modality}?max_results={SERVER_PAGE_SIZE}"
-  if (page_num is not None or query_params is not None):
-    if (page_num is not None):
-      url_str = f"{url_str}&page={page_num}"
-    if (query_params is not None):
-      # TODO: add the various query parameters
-      pass
+
+  # check for reasonable page number
+  if (not page_num or (page_num < 1)):
+    page_num = 1
+
+  url_str = f"{SERVER_URL}/{modality}?max_results={SERVER_PAGE_SIZE}&page={page_num}"
+  if (latest):                         # by default use the latest records
+    url_str = f"{url_str}&sort=-_created"
+
+  if (query_params is not None):
+    # TODO: add the various query parameters
+    pass
   return url_str
 
 
