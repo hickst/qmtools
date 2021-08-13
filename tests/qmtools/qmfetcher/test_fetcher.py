@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher library code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/7/2021.
-#   Last Modified: Add tests for flatten_a_record and flatten_records. Update clean_records test.
+#   Last Modified: Update build_query tests for changed parameters.
 #
 import json
 import os
@@ -90,24 +90,33 @@ class TestFetcher(object):
       fetch.build_query('BAD_MODE')
 
 
-  def test_build_query_modes(self):
+  def test_build_query_modes_default(self):
     qstr = fetch.build_query('bold')
-    assert qstr == f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}"
+    assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=1" in qstr
     qstr = fetch.build_query('t1w')
-    assert qstr == f"{SERVER_URL}/t1w?max_results={SERVER_PAGE_SIZE}"
+    assert f"{SERVER_URL}/t1w?max_results={SERVER_PAGE_SIZE}&page=1" in qstr
     qstr = fetch.build_query('t2w')
-    assert qstr == f"{SERVER_URL}/t2w?max_results={SERVER_PAGE_SIZE}"
+    assert f"{SERVER_URL}/t2w?max_results={SERVER_PAGE_SIZE}&page=1" in qstr
 
 
-  def test_build_query_pagenum_none(self):
+  def test_build_query_pagenum_nums(self):
     qstr = fetch.build_query('bold', None)
-    assert qstr == f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}"
+    assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=1" in qstr
     qstr = fetch.build_query('bold', 0)
-    assert qstr == f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=0"
+    assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=1" in qstr
     qstr = fetch.build_query('bold', 1)
-    assert qstr == f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=1"
+    assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=1" in qstr
     qstr = fetch.build_query('bold', 999)
-    assert qstr == f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=999"
+    assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=999" in qstr
+
+
+  def test_build_query_latest(self):
+    qstr = fetch.build_query('bold')
+    assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=1&sort=-_created" in qstr
+    qstr = fetch.build_query('bold', latest=False)
+    assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=1" in qstr
+    assert 'sort=' not in qstr
+    assert '_created' not in qstr
 
 
   def test_clean_records_empty(self):
