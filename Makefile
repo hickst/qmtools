@@ -19,10 +19,10 @@ TEST=tests
 TSTIMG=qmtools:test
 
 
-.PHONY: help bash cleancache cleanrpts docker dockert down exec run runt runt1 runtc runtep stop tests up watch
+.PHONY: help bash cleancache cleanrpts docker dockert down exec run runt runt1 runtc runtep stop test1 tests up watch
 
 help:
-	@echo "Make what? Try: bash, cleancache, cleanrpts, docker, dockert, down, run, runt, runt1, runtc, runtep, stop, tests, up, watch"
+	@echo "Make what? Try: bash, cleancache, cleanrpts, docker, dockert, down, run, runt, runt1, runtc, runtep, stop, test1, tests, up, watch"
 	@echo '  where:'
 	@echo '     help      - show this help message'
 	@echo '     bash      - run Bash in a ${PROG} container (for development)'
@@ -37,6 +37,7 @@ help:
 	@echo '     runtc     - run all tests and code coverage in a container'
 	@echo '     runtep    - run a test container with alternate entrypoint (CLI: EP=entrypoint, ARGS=args)'
 	@echo '     stop      - stop a running container'
+	@echo '     test1     - run a single test from a test file (CLI: ARG=single_test_name)'
 	@echo '     tests     - run one or all tests in the tests directory (CLI: TEST=single_test_file)'
 	@echo '     watch     - show logfile for a running container'
 
@@ -77,8 +78,11 @@ runtc:
 stop:
 	docker stop ${NAME}
 
+test1:
+	pytest -vv ${TEST} -k ${ARGS}
+
 tests:
-	pytest -vv ${TEST} --cov-report term-missing --cov ${SCOPE}
+	pytest -vv ${TEST} ${ARGS} --cov-report term-missing --cov ${SCOPE}
 
 watch:
 	docker logs -f ${NAME}
