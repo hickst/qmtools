@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: Methods to query the MRIQC server and download query result records.
-# Last Modified: Fetch latest records by default. Check page_num or correct.
-
+# Last Modified: Add functions to deduplicate a list of records.
+#
 import json
 import os
 import pandas as pd
@@ -50,6 +50,32 @@ def clean_records (json_recs, fields_to_remove=DEFAULT_FIELDS_TO_REMOVE):
       if (field in rec):
         rec.pop(field)
   return json_recs
+
+
+def deduplicate_records (records, chksums=set()):
+  """
+  Use the given set of previously gathered checksums to identify and
+  remove duplicate records from the given list.
+  Arguments:
+     records: list of records (dictionaries) to be deduplicated
+     chksums: set of previously seen checksums; use to identify duplicate records.
+  """
+  # omit records w/ no checksum or checksum is in list of checksums already seen
+  return [rec for rec in records if is_not_duplicate(rec, chksums)]
+
+
+def is_not_duplicate (record, chksums):
+  """
+  Return False for records w/ no checksum or with a checksum in the list of
+  checksums already seen. Returns True if record checksum has not been seen AND
+  adds the checksum to the given set of checksums, by side effect!
+  """
+  recsum = record.get('provenance.md5sum')
+  if (recsum is None or (recsum in chksums)):
+    return False
+  else:
+    chksums.add(recsum)
+    return True
 
 
 def do_query (query_str):
