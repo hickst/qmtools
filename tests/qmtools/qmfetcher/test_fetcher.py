@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher library code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/7/2021.
-#   Last Modified: Update build_query tests for changed parameters.
+#   Last Modified: Added tests for deduplicate_records and is_not_duplicate.
 #
 import json
 import os
@@ -84,6 +84,28 @@ class TestFetcher(object):
     '_links.self.href': 'bold/59cfad7f265d200019380537'
   }
 
+  for_dedup_recs = [
+    {
+      '_id': '1',
+      'provenance.md5sum': '19cf39e8895fcf98e46f6017caebbbf1',
+      'dummy_data': 111,
+    },
+    {
+      '_id': '2',
+      'provenance.md5sum': '42febfb2ff72767655b0901dbde42ecb',
+      'dummy_data': 222,
+    },
+    {
+      '_id': '999',
+      'dummy_data': 'BAD RECORD',
+    },
+    {
+      '_id': '3',
+      'provenance.md5sum': 'af34ecc2a49a550d49216f5b5b5b22d7',
+      'dummy_data': 333,
+    }
+  ]
+
 
   def test_build_query_bad_modality(self):
     with pytest.raises(ValueError) as ve:
@@ -140,6 +162,61 @@ class TestFetcher(object):
         assert rec.get(field) is None
       for field in ['bids_meta', '_links', 'provenance']:
         assert rec.get(field) is None
+
+
+  def test_deduplicate_records(self):
+    # Also tests is_not_duplicate
+    recs = fetch.deduplicate_records(self.for_dedup_recs,set())
+    assert recs is not None
+    assert len(recs) == 3
+
+    recs = fetch.deduplicate_records(self.for_dedup_recs,
+      set(['8f56e0168c25e7bd919572669c2e43be'])) # not in set: has no effect
+    assert recs is not None
+    assert len(recs) == 3
+
+    recs = fetch.deduplicate_records(self.for_dedup_recs,
+      set(['42febfb2ff72767655b0901dbde42ecb']))      # should remove 1 record
+    assert recs is not None
+    assert len(recs) == 2
+
+    recs = fetch.deduplicate_records(self.for_dedup_recs,
+      set(['42febfb2ff72767655b0901dbde42ecb',       # should remove record w/ this key
+       '8f56e0168c25e7bd919572669c2e43be']))
+    assert recs is not None
+    assert len(recs) == 2
+
+    recs = fetch.deduplicate_records(self.for_dedup_recs,
+      set(['42febfb2ff72767655b0901dbde42ecb',       # should remove this record
+       '19cf39e8895fcf98e46f6017caebbbf1']))      # should remove this record
+    assert recs is not None
+    assert len(recs) == 1
+
+    recs = fetch.deduplicate_records(self.for_dedup_recs,
+      set([ '69b0e488119a656f70d881e6112a41cd',
+        '42febfb2ff72767655b0901dbde42ecb',       # should remove this record
+        '19cf39e8895fcf98e46f6017caebbbf1',       # should remove this record
+        'c54e9578f22a0efebe32128291e1c947']))
+    assert recs is not None
+    assert len(recs) == 1
+
+    recs = fetch.deduplicate_records(self.for_dedup_recs,
+      set([ '42febfb2ff72767655b0901dbde42ecb',       # should remove these records
+        '19cf39e8895fcf98e46f6017caebbbf1',
+        'af34ecc2a49a550d49216f5b5b5b22d7']))
+    assert recs is not None
+    assert len(recs) == 0
+
+    recs = fetch.deduplicate_records(self.for_dedup_recs,
+      set([ 'cb948823526737aa29f11e3acd1c8dd2',
+        '42febfb2ff72767655b0901dbde42ecb',       # should remove this record
+        '5805b03d4ea8cfd577bff761e321f0b9',
+        '69b0e488119a656f70d881e6112a41cd',
+        '19cf39e8895fcf98e46f6017caebbbf1',       # should remove this record
+        'af34ecc2a49a550d49216f5b5b5b22d7',       # should remove this record
+        'cb948823526737aa29f11e3acd1c8dd2']))
+    assert recs is not None
+    assert len(recs) == 0
 
 
   def test_do_query_bad_url(self):
