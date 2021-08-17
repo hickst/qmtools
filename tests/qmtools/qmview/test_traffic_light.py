@@ -1,6 +1,6 @@
 # Tests of the traffic-light table code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/19/2021.
-#   Last Modified: Update for refactored constants.
+# Last Modified: Update for strict modality capitalization.
 #
 import os
 import matplotlib
@@ -77,7 +77,7 @@ class TestTrafficLight(object):
     with tempfile.TemporaryDirectory() as tmpdir:
       print(f"type(tmpdir)={type(tmpdir)}")
       print(f"tmpdir={tmpdir}")
-      traf.make_traffic_light_table(self.struct_test_fyl, 't1w', tmpdir)
+      traf.make_traffic_light_table(self.struct_test_fyl, 'T1w', tmpdir)
       # os.system(f"ls -lH {tmpdir} >/tmp/DEBUG")
       files = os.listdir(tmpdir)
       print(f"FILES={files}")

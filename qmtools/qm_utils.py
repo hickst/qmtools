@@ -1,6 +1,6 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: Shared utilities for the QMTools programs.
-# Last Modified: Add ensure_reports_dir.
+# Last Modified: Correct for strict modality capitalization.
 #
 import datetime
 import os
@@ -71,7 +71,6 @@ def validate_modality (modality):
    Returns the canonicalized modality string or raises ValueError if
    given an invalid modality string.
   """
-  mode = modality.lower()
-  if (mode in ALLOWED_MODALITIES):
-    return mode
+  if (modality in ALLOWED_MODALITIES):
+    return modality
   raise ValueError(f"Modality argument must be one of: {ALLOWED_MODALITIES}")

@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to query the MRIQC server and download query result records
 #          into a file for further processing.
-# Last Modified: Update output file path verbose message.
+# Last Modified: Correct for strict modality capitalization.
 
 import argparse
 import os
@@ -32,7 +32,7 @@ def main (argv=None):
   its work.
   This main method takes no arguments so it can be called by setuptools but
   the program expects two arguments from the command line:
-    1) the modality of the output file (one of 'bold', 't1w', or 't2w')
+    1) the modality of the output file (one of 'bold', 'T1w', or 'T2w')
     2) optional number of records to fetch (default: {SERVER_PAGE_SIZE})
     3) optional output filename (default: NONE (one will be generated))
     4) path to parameter file (default: query_params.toml)

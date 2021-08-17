@@ -1,6 +1,6 @@
 # Tests of Shared utilities for the QMTools programs.
 #   Written by: Tom Hicks and Dianne Patterson. 8/5/2021.
-#   Last Modified: Added tests for ensure_reports_dir.
+# Last Modified: Update for strict modality capitalization.
 #
 import os
 import pandas
@@ -74,9 +74,9 @@ class TestQMUtils(object):
 
 
   def test_gen_output_filename_ext(self):
-    fname = qmu.gen_output_filename('t1w', 'csv')
+    fname = qmu.gen_output_filename('T1w', 'csv')
     print(fname)
-    assert 't1w' in fname
+    assert 'T1w' in fname
     assert '.csv' in fname
 
 
@@ -91,15 +91,8 @@ class TestQMUtils(object):
 
   def test_validate_modality_good(self):
     assert qmu.validate_modality('bold') == 'bold'
-    assert qmu.validate_modality('t1w') == 't1w'
-    assert qmu.validate_modality('t2w') == 't2w'
-    assert qmu.validate_modality('Bold') == 'bold'
-    assert qmu.validate_modality('T1w') == 't1w'
-    assert qmu.validate_modality('T2w') == 't2w'
-    assert qmu.validate_modality('BOLD') == 'bold'
-    assert qmu.validate_modality('T1W') == 't1w'
-    assert qmu.validate_modality('T2W') == 't2w'
-    assert qmu.validate_modality('BoLd') == 'bold'
+    assert qmu.validate_modality('T1w') == 'T1w'
+    assert qmu.validate_modality('T2w') == 'T2w'
 
 
   def test_validate_modality_fail(self):
@@ -110,7 +103,22 @@ class TestQMUtils(object):
       qmu.validate_modality('BAD argument')
 
     with pytest.raises(ValueError, match='Modality argument must be one of'):
-      qmu.validate_modality('T1')
+      qmu.validate_modality('t1w')
+
+    with pytest.raises(ValueError, match='Modality argument must be one of'):
+      qmu.validate_modality('t2w')
+
+    with pytest.raises(ValueError, match='Modality argument must be one of'):
+      qmu.validate_modality('Bold')
 
     with pytest.raises(ValueError, match='Modality argument must be one of'):
       qmu.validate_modality('t1')
+
+    with pytest.raises(ValueError, match='Modality argument must be one of'):
+      qmu.validate_modality('T1')
+
+    with pytest.raises(ValueError, match='Modality argument must be one of'):
+      qmu.validate_modality('t2')
+
+    with pytest.raises(ValueError, match='Modality argument must be one of'):
+      qmu.validate_modality('T2')

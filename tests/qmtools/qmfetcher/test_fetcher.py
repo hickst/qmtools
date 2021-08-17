@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher library code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/7/2021.
-#   Last Modified: Fix tests failing by interference (shame, shame).
+# Last Modified: Update for strict modality capitalization.
 #
 import json
 import os
@@ -126,10 +126,10 @@ class TestFetcher(object):
   def test_build_query_modes_default(self):
     qstr = fetch.build_query('bold')
     assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=1" in qstr
-    qstr = fetch.build_query('t1w')
-    assert f"{SERVER_URL}/t1w?max_results={SERVER_PAGE_SIZE}&page=1" in qstr
-    qstr = fetch.build_query('t2w')
-    assert f"{SERVER_URL}/t2w?max_results={SERVER_PAGE_SIZE}&page=1" in qstr
+    qstr = fetch.build_query('T1w')
+    assert f"{SERVER_URL}/T1w?max_results={SERVER_PAGE_SIZE}&page=1" in qstr
+    qstr = fetch.build_query('T2w')
+    assert f"{SERVER_URL}/T2w?max_results={SERVER_PAGE_SIZE}&page=1" in qstr
 
 
   def test_build_query_pagenum_nums(self):

@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to convert an MRIQC output file to normalized scores
 #          for representation in an HTML "traffic-light" report.
-# Last Modified: Update for fixed reports directory (really, this time).
+# Last Modified: Correct for strict modality capitalization.
 
 import argparse
 import sys
@@ -35,7 +35,7 @@ def main (argv=None):
   This main method takes no arguments so it can be called by setuptools but
   the program expects two arguments from the command line:
     1) path to the MRIQC group output file in TSV format,
-    2) the modality of the input file (one of 'bold', 't1w', or 't2w')
+    2) the modality of the input file (one of 'bold', 'T1w', or 'T2w')
   """
   # the main method takes no arguments so it can be called by setuptools
   if (argv is None):                   # if called by setuptools

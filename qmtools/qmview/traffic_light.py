@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: To convert an mriqc output file to normalized scores for
 #          representation in a traffic-light table.
-# Last Modified: Update for refactored constants.
+# Last Modified: Correct for strict modality capitalization.
 
 import os
 import numpy as np
@@ -118,7 +118,7 @@ def pos_neg_split (qm_df, modality):
   are better and the other where negative values are better.
   Return a tuple of the positive good and positive bad dataframes.
   """
-  if (modality.lower() in ['t1w', 't2w', 't1', 't2']):
+  if (modality in ['T1w', 'T2w']):
     pos_good_df = qm_df[STRUCTURAL_POS_GOOD_COLUMNS]
     pos_bad_df = qm_df[STRUCTURAL_POS_BAD_COLUMNS]
   else:
