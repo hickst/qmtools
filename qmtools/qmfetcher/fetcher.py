@@ -1,11 +1,13 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: Methods to query the MRIQC server and download query result records.
-# Last Modified: Added get_n_records method.
+# Last Modified: Added save_to_tsv method.
 #
+import csv
 import json
 import os
 import pandas as pd
 import requests as req
+import sys
 
 from qmtools import ALLOWED_MODALITIES
 from qmtools.qmfetcher import DEFAULT_RESULTS_SIZE, SERVER_PAGE_SIZE
@@ -176,6 +178,20 @@ def query_for_page (modality, page_num=1, query_params=None,
   json_recs = extract_records(json_query_result)
   flat_recs = flatten_records(json_recs)
   return clean_records(flat_recs, fields_to_remove)
+
+
+def save_to_tsv (records, filepath):
+  """
+  Save the given image metric records (list of dictionaries) to the
+  file at the given filepath (default standard output).
+  """
+  if (records):
+    fields = sorted(records[0].keys())
+    with open(filepath, 'w', newline='') as tsvfile:
+      writer = csv.DictWriter(tsvfile, fieldnames=fields, delimiter='\t')
+      writer.writeheader()
+      for rec in records:
+        writer.writerow(rec)
 
 
 def server_health_check ():

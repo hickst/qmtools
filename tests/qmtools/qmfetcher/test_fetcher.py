@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher library code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/7/2021.
-#   Last Modified: Added tests for get_n_records and do_query w/ no results.
+#   Last Modified: Added test for save_to_tsv method.
 #
 import json
 import os
@@ -362,6 +362,24 @@ class TestFetcher(object):
     assert recs is not None
     assert type(recs) == list
     assert len(recs) == SERVER_PAGE_SIZE
+
+
+  def test_save_to_tsv_1(self):
+    with tempfile.TemporaryDirectory() as tmpdir:
+      print(f"tmpdir={tmpdir}")
+      tmpfile = os.path.join(tmpdir, 'test.tsv')
+      fetch.save_to_tsv([self.flrec], tmpfile)
+      files = os.listdir(os.path.join(tmpdir))
+      assert files is not None
+      assert len(files) == 1
+      with open(tmpfile) as tmpf:
+        lines = tmpf.readlines()
+      assert len(lines) == 2
+      assert '_id' in lines[0]
+      assert '_created' in lines[0]
+      assert 'provenance.md5sum' in lines[0]
+      assert 'bold/59cfad7f265d200019380537' in lines[1]
+      assert 'Siemens' in lines[1]
 
 
   def test_server_health_check(self):
