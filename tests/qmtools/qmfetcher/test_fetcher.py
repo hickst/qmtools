@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher library code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/7/2021.
-#   Last Modified: Added tests for deduplicate_records and is_not_duplicate.
+#   Last Modified: Added tests for get_n_records and do_query w/ no results.
 #
 import json
 import os
@@ -20,6 +20,8 @@ from tests import TEST_RESOURCES_DIR
 SYSEXIT_ERROR_CODE = 2                 # seems to be error exit code from argparse
 
 class TestFetcher(object):
+
+  noresult_query = 'https://mriqc.nimh.nih.gov/api/v1/bold?max_records=1&where=bids_meta.Manufacturer%3D%3D"BADCO"'
 
   empty_results_fyl = f"{TEST_RESOURCES_DIR}/no_results.json"
   page1_results_fyl = f"{TEST_RESOURCES_DIR}/reptime1.json"
@@ -226,6 +228,12 @@ class TestFetcher(object):
     print(re)
 
 
+  def test_do_query_noresults(self):
+    recs = fetch.do_query(self.noresult_query)
+    assert recs is not None
+    assert recs == []
+
+
   def test_extract_records_empty(self):
     with open(self.empty_results_fyl) as jfyl:
       results = json.load(jfyl)
@@ -288,6 +296,59 @@ class TestFetcher(object):
     assert '_links' not in d
     assert '_links.self' not in d
     assert 'aqi' not in d
+
+
+  def test_get_n_records_bad_modality(self):
+    with pytest.raises(ValueError) as ve:
+      fetch.get_n_records('BAD_MODE')
+
+
+  def test_get_n_records_0(self):
+    recs = fetch.get_n_records('bold', 0)
+    print(recs)
+    assert recs is not None
+    assert type(recs) == list
+    assert len(recs) == 0
+
+
+  def test_get_n_records_1(self):
+    recs = fetch.get_n_records('bold', 1)
+    print(recs)
+    assert recs is not None
+    assert type(recs) == list
+    assert len(recs) == 1
+
+
+  def test_get_n_records_9(self):
+    recs = fetch.get_n_records('bold', 9)
+    print(recs)
+    assert recs is not None
+    assert type(recs) == list
+    assert len(recs) == 9
+
+
+  def test_get_n_records_pagesize(self):
+    recs = fetch.get_n_records('bold', SERVER_PAGE_SIZE)
+    print(recs)
+    assert recs is not None
+    assert type(recs) == list
+    assert len(recs) == SERVER_PAGE_SIZE
+
+
+  def test_get_n_records_pagesize_plus(self):
+    recs = fetch.get_n_records('bold', SERVER_PAGE_SIZE+4)
+    print(recs)
+    assert recs is not None
+    assert type(recs) == list
+    assert len(recs) == SERVER_PAGE_SIZE+4
+
+
+  def test_get_n_records_pagesize2x(self):
+    recs = fetch.get_n_records('bold', 2 * SERVER_PAGE_SIZE)
+    print(recs)
+    assert recs is not None
+    assert type(recs) == list
+    assert len(recs) == 2 * SERVER_PAGE_SIZE
 
 
   def test_query_for_page_bad_modality(self):

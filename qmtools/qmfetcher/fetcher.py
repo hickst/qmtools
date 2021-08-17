@@ -1,6 +1,6 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: Methods to query the MRIQC server and download query result records.
-# Last Modified: Add doc string for deduplicate_records.
+# Last Modified: Added get_n_records method.
 #
 import json
 import os
@@ -57,11 +57,11 @@ def deduplicate_records (records, chksums=set()):
   Use the given set of previously gathered checksums to identify and
   remove duplicate records from the given list.
   Arguments:
-     records: list of records (dictionaries) to be deduplicated
+     records: list of records (dictionaries) to be deduplicated.
      chksums: SET of previously seen checksums; used to identify duplicate records.
   """
   # omit records w/ no checksum or checksum is in list of checksums already seen
-  return [rec for rec in records if is_not_duplicate(rec, chksums)]
+  return ([rec for rec in records if is_not_duplicate(rec, chksums)], chksums)
 
 
 def is_not_duplicate (record, chksums):
@@ -130,6 +130,33 @@ def flatten_records (json_recs):
     json_recs: a list of records (dictionaries), each one representing metrics for a single image.
   """
   return [dict(flatten_a_record(rec)) for rec in json_recs]
+
+
+def get_n_records (modality, num_recs=SERVER_PAGE_SIZE, query_params=None,
+                   fields_to_remove=DEFAULT_FIELDS_TO_REMOVE):
+  """
+  Fetch N records from the server using the given paramters. Query then
+  clean, flatten, deduplicate and return a list of fetched image quality
+  metrics records (dictionaries).
+  Arguments:
+    modality: the modality to query on (must be one of {ALLOWED_MODALITIES}).
+    page_num: page number (one offset) for the page to fetch (default: 1).
+    query_params: dictionary of additional query parameters (default: None).
+    fields_to_remove: a list of field names to remove when cleaning records.
+  """
+  good_records = []
+  next_page_num = 1
+  chksums_seen = set()
+  while (len(good_records) < num_recs):
+    recs = query_for_page(modality, next_page_num, query_params, fields_to_remove)
+    if (len(recs) < 1):                # if no more records available, then exit
+      break
+    recs, chksums_seen = deduplicate_records(recs, chksums_seen)
+    good_records.extend(recs)
+    next_page_num += 1
+
+  # if got more than user asked for, prune off any extra records:
+  return good_records[:num_recs] if (len(good_records) > num_recs) else good_records
 
 
 def query_for_page (modality, page_num=1, query_params=None,
