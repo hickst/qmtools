@@ -1,6 +1,6 @@
 # Tests of the module to read and parse a query parameters file.
 #   Written by: Tom Hicks and Dianne Patterson. 8/17/2021.
-# Last Modified: Update for rename to load_query_from_file. Add nocolon test for same.
+# Last Modified: Test error messages from load_query_from_file.
 #
 import configparser
 import os
@@ -26,27 +26,37 @@ class TestQueryParser(object):
   def test_load_query_from_file_nosuch(self):
     with pytest.raises(FileNotFoundError) as fnf:
       qp.load_query_from_file('NOSUCH_FILE', self.TEST_NAME)
+    print(fnf)
+    assert f"Query parameters file 'NOSUCH_FILE' not found" in str(fnf)
 
 
   def test_load_query_from_file_empty(self):
     with pytest.raises(ValueError) as ve:
       qp.load_query_from_file(self.empty_query_fyl, self.TEST_NAME)
+    print(ve)
+    assert 'No section named' in str(ve)
 
 
   def test_load_query_from_file_nosec(self):
     with pytest.raises(ValueError) as ve:
       qp.load_query_from_file(self.nosec_query_fyl, self.TEST_NAME)
+    print(ve)
+    assert "A 'parameters' section header" in str(ve)
 
 
   def test_load_query_from_file_noparams(self):
     with pytest.raises(ValueError) as ve:
       qp.load_query_from_file(self.noparams_query_fyl, self.TEST_NAME)
+    print(ve)
+    assert 'No section named' in str(ve)
 
 
   def test_load_query_from_file_nocolon(self):
     with pytest.raises(ValueError) as ve:
       pd = qp.load_query_from_file(self.nocolon_query_fyl, self.TEST_NAME)
     print(ve)
+    assert 'Source contains parsing errors' in str(ve)
+    assert 'line  4' in str(ve)
 
 
   def test_load_query_from_file_params(self):

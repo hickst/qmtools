@@ -1,7 +1,7 @@
 #
 # Module with methods to read and parse a query parameters file.
 #   Written by: Tom Hicks. 8/17/2021.
-#   Last Modified: Refactor load from parse.
+#   Last Modified: Fix an error message.
 #
 import configparser as cp
 from configparser import MissingSectionHeaderError, ParsingError
@@ -31,7 +31,7 @@ def load_query_from_file (query_file, prog_name=''):
       config.read_file(open(query_file))
     except FileNotFoundError as fnf:
       errMsg = "({}): ERROR: {} Exiting...".format(prog_name,
-        "Query parameters file '{query_file}' not found or not readable.")
+        f"Query parameters file '{query_file}' not found or not readable.")
       raise FileNotFoundError(errMsg)
     except MissingSectionHeaderError as mse:
       errMsg = "({}): ERROR: {} Exiting...".format(prog_name,

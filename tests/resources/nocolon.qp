@@ -1,5 +1,5 @@
 [parameters]
   dummy_trs: == 0
-  bids_meta.Manufacturer == "Siemens"
+  bids_meta.Manufacturer: == "Siemens"
   size_x > 32
   bids_meta.MultibandAccelerationFactor: > 3
