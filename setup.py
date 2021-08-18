@@ -9,8 +9,8 @@ setup(
     install_requires=[],
     entry_points={
         'console_scripts': [
-            'run_traffic = qmtools.qmview.traffic_light_cli:main',
-            'run_fetcher = qmtools.qmfetcher.fetcher_cli:main'
+            'qmtraffic = qmtools.qmview.traffic_light_cli:main',
+            'qmfetcher = qmtools.qmfetcher.fetcher_cli:main'
         ]
     },
 )
