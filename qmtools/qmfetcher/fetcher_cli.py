@@ -1,8 +1,8 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to query the MRIQC server and download query result records
 #          into a file for further processing.
-# Last Modified: Correct for strict modality capitalization.
-
+# Last Modified: Add/check/use query file parameter.
+#
 import argparse
 import os
 import pandas as pd
@@ -11,10 +11,25 @@ import sys
 
 import qmtools.qm_utils as qmu
 import qmtools.qmfetcher.fetcher as fetch
-from qmtools import ALLOWED_MODALITIES, FETCHED_DIR, NUM_RECS_EXIT_CODE
+from qmtools import ALLOWED_MODALITIES, FETCHED_DIR, NUM_RECS_EXIT_CODE, QUERY_FILE_EXIT_CODE
+from qmtools.file_utils import good_file_path
 from qmtools.qmfetcher import SERVER_PAGE_SIZE
+from qmtools.qmfetcher.query_parser import parse_query_from_file
 
 PROG_NAME = 'qmfetcher'
+
+
+def check_query_file (query_file):
+  """
+  If a query parameters file path is given, check that it is a good path.
+  If not, then exit the entire program here with the specified (or default)
+  system exit code.
+  """
+  if (not good_file_path(query_file)):
+    errMsg = "({}): ERROR: {} Exiting...".format(PROG_NAME,
+      "The -q flag must specify a valid, readable query parameters file.")
+    print(errMsg, file=sys.stderr)
+    sys.exit(QUERY_FILE_EXIT_CODE)
 
 
 def check_num_recs (num_recs):
@@ -72,6 +87,12 @@ def main (argv=None):
     help='Optional name of file to hold query results in fetched directory [default: none].'
   )
 
+  parser.add_argument(
+    '-q', '--query-file', dest='query_file', metavar='filepath',
+    default=argparse.SUPPRESS,
+    help="Path to a query parameters file in or below the run directory [no default]"
+  )
+
   # TODO: Add/check query parameter file argument.
 
   # actually parse the arguments from the command line
@@ -92,6 +113,14 @@ def main (argv=None):
   if (not output_filename):            # if none provided, generate an output filename
     output_filename = qmu.gen_output_filename(modality)
 
+  # if query parameters file path given, check the file path for validity
+  query_file = args.get('query_file')
+  if (query_file):                     # if filepath provided, validate it
+    check_query_file(query_file)       # may exit here and not return!
+    query_params = parse_query_from_file(query_file)
+  else:
+    query_params = None
+
   if (args.get('verbose')):
     print(f"({PROG_NAME}): Querying MRIQC server with modality '{modality}', for {num_recs} records.",
       file=sys.stderr)
@@ -108,27 +137,9 @@ def main (argv=None):
 
   # query the MRIQC server and output or save the results
   try:
-    # while more pages:
-    #  ?? drop rows with no md5sum ?? 
-    #  ?? and duplicate rows ??
-    #  concatenate df onto master df
-
-    # url_root = 'https://mriqc.nimh.nih.gov/api/v1/{modality}?{query}'
-    # url_root = 'https://mriqc.nimh.nih.gov/api/v1/bold?max_results=100'
-
-    # list of all records gathered so far
-    # all_recs = []
-    # while True:
-    #   jrecs = fetch.query_for_page(modality, start_page)
-    #   if (not jrecs):
-    #     break
-    #   else:
-    #     start_page += 1
-    #     all_recs.append(jrecs)
-
-    # df = pd.DataFrame(all_recs)
-    # write out the dataframe as a TSV file
     print(f"ARGS={args}")              # REMOVE LATER
+    if (query_params):                 # REMOVE LATER
+      print(f"QPARAMS={query_params}")
 
   except Exception as err:
     errMsg = "({}): ERROR: Processing Error ({}): {}".format(
@@ -144,3 +155,8 @@ def main (argv=None):
 
 if __name__ == "__main__":
   main()
+
+# Sample MRIQC queries: for development.
+#   url_root = 'https://mriqc.nimh.nih.gov/api/v1/{modality}?{query}'
+#   url_root = 'https://mriqc.nimh.nih.gov/api/v1/bold?max_results=100'
+#

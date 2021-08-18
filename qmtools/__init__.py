@@ -13,6 +13,7 @@ REPORTS_DIR = 'reports'
 # Symbolic exit codes for various error exit scenarios
 INPUT_FILE_EXIT_CODE = 10
 OUTPUT_FILE_EXIT_CODE = 11
+QUERY_FILE_EXIT_CODE = 12
 
 FETCHED_DIR_EXIT_CODE = 20
 INPUTS_DIR_EXIT_CODE = 21

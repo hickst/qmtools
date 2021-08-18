@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/4/2021.
-#   Last Modified: Get test_main_verbose working again.
+#   Last Modified: Added tests for check_query_file.
 #
 import os
 import matplotlib
@@ -11,7 +11,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-from qmtools import ALLOWED_MODALITIES, FETCHED_DIR, NUM_RECS_EXIT_CODE
+from qmtools import ALLOWED_MODALITIES, FETCHED_DIR, NUM_RECS_EXIT_CODE, QUERY_FILE_EXIT_CODE
 import qmtools.qmfetcher.fetcher_cli as cli
 from tests import TEST_RESOURCES_DIR
 
@@ -26,6 +26,18 @@ class TestFetcherCLI(object):
 
   nosuch_dir = f"{TEST_RESOURCES_DIR}/NO_SUCH_DIR"
   tmp_dir = '/tmp'
+
+
+  def test_check_query_file_empty(self):
+    with pytest.raises(SystemExit) as se:
+      cli.check_query_file('')
+    assert se.value.code == QUERY_FILE_EXIT_CODE
+
+
+  def test_check_query_file_bad(self):
+    with pytest.raises(SystemExit) as se:
+      cli.check_query_file('NOSUCH.qp')
+    assert se.value.code == QUERY_FILE_EXIT_CODE
 
 
   def test_check_num_recs_zero(self):
