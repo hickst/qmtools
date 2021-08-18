@@ -1,11 +1,10 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: Methods to query the MRIQC server and download query result records.
-# Last Modified: Added save_to_tsv method.
+# Last Modified: Remove unused pandas import.
 #
 import csv
 import json
 import os
-import pandas as pd
 import requests as req
 import sys
 

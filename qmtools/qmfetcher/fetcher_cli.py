@@ -1,11 +1,10 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to query the MRIQC server and download query result records
 #          into a file for further processing.
-# Last Modified: Pass program name to query parser.
+# Last Modified: Remove unused pandas import.
 #
 import argparse
 import os
-import pandas as pd
 import requests as req
 import sys
 
