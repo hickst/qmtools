@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to query the MRIQC server and download query result records
 #          into a file for further processing.
-# Last Modified: Add/check/use query file parameter.
+# Last Modified: Pass program name to query parser.
 #
 import argparse
 import os
@@ -117,7 +117,7 @@ def main (argv=None):
   query_file = args.get('query_file')
   if (query_file):                     # if filepath provided, validate it
     check_query_file(query_file)       # may exit here and not return!
-    query_params = parse_query_from_file(query_file)
+    query_params = parse_query_from_file(query_file, PROG_NAME)
   else:
     query_params = None
 
