@@ -1,6 +1,6 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: Methods to query the MRIQC server and download query result records.
-# Last Modified: Remove unused pandas import.
+# Last Modified: Add query parameters in build_query.
 #
 import csv
 import json
@@ -21,20 +21,24 @@ def build_query (modality, page_num=1, query_params=None, latest=True):
   """
   Construct and return a query string given the modality, starting page number,
   and optional dictionary of query parameter keys and values.
+  Returns a single constructed query URL string.
   """
   validate_modality(modality)          # validates or raises ValueError
 
   # check for reasonable page number
   if (not page_num or (page_num < 1)):
     page_num = 1
-
   url_str = f"{SERVER_URL}/{modality}?max_results={SERVER_PAGE_SIZE}&page={page_num}"
-  if (latest):                         # by default use the latest records
+
+  # if latest flag specified, use the most recent records
+  if (latest):                         # uses most recent by default
     url_str = f"{url_str}&sort=-_created"
 
   if (query_params is not None):
-    # TODO: add the various query parameters
-    pass
+    pairs = [f"{key}{val}" for key, val in query_params.items()]
+    qps = '%20and%20'.join(pairs)
+    url_str = f"{url_str}&where={qps}"
+
   return url_str
 
 

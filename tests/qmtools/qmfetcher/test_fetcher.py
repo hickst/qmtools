@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher library code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/7/2021.
-# Last Modified: Update for strict modality capitalization.
+# Last Modified: Add tests for query parameters in build_query.
 #
 import json
 import os
@@ -112,6 +112,8 @@ class TestFetcher(object):
 
   noresult_query = 'https://mriqc.nimh.nih.gov/api/v1/bold?max_records=1&where=bids_meta.Manufacturer%3D%3D"BADCO"'
 
+  query_file = f"{TEST_RESOURCES_DIR}/manmaf.qp"
+
   empty_results_fyl = f"{TEST_RESOURCES_DIR}/no_results.json"
   page1_results_fyl = f"{TEST_RESOURCES_DIR}/reptime1.json"
   page1_results_cnt = 25
@@ -150,6 +152,22 @@ class TestFetcher(object):
     assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=1" in qstr
     assert 'sort=' not in qstr
     assert '_created' not in qstr
+
+
+  def test_build_query_qps(self):
+    qparams = {
+      'dummy_trs': '==0',
+      'bids_meta.Manufacturer': '=="Siemens"',
+      'bids_meta.MultibandAccelerationFactor': '>3'
+    }
+    query = fetch.build_query('bold', query_params=qparams)
+    print(f"QUERY={query}")
+    assert 'max_results=' in query
+    assert 'sort=-_created' in query
+    assert 'where=' in query
+    assert 'dummy_trs==0' in query
+    assert 'bids_meta.Manufacturer=="Siemens"'
+    assert 'bids_meta.MultibandAccelerationFactor>3'
 
 
   def test_clean_records_empty(self):
