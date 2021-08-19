@@ -92,8 +92,6 @@ def main (argv=None):
     help="Path to a query parameters file in or below the run directory [no default]"
   )
 
-  # TODO: Add/check query parameter file argument.
-
   # actually parse the arguments from the command line
   args = vars(parser.parse_args(argv))
 
@@ -138,7 +136,9 @@ def main (argv=None):
   try:
     print(f"ARGS={args}")              # REMOVE LATER
     if (query_params):                 # REMOVE LATER
-      print(f"QPARAMS={query_params}")
+      print(f"QPARAMS={query_params}") # REMOVE LATER
+    query = fetch.build_query(modality, query_params=query_params)  # REMOVE LATER
+    print(f"QUERY={query}")            # REMOVE LATER
 
   except Exception as err:
     errMsg = "({}): ERROR: Processing Error ({}): {}".format(

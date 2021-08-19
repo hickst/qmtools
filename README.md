@@ -132,8 +132,3 @@ bids_meta.SequenceName	bids_meta.MagneticFieldStrength	bids_meta.ManufacturersMo
       1. Create a TOML parameter file for the user's query parameters
       2. Push back development of a DSL til later.
    4. Save query results to a TSV file for later reuse.
-   5. Arguments on CLI:
-      1. Modality for query
-      2. number of records to fetch (default: 1000)
-      3. output file path (default: standard output)
-      4. path to parameter file (default: ./query_params.toml)
