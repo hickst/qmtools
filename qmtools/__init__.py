@@ -1,5 +1,6 @@
 # Only these modalities are available for query
 ALLOWED_MODALITIES = ['bold', 'T1w', 'T2w']
+STRUCTURAL_MODALITIES = ['T1w', 'T2w']
 
 # Name of a subdirectory to hold fetched query results
 FETCHED_DIR = 'fetched'

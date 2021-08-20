@@ -1,8 +1,8 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: To convert an mriqc output file to normalized scores for
 #          representation in a traffic-light table.
-# Last Modified: Correct for strict modality capitalization.
-
+# Last Modified: Use symbolic structural modalities constant.
+#
 import os
 import numpy as np
 import pandas as pd
@@ -11,7 +11,7 @@ import scipy.stats as stats
 from matplotlib import cm
 from matplotlib import pyplot as plt
 
-from qmtools import ALLOWED_MODALITIES, REPORTS_DIR
+from qmtools import ALLOWED_MODALITIES, REPORTS_DIR, STRUCTURAL_MODALITIES
 from qmtools.qm_utils import load_tsv, validate_modality
 
 # Constants to "mark" a dataframe as having positive good values or positive bad values
@@ -118,7 +118,7 @@ def pos_neg_split (qm_df, modality):
   are better and the other where negative values are better.
   Return a tuple of the positive good and positive bad dataframes.
   """
-  if (modality in ['T1w', 'T2w']):
+  if (modality in STRUCTURAL_MODALITIES):
     pos_good_df = qm_df[STRUCTURAL_POS_GOOD_COLUMNS]
     pos_bad_df = qm_df[STRUCTURAL_POS_BAD_COLUMNS]
   else:
