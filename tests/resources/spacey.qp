@@ -1,0 +1,4 @@
+[parameters]
+  dummy_trs :  ==  0
+  bids_meta.Manufacturer : ==  "Siemens Inc"  
+  bids_meta.MultibandAccelerationFactor : >  3
