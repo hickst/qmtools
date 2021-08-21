@@ -1,7 +1,7 @@
 #
 # Module with methods to read and parse a query parameters file.
 #   Written by: Tom Hicks. 8/17/2021.
-#   Last Modified: Fix indentation. Add methods to parse and validate the query parameters.
+#   Last Modified: Redid parse_value to check for empty values.
 #
 import sys
 import configparser as cp
@@ -61,16 +61,25 @@ def parse_value (val, prog_name=''):
   ops1 = set(['<', '>'])
   ops2 = set(['==', '<=', '>=', '!='])
   opsall = ops1.union(ops2)
-  ch1 = val[:2]
-  ch2 = val[:1]
+
+  ch1 = val[:1]
+  ch2 = val[:2]
   if (ch2 in ops2):
-    return f"{ch2}{val[2:].strip()}"
+    value = val[2:].strip()
+    if (value):
+      return f"{ch2}{value}"
   elif (ch1 in ops1):
-    return f"{ch1}{val[1:].strip()}"
+    value = val[1:].strip()
+    if (value):
+      return f"{ch1}{value}"
   else:
     errMsg = "({}): ERROR: {} Exiting...".format(prog_name,
              f"The comparison operator must be one of {opsall}")
     raise ValueError(errMsg)
+  # if we reach here there was no non-empty value
+  errMsg = "({}): ERROR: {} Exiting...".format(prog_name,
+            "The value to be compared must not be empty")
+  raise ValueError(errMsg)
 
 
 def validate_keyword (modality, key, prog_name=''):

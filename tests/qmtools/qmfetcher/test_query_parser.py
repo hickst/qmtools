@@ -1,6 +1,6 @@
 # Tests of the module to read and parse a query parameters file.
 #   Written by: Tom Hicks and Dianne Patterson. 8/17/2021.
-# Last Modified: Test error messages from load_query_from_file.
+# Last Modified: Add tests for parse_value.
 #
 import configparser
 import os
@@ -66,3 +66,38 @@ class TestQueryParser(object):
     assert len(pd) == 3
     assert 'dummy_trs' in pd.keys()
     assert 'bids_meta.Manufacturer' in pd.keys()
+
+
+  def test_parse_value_noop(self):
+    with pytest.raises(ValueError) as ve:
+      qp.parse_value('', self.TEST_NAME)
+    assert 'The comparison operator must be' in str(ve)
+
+
+  def test_parse_value_badop(self):
+    with pytest.raises(ValueError) as ve:
+      qp.parse_value('=', self.TEST_NAME)
+    assert 'The comparison operator must be' in str(ve)
+
+
+  def test_parse_value_ee_only(self):
+    with pytest.raises(ValueError) as ve:
+      comp = qp.parse_value('==', self.TEST_NAME)
+    assert 'The value to be compared' in str(ve)
+
+
+  def test_parse_value_ee(self):
+    comp = qp.parse_value('==  x', self.TEST_NAME)
+    assert comp is not None
+    assert comp == '==x'
+
+
+  def test_parse_value_lt(self):
+    comp = qp.parse_value('<  xyz', self.TEST_NAME)
+    assert comp is not None
+    assert comp == '<xyz'
+
+
+  def test_validate_keyword(self):
+    # TODO: implement tests when fn working
+    pass
