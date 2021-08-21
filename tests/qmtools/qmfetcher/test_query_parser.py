@@ -1,6 +1,6 @@
 # Tests of the module to read and parse a query parameters file.
 #   Written by: Tom Hicks and Dianne Patterson. 8/17/2021.
-# Last Modified: Add tests for parse_value.
+# Last Modified: Add tests for validate_keyword.
 #
 import configparser
 import os
@@ -98,6 +98,49 @@ class TestQueryParser(object):
     assert comp == '<xyz'
 
 
-  def test_validate_keyword(self):
-    # TODO: implement tests when fn working
-    pass
+  def test_validate_keyword_b_empty(self):
+    with pytest.raises(ValueError) as ve:
+      qp.validate_keyword('bold', '', self.TEST_NAME)
+    assert 'is not a valid bold keyword' in str(ve)
+
+
+  def test_validate_keyword_b_badword(self):
+    with pytest.raises(ValueError) as ve:
+      qp.validate_keyword('bold', 'XXX', self.TEST_NAME)
+    assert "'XXX' is not a valid bold keyword" in str(ve)
+
+
+  def test_validate_keyword_b_badmode(self):
+    with pytest.raises(ValueError) as ve:
+      qp.validate_keyword('bold', 'cnr', self.TEST_NAME)
+    assert "'cnr' is not a valid bold keyword" in str(ve)
+
+
+  def test_validate_keyword_b_good(self):
+    assert qp.validate_keyword('bold', 'aor', self.TEST_NAME)
+    assert qp.validate_keyword('bold', 'dummy_trs', self.TEST_NAME)
+    assert qp.validate_keyword('bold', 'bids_meta.subject_id', self.TEST_NAME)
+
+
+  def test_validate_keyword_s_empty(self):
+    with pytest.raises(ValueError) as ve:
+      qp.validate_keyword('T1w', '', self.TEST_NAME)
+    assert 'is not a valid T1w keyword' in str(ve)
+
+
+  def test_validate_keyword_s_badword(self):
+    with pytest.raises(ValueError) as ve:
+      qp.validate_keyword('T1w', 'XXX', self.TEST_NAME)
+    assert "'XXX' is not a valid T1w keyword" in str(ve)
+
+
+  def test_validate_keyword_s_badmode(self):
+    with pytest.raises(ValueError) as ve:
+      qp.validate_keyword('T1w', 'aor', self.TEST_NAME)
+    assert "'aor' is not a valid T1w keyword" in str(ve)
+
+
+  def test_validate_keyword_s_good(self):
+    assert qp.validate_keyword('T1w', 'cnr', self.TEST_NAME)
+    assert qp.validate_keyword('T1w', 'fber', self.TEST_NAME)
+    assert qp.validate_keyword('T1w', 'bids_meta.subject_id', self.TEST_NAME)
