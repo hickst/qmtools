@@ -1,5 +1,6 @@
 # environment variables for Docker container run parameters.
 TOPLVL=${PWD}
+FETCHED=${TOPLVL}/fetched
 INPUTS=${TOPLVL}/inputs
 RPTS=${TOPLVL}/reports
 TESTDIR=${TOPLVL}/tests
@@ -19,14 +20,15 @@ TEST=tests
 TSTIMG=qmtools:test
 
 
-.PHONY: help bash cleancache cleanrpts docker dockert down exec run runt runt1 runtc runtep stop test1 tests up watch
+.PHONY: help bash cleancache cleanfetch cleanrpts docker dockert down exec run runt runt1 runtc runtep stop test1 tests up watch
 
 help:
-	@echo "Make what? Try: bash, cleancache, cleanrpts, docker, dockert, down, run, runt, runt1, runtc, runtep, stop, test1, tests, up, watch"
+	@echo "Make what? Try: bash, cleancache, cleanfetch, cleanrpts, docker, dockert, down, run, runt, runt1, runtc, runtep, stop, test1, tests, up, watch"
 	@echo '  where:'
 	@echo '     help      - show this help message'
 	@echo '     bash      - run Bash in a ${PROG} container (for development)'
 	@echo '     cleancache - REMOVE ALL __pycache__ dirs from the project directory!'
+	@echo '     cleanfetch - REMOVE ALL  output files from the fetched directory!'
 	@echo '     cleanrpts - REMOVE ALL input and output files from the reports directory!'
 	@echo '     docker    - build a production container image'
 	@echo '     dockert   - build a container image with tests (for testing)'
@@ -46,6 +48,9 @@ bash:
 
 cleancache:
 	find . -name __pycache__ -print | grep -v .venv | xargs rm -rf
+
+cleanfetch:
+	@rm -f ${FETCHED}/*
 
 cleanrpts:
 	@rm -f ${RPTS}/*
