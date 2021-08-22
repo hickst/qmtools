@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher library code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/7/2021.
-# Last Modified: Add tests for query parameters in build_query.
+# Last Modified: Stop using the stupid underscore links field.
 #
 import json
 import os
@@ -49,12 +49,6 @@ def arec():
     '_updated': 'Sat, 30 Sep 2017 14:43:11 GMT',
     '_etag': 'c93ade3cea8db90a9d1f6f1d4433effe5ce7192c',
     'spacing_z': 1.9999998807907104,
-    '_links': {
-      'self': {
-        'title': 'bold',
-        'href': 'bold/59cfad7f265d200019380537'
-      }
-    }
   }
 
 
@@ -103,8 +97,6 @@ def flrec():
     '_updated': 'Sat, 30 Sep 2017 14:43:11 GMT',
     '_etag': 'c93ade3cea8db90a9d1f6f1d4433effe5ce7192c',
     'spacing_z': 1.9999998807907104,
-    '_links.self.title': 'bold',
-    '_links.self.href': 'bold/59cfad7f265d200019380537'
 }
 
 
@@ -118,7 +110,7 @@ class TestFetcher(object):
   page1_results_fyl = f"{TEST_RESOURCES_DIR}/reptime1.json"
   page1_results_cnt = 25
 
-  arec_len = 23
+  arec_len = 21              # number of keys in arec above
 
   def test_build_query_bad_modality(self):
     with pytest.raises(ValueError) as ve:
@@ -325,12 +317,9 @@ class TestFetcher(object):
     assert 'provenance.md5sum' in d
     assert 'provenance.settings.fd_thres' in d
     assert '_etag' in d
-    assert '_links.self.title' in d
 
     assert 'bids_meta' not in d
     assert 'provenance' not in d
-    assert '_links' not in d
-    assert '_links.self' not in d
     assert 'aqi' not in d
 
 
@@ -348,12 +337,9 @@ class TestFetcher(object):
     assert 'provenance.md5sum' in d
     assert 'provenance.settings.fd_thres' in d
     assert '_etag' in d
-    assert '_links.self.title' in d
 
     assert 'bids_meta' not in d
     assert 'provenance' not in d
-    assert '_links' not in d
-    assert '_links.self' not in d
     assert 'aqi' not in d
 
 
@@ -427,7 +413,7 @@ class TestFetcher(object):
     with tempfile.TemporaryDirectory() as tmpdir:
       print(f"tmpdir={tmpdir}")
       tmpfile = os.path.join(tmpdir, 'test.tsv')
-      fetch.save_to_tsv([flrec], tmpfile)
+      fetch.save_to_tsv('bold', [flrec], tmpfile)
       files = os.listdir(os.path.join(tmpdir))
       assert files is not None
       assert len(files) == 1
@@ -439,7 +425,7 @@ class TestFetcher(object):
       assert '_id' in lines[0]
       assert '_created' in lines[0]
       assert 'provenance.md5sum' in lines[0]
-      assert 'bold/59cfad7f265d200019380537' in lines[1]
+      assert '59cfad7f265d200019380537' in lines[1]
       assert 'Siemens' in lines[1]
 
 
