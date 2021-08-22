@@ -1,7 +1,7 @@
 #
 # Module with methods to read and parse a query parameters file.
 #   Written by: Tom Hicks. 8/17/2021.
-#   Last Modified: Redid parse_value to check for empty values.
+#   Last Modified: Fix iteration in validate_query_params.
 #
 import sys
 import configparser as cp
@@ -25,6 +25,7 @@ def load_query_from_file (query_file, prog_name=''):
   Load query parameters from the 'parameters' section of the given
   query parameters file. Return those parameters as a dictionary
   or raise exceptions for various loading problems.
+  NB: This loading process strips whitespace from both keys and values!
   """
   sys.tracebacklimit = 0
   try:
@@ -110,7 +111,7 @@ def validate_query_params (modality, query_params, prog_name=''):
   back into the query_params dictionary under the validated key.
   Raises ValueError if any validation step fails.
   """
-  for key, value in query_params:
+  for key, value in query_params.items():
     validate_keyword(modality, key, prog_name)
     comparison = parse_value(value, prog_name)
     query_params[key] = comparison
