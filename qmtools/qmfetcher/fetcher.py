@@ -1,6 +1,6 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: Methods to query the MRIQC server and download query result records.
-# Last Modified: Wrote TSV using imported modality-specific keywords.
+# Last Modified: Wrote TSV using imported modality keywords. Ignore extra fields when writing TSV.
 #
 import csv
 import json
