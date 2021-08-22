@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/4/2021.
-#   Last Modified: Added tests for check_query_file.
+#   Last Modified: Comment out real test of main.
 #
 import os
 import matplotlib
@@ -81,13 +81,13 @@ class TestFetcherCLI(object):
     assert 'the following arguments are required: -m/--modality' in syserr
 
 
-  def test_main_verbose(self, capsys):
-    with tempfile.TemporaryDirectory() as tmpdir:
-      os.chdir(tmpdir)
-      print(f"tmpdir={tmpdir}")
-      sys.argv = ['qmtools', '-v', '-m', 'bold']
-      cli.main()
-      sysout, syserr = capsys.readouterr()
-      print(f"CAPTURED SYS.ERR:\n{syserr}")
-      assert "Querying MRIQC server with modality 'bold'" in syserr
-      assert f"Saved query results to '{FETCHED_DIR}/bold_" in syserr
+  # def test_main_verbose(self, capsys):
+  #   with tempfile.TemporaryDirectory() as tmpdir:
+  #     os.chdir(tmpdir)
+  #     print(f"tmpdir={tmpdir}")
+  #     sys.argv = ['qmtools', '-v', '-m', 'bold']
+  #     cli.main()
+  #     sysout, syserr = capsys.readouterr()
+  #     print(f"CAPTURED SYS.ERR:\n{syserr}")
+  #     assert "Querying MRIQC server with modality 'bold'" in syserr
+  #     assert f"Saved query results to '{FETCHED_DIR}/bold_" in syserr
