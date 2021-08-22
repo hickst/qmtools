@@ -1,6 +1,6 @@
 # Tests of the module to read and parse a query parameters file.
 #   Written by: Tom Hicks and Dianne Patterson. 8/17/2021.
-# Last Modified: Add more tests for validate_keyword.
+#   Last Modified: Add test for load_query_from_file: no params vs no params section.
 #
 import configparser
 import os
@@ -20,6 +20,7 @@ class TestQueryParser(object):
   empty_query_fyl = f"{TEST_RESOURCES_DIR}/empty.qp"
   nocolon_query_fyl = f"{TEST_RESOURCES_DIR}/nocolon.qp"
   noparams_query_fyl = f"{TEST_RESOURCES_DIR}/noparams.qp"
+  noparamsec_query_fyl = f"{TEST_RESOURCES_DIR}/noparamsec.qp"
   nosec_query_fyl = f"{TEST_RESOURCES_DIR}/nosec.qp"
   params_query_fyl = f"{TEST_RESOURCES_DIR}/manmaf.qp"
 
@@ -44,9 +45,9 @@ class TestQueryParser(object):
     assert "A 'parameters' section header" in str(ve)
 
 
-  def test_load_query_from_file_noparams(self):
+  def test_load_query_from_file_noparamsec(self):
     with pytest.raises(ValueError) as ve:
-      qp.load_query_from_file(self.noparams_query_fyl, self.TEST_NAME)
+      qp.load_query_from_file(self.noparamsec_query_fyl, self.TEST_NAME)
     print(ve)
     assert 'No section named' in str(ve)
 
@@ -57,6 +58,13 @@ class TestQueryParser(object):
     print(ve)
     assert 'Source contains parsing errors' in str(ve)
     assert 'line  4' in str(ve)
+
+
+  def test_load_query_from_file_noparams(self):
+    pd = qp.load_query_from_file(self.noparams_query_fyl, self.TEST_NAME)
+    assert pd is not None
+    assert type(pd) is dict
+    assert len(pd) == 0
 
 
   def test_load_query_from_file_params(self):
