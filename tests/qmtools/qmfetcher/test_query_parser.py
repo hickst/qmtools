@@ -1,6 +1,6 @@
 # Tests of the module to read and parse a query parameters file.
 #   Written by: Tom Hicks and Dianne Patterson. 8/17/2021.
-#   Last Modified: Add test for load_query_from_file: no params vs no params section.
+#   Last Modified: Add tests for parse_query_from_file and validate_query_params.
 #
 import configparser
 import os
@@ -23,6 +23,22 @@ class TestQueryParser(object):
   noparamsec_query_fyl = f"{TEST_RESOURCES_DIR}/noparamsec.qp"
   nosec_query_fyl = f"{TEST_RESOURCES_DIR}/nosec.qp"
   params_query_fyl = f"{TEST_RESOURCES_DIR}/manmaf.qp"
+
+  query_params_dict = {
+    'snr': '>  5',
+    'bids_meta.Manufacturer': '== "Siemens"',
+    'bids_meta.RepetitionTime': '<= 3'
+  }
+
+
+  def test_parse_query_from_file(self):
+    pd = qp.parse_query_from_file('bold', self.params_query_fyl, self.TEST_NAME)
+    assert pd is not None
+    assert type(pd) is dict
+    assert len(pd) == 3
+    assert 'dummy_trs' in pd.keys()
+    assert 'bids_meta.Manufacturer' in pd.keys()
+
 
   def test_load_query_from_file_nosuch(self):
     with pytest.raises(FileNotFoundError) as fnf:
@@ -163,3 +179,14 @@ class TestQueryParser(object):
     assert qp.validate_keyword('T1w', 'bids_meta.subject_id', self.TEST_NAME)
     assert qp.validate_keyword('T1w', 'provenance.version', self.TEST_NAME)
     assert qp.validate_keyword('T1w', 'wm2max', self.TEST_NAME)
+
+
+  def test_validate_query_params(self):
+    qpd = self.query_params_dict
+    qp.validate_query_params('bold', qpd, self.TEST_NAME)
+    assert qpd is not None
+    assert len(qpd) == 3
+    assert 'snr' in qpd
+    assert 'bids_meta.Manufacturer' in qpd
+    assert 'bids_meta.RepetitionTime' in qpd
+    assert 'dummy_trs' not in qpd
