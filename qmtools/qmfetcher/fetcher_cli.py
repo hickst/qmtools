@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to query the MRIQC server and download query result records
 #          into a file for further processing.
-# Last Modified: Remove unused pandas import.
+# Last Modified: Actually do the fetch and write TSV.
 #
 import argparse
 import os
@@ -75,7 +75,7 @@ def main (argv=None):
   )
 
   parser.add_argument(
-    '-n', '--num-recs', dest='num_recs',
+    '-n', '--num-recs', dest='num_recs', type=int,
     default=SERVER_PAGE_SIZE,
     help='Number of records to fetch (maximum) from a query [default: {SERVER_PAGE_SIZE}]'
   )
@@ -105,16 +105,17 @@ def main (argv=None):
   num_recs = args.get('num_recs')      # total number of records to fetch
   check_num_recs(num_recs)             # if check fails exits here, does not return!
 
-  # if output file path given, check the file path for validity
+  # use output file name given or generate one
   output_filename = args.get('output_filename')
   if (not output_filename):            # if none provided, generate an output filename
     output_filename = qmu.gen_output_filename(modality)
+  output_filepath = os.path.join(FETCHED_DIR, output_filename)
 
   # if query parameters file path given, check the file path for validity
   query_file = args.get('query_file')
   if (query_file):                     # if filepath provided, validate it
     check_query_file(query_file)       # may exit here and not return!
-    query_params = parse_query_from_file(query_file, PROG_NAME)
+    query_params = parse_query_from_file(modality, query_file, PROG_NAME)
   else:
     query_params = None
 
@@ -134,21 +135,20 @@ def main (argv=None):
 
   # query the MRIQC server and output or save the results
   try:
-    print(f"ARGS={args}")              # REMOVE LATER
-    if (query_params):                 # REMOVE LATER
-      print(f"QPARAMS={query_params}") # REMOVE LATER
-    query = fetch.build_query(modality, query_params=query_params)  # REMOVE LATER
-    print(f"QUERY={query}")            # REMOVE LATER
-
+    if (args.get('debug')):
+      print(f"ARGS={args}")
+    recs = fetch.get_n_records(modality, num_recs, query_params)
+    if (args.get('verbose')):
+      print(f"Fetched #{len(recs)} records.")
+    fetch.save_to_tsv(modality, recs, output_filepath)
   except Exception as err:
-    errMsg = "({}): ERROR: Processing Error ({}): {}".format(
-      PROG_NAME, err.error_code, err.message)
+    errMsg = "({}): ERROR: Processing Error: {}".format(PROG_NAME, str(err))
     print(errMsg, file=sys.stderr)
-    sys.exit(err.error_code)
+    sys.exit(1)
 
   if (args.get('verbose')):
     if (output_filename is not None):
-      print(f"({PROG_NAME}): Saved query results to '{FETCHED_DIR}/{output_filename}'.", file=sys.stderr)
+      print(f"({PROG_NAME}): Saved query results to '{output_filepath}'.", file=sys.stderr)
 
 
 
