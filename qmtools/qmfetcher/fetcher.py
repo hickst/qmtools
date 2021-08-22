@@ -1,6 +1,6 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: Methods to query the MRIQC server and download query result records.
-# Last Modified: Add query parameters in build_query.
+# Last Modified: Wrote TSV using imported modality-specific keywords.
 #
 import csv
 import json
@@ -8,7 +8,8 @@ import os
 import requests as req
 import sys
 
-from qmtools import ALLOWED_MODALITIES
+from config.mriqc_keywords import BOLD_KEYWORDS, STRUCTURAL_KEYWORDS
+from qmtools import ALLOWED_MODALITIES, STRUCTURAL_MODALITIES
 from qmtools.qmfetcher import DEFAULT_RESULTS_SIZE, SERVER_PAGE_SIZE
 from qmtools.qm_utils import validate_modality
 
@@ -183,15 +184,18 @@ def query_for_page (modality, page_num=1, query_params=None,
   return clean_records(flat_recs, fields_to_remove)
 
 
-def save_to_tsv (records, filepath):
+def save_to_tsv (modality, records, filepath):
   """
   Save the given image metric records (list of dictionaries) to the
   file at the given filepath (default standard output).
   """
   if (records):
-    fields = sorted(records[0].keys())
+    if (modality in STRUCTURAL_MODALITIES):
+      fields = sorted(list(STRUCTURAL_KEYWORDS))
+    else:
+      fields = sorted(list(BOLD_KEYWORDS))
     with open(filepath, 'w', newline='') as tsvfile:
-      writer = csv.DictWriter(tsvfile, fieldnames=fields, delimiter='\t')
+      writer = csv.DictWriter(tsvfile, fieldnames=fields, delimiter='\t', extrasaction='ignore')
       writer.writeheader()
       for rec in records:
         writer.writerow(rec)

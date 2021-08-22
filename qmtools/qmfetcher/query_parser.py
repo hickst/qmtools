@@ -1,13 +1,13 @@
 #
 # Module with methods to read and parse a query parameters file.
 #   Written by: Tom Hicks. 8/17/2021.
-#   Last Modified: Fix iteration in validate_query_params.
+#   Last Modified: Update for merge of Bids keywords into other keywords.
 #
 import sys
 import configparser as cp
 from configparser import MissingSectionHeaderError, ParsingError
 from qmtools import STRUCTURAL_MODALITIES
-from config.mriqc_keywords import BIDS_KEYWORDS, BOLD_KEYWORDS, STRUCTURAL_KEYWORDS
+from config.mriqc_keywords import BOLD_KEYWORDS, STRUCTURAL_KEYWORDS
 
 
 def parse_query_from_file (modality, query_file, prog_name=''):
@@ -88,9 +88,6 @@ def validate_keyword (modality, key, prog_name=''):
   Compare the given keyword to known sets of modality-specific keywords and
   raise a ValueError if the keyword is unknown or not valid for the modality.
   """
-  if (key in BIDS_KEYWORDS):
-    return True
-
   if (modality in STRUCTURAL_MODALITIES):
     if (key in STRUCTURAL_KEYWORDS):
       return True

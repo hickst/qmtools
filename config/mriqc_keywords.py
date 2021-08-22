@@ -4,7 +4,7 @@
 #     https://github.com/poldracklab/mriqcwebapi/blob/master/dockereve-master/eve-app/settings.py
 #
 #   Written by: Tom Hicks. 8/19/2021.
-#   Last Modified: Complete the lists.
+#   Last Modified: Merge Bids keywords into Bold and structural keywords.
 #
 BIDS_KEYWORDS = set([
   'bids_meta.modality',
@@ -220,5 +220,8 @@ STRUCTURAL_KEYWORDS = set([
   'provenance.settings.testing',
   'provenance.mriqc_pred',
   'provenance.email'
-
 ])
+
+# Add all Bids keywords to Bold keywords and Structural (T1w, T2w) keywords
+BOLD_KEYWORDS.update(BIDS_KEYWORDS)
+STRUCTURAL_KEYWORDS.update(BIDS_KEYWORDS)
