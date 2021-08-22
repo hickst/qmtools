@@ -1,6 +1,6 @@
 # Tests of the module to read and parse a query parameters file.
 #   Written by: Tom Hicks and Dianne Patterson. 8/17/2021.
-# Last Modified: Add tests for validate_keyword.
+# Last Modified: Add more tests for validate_keyword.
 #
 import configparser
 import os
@@ -120,6 +120,9 @@ class TestQueryParser(object):
     assert qp.validate_keyword('bold', 'aor', self.TEST_NAME)
     assert qp.validate_keyword('bold', 'dummy_trs', self.TEST_NAME)
     assert qp.validate_keyword('bold', 'bids_meta.subject_id', self.TEST_NAME)
+    assert qp.validate_keyword('bold', 'provenance.md5sum', self.TEST_NAME)
+    assert qp.validate_keyword('bold', 'rating.name', self.TEST_NAME)
+    assert qp.validate_keyword('bold', 'bids_meta.TaskName', self.TEST_NAME)
 
 
   def test_validate_keyword_s_empty(self):
@@ -140,7 +143,15 @@ class TestQueryParser(object):
     assert "'aor' is not a valid T1w keyword" in str(ve)
 
 
+  def test_validate_keyword_s_taskname(self):
+    with pytest.raises(ValueError) as ve:
+      qp.validate_keyword('T1w', 'bids_meta.TaskName', self.TEST_NAME)
+    assert "'bids_meta.TaskName' is not a valid T1w keyword" in str(ve)
+
+
   def test_validate_keyword_s_good(self):
     assert qp.validate_keyword('T1w', 'cnr', self.TEST_NAME)
     assert qp.validate_keyword('T1w', 'fber', self.TEST_NAME)
     assert qp.validate_keyword('T1w', 'bids_meta.subject_id', self.TEST_NAME)
+    assert qp.validate_keyword('T1w', 'provenance.version', self.TEST_NAME)
+    assert qp.validate_keyword('T1w', 'wm2max', self.TEST_NAME)
