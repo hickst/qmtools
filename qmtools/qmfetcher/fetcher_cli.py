@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to query the MRIQC server and download query result records
 #          into a file for further processing.
-# Last Modified: Actually do the fetch and write TSV.
+# Last Modified: Allow fetch URL generation only.
 #
 import argparse
 import os
@@ -21,8 +21,7 @@ PROG_NAME = 'qmfetcher'
 def check_query_file (query_file):
   """
   If a query parameters file path is given, check that it is a good path.
-  If not, then exit the entire program here with the specified (or default)
-  system exit code.
+  If not, then exit the entire program here with a specific system exit code.
   """
   if (not good_file_path(query_file)):
     errMsg = "({}): ERROR: {} Exiting...".format(PROG_NAME,
@@ -32,6 +31,10 @@ def check_query_file (query_file):
 
 
 def check_num_recs (num_recs):
+  """
+  Check that the number of records requested is reasonable (i.e. >= 1).
+  If not, then exit the entire program here with a specific system exit code.
+  """
   if (num_recs < 1):
     err_msg = "({}): ERROR: {} Exiting...".format(PROG_NAME,
       "The total number of records to fetch must be 1 or more.")
@@ -92,6 +95,12 @@ def main (argv=None):
     help="Path to a query parameters file in or below the run directory [no default]"
   )
 
+  parser.add_argument(
+    '--url-only', dest='url_only', action='store_true',
+    default=False,
+    help='Generate the query URL and exit program [default: False].'
+  )
+
   # actually parse the arguments from the command line
   args = vars(parser.parse_args(argv))
 
@@ -119,6 +128,10 @@ def main (argv=None):
   else:
     query_params = None
 
+  if (args.get('url_only')):           # if generating URL only
+    print(fetch.build_query(modality, num_recs=num_recs, query_params=query_params))
+    sys.exit(0)                        # all done: exit out now
+
   if (args.get('verbose')):
     print(f"({PROG_NAME}): Querying MRIQC server with modality '{modality}', for {num_recs} records.",
       file=sys.stderr)
@@ -137,10 +150,16 @@ def main (argv=None):
   try:
     if (args.get('debug')):
       print(f"ARGS={args}")
+
+    # finally fetch some records from the server:
     recs = fetch.get_n_records(modality, num_recs, query_params)
+
     if (args.get('verbose')):
       print(f"Fetched #{len(recs)} records.")
+
+    # save the fetched records into a TSV file:
     fetch.save_to_tsv(modality, recs, output_filepath)
+
   except Exception as err:
     errMsg = "({}): ERROR: Processing Error: {}".format(PROG_NAME, str(err))
     print(errMsg, file=sys.stderr)
