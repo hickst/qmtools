@@ -1,6 +1,6 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: Shared utilities for the QMTools programs.
-# Last Modified: Correct for strict modality capitalization.
+# Last Modified: Remove spurious param checks in ensure_* fns. Fix error msg in ensure_reports_dir.
 #
 import datetime
 import os
@@ -18,7 +18,7 @@ def ensure_fetched_dir (program_name):
   If not, then attempt to create the subdirectory in the current directory.
   If unable to create the directory, then exit out.
   """
-  if (FETCHED_DIR is None or (not good_dir_path(FETCHED_DIR, writeable=True))):
+  if (not good_dir_path(FETCHED_DIR, writeable=True)):
     try:
       os.mkdir(FETCHED_DIR, mode=0o775)
     except OSError:
@@ -37,13 +37,13 @@ def ensure_reports_dir (program_name):
   If not, then attempt to create the subdirectory in the current directory.
   If unable to create the directory, then exit out.
   """
-  if (REPORTS_DIR is None or (not good_dir_path(REPORTS_DIR, writeable=True))):
+  if (not good_dir_path(REPORTS_DIR, writeable=True)):
     try:
       os.mkdir(REPORTS_DIR, mode=0o775)
     except OSError:
       helpMsg =  """
-        There must be a writeable child subdirectory called 'fetched'
-        to hold the fetched query results.
+        There must be a writeable child subdirectory called 'reports'
+        to hold the output reports.
         """
       errMsg = "({}): ERROR: {} Exiting...".format(program_name, helpMsg)
       print(errMsg, file=sys.stderr)
