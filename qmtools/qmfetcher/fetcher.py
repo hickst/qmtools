@@ -1,6 +1,6 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: Methods to query the MRIQC server and download query result records.
-# Last Modified: Wrote TSV using imported modality keywords. Ignore extra fields when writing TSV.
+# Last Modified: Refactor build_query to take num_recs, query_for_page to take query string.
 #
 import csv
 import json
@@ -18,7 +18,8 @@ DEFAULT_FIELDS_TO_REMOVE = ['_etag', 'bids_meta.Instructions',
                             '_links.self.title', '_links.self.href']
 
 
-def build_query (modality, page_num=1, query_params=None, latest=True):
+def build_query (modality, num_recs=SERVER_PAGE_SIZE, page_num=1,
+                 query_params=None, latest=True):
   """
   Construct and return a query string given the modality, starting page number,
   and optional dictionary of query parameter keys and values.
@@ -26,10 +27,13 @@ def build_query (modality, page_num=1, query_params=None, latest=True):
   """
   validate_modality(modality)          # validates or raises ValueError
 
-  # check for reasonable page number
+  # check for reasonable page number and number of records
   if (not page_num or (page_num < 1)):
     page_num = 1
-  url_str = f"{SERVER_URL}/{modality}?max_results={SERVER_PAGE_SIZE}&page={page_num}"
+  if (not num_recs or (num_recs < 1)):
+    num_recs = SERVER_PAGE_SIZE
+
+  url_str = f"{SERVER_URL}/{modality}?max_results={num_recs}&page={page_num}"
 
   # if latest flag specified, use the most recent records
   if (latest):                         # uses most recent by default
@@ -141,7 +145,7 @@ def flatten_records (json_recs):
 def get_n_records (modality, num_recs=SERVER_PAGE_SIZE, query_params=None,
                    fields_to_remove=DEFAULT_FIELDS_TO_REMOVE):
   """
-  Fetch N records from the server using the given paramters. Query then
+  Fetch N records from the server using the given parameters. Query then
   clean, flatten, deduplicate and return a list of fetched image quality
   metrics records (dictionaries).
   Arguments:
@@ -154,7 +158,8 @@ def get_n_records (modality, num_recs=SERVER_PAGE_SIZE, query_params=None,
   next_page_num = 1
   chksums_seen = set()
   while (len(good_records) < num_recs):
-    recs = query_for_page(modality, next_page_num, query_params, fields_to_remove)
+    recs = query_for_page(modality, page_num=next_page_num, query_params=query_params,
+                          fields_to_remove=fields_to_remove)
     if (len(recs) < 1):                # if no more records available, then exit
       break
     recs, chksums_seen = deduplicate_records(recs, chksums_seen)
@@ -165,7 +170,7 @@ def get_n_records (modality, num_recs=SERVER_PAGE_SIZE, query_params=None,
   return good_records[:num_recs] if (len(good_records) > num_recs) else good_records
 
 
-def query_for_page (modality, page_num=1, query_params=None,
+def query_for_page (modality, page_num=1, query=None, query_params=None,
                     fields_to_remove=DEFAULT_FIELDS_TO_REMOVE):
   """
   Query for the first (or numbered) page of results from
@@ -173,15 +178,17 @@ def query_for_page (modality, page_num=1, query_params=None,
   Arguments:
     modality: the modality to query on (must be one of {ALLOWED_MODALITIES}).
     page_num: page number (one offset) for the page to fetch (default: 1).
+    query: an optional pre-built query to use to fetch a page of results.
     query_params: dictionary of additional query parameters (default: None).
     fields_to_remove: a list of field names to remove when cleaning records.
   """
   validate_modality(modality)          # validates or raises ValueError
-  query = build_query(modality, page_num, query_params)
+  if (query is None):
+    query = build_query(modality, page_num=page_num, query_params=query_params)
   json_query_result = do_query(query)
   json_recs = extract_records(json_query_result)
   flat_recs = flatten_records(json_recs)
-  return clean_records(flat_recs, fields_to_remove)
+  return clean_records(flat_recs, fields_to_remove=fields_to_remove)
 
 
 def save_to_tsv (modality, records, filepath):
