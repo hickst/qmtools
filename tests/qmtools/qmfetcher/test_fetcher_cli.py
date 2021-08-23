@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/4/2021.
-#   Last Modified: Comment out real test of main.
+#   Last Modified: Add tests for building query only in main.
 #
 import os
 import matplotlib
@@ -12,6 +12,7 @@ import tempfile
 from pathlib import Path
 
 from qmtools import ALLOWED_MODALITIES, FETCHED_DIR, NUM_RECS_EXIT_CODE, QUERY_FILE_EXIT_CODE
+from qmtools.qmfetcher.fetcher import SERVER_URL
 import qmtools.qmfetcher.fetcher_cli as cli
 from tests import TEST_RESOURCES_DIR
 
@@ -23,6 +24,7 @@ class TestFetcherCLI(object):
   struct_test_fyl  = f"{TEST_RESOURCES_DIR}/struct_test.tsv"
   empty_test_fyl   = f"{TEST_RESOURCES_DIR}/empty.txt"
   nosuch_test_fyl = f"{TEST_RESOURCES_DIR}/NO_SUCH.tsv"
+  params_query_fyl = f"{TEST_RESOURCES_DIR}/manmaf.qp"
 
   nosuch_dir = f"{TEST_RESOURCES_DIR}/NO_SUCH_DIR"
   tmp_dir = '/tmp'
@@ -79,6 +81,35 @@ class TestFetcherCLI(object):
     sysout, syserr = capsys.readouterr()
     print(f"CAPTURED SYS.ERR:\n{syserr}")
     assert 'the following arguments are required: -m/--modality' in syserr
+
+
+  def test_main_bq_noqps(self, capsys):
+    with pytest.raises(SystemExit) as se:
+      sys.argv = [ 'qmtools', '-v', '-m', 'T1w', '-n', '4', '--url-only' ]
+      cli.main()
+    print(se)
+    assert se.value.code == 0
+    sysout, syserr = capsys.readouterr()
+    print(f"CAPTURED SYS.OUT:\n{sysout}")
+    print(f"CAPTURED SYS.ERR:\n{syserr}")
+    assert SERVER_URL in sysout
+    assert '/T1w' in sysout
+    assert 'max_results=4' in sysout
+
+
+  def test_main_bq_qps(self, capsys):
+    with pytest.raises(SystemExit) as se:
+      sys.argv = [ 'qmtools', '-v', '-m', 'bold', '-n', '4',
+                   '-q', self.params_query_fyl, '--url-only' ]
+      cli.main()
+    print(se)
+    assert se.value.code == 0
+    sysout, syserr = capsys.readouterr()
+    print(f"CAPTURED SYS.OUT:\n{sysout}")
+    print(f"CAPTURED SYS.ERR:\n{syserr}")
+    assert SERVER_URL in sysout
+    assert '/bold' in sysout
+    assert 'max_results=4' in sysout
 
 
   # def test_main_verbose(self, capsys):

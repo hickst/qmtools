@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher library code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/7/2021.
-# Last Modified: Stop using the stupid underscore links field.
+# Last Modified: Test num_recs arg of build_query.
 #
 import json
 import os
@@ -97,7 +97,18 @@ def flrec():
     '_updated': 'Sat, 30 Sep 2017 14:43:11 GMT',
     '_etag': 'c93ade3cea8db90a9d1f6f1d4433effe5ce7192c',
     'spacing_z': 1.9999998807907104,
-}
+  }
+
+
+@pytest.fixture
+def flrec_t1():
+  return {
+    '_id': '611c26e11329e57f6e1f4de6',
+    'cjv': 3165.384765625,
+    'fwhm_x': 2.266005,
+    '_created': 'Sat, 30 Sep 2017 14:43:11 GMT',
+    'bids_meta.EchoTime': 0.123
+  }
 
 
 class TestFetcher(object):
@@ -126,14 +137,29 @@ class TestFetcher(object):
     assert f"{SERVER_URL}/T2w?max_results={SERVER_PAGE_SIZE}&page=1" in qstr
 
 
+  def test_build_query_num_recs(self):
+    qstr = fetch.build_query('bold', num_recs=None)
+    assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}" in qstr
+    qstr = fetch.build_query('bold', num_recs=0)
+    assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}" in qstr
+    qstr = fetch.build_query('bold', num_recs=-4)
+    assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}" in qstr
+    qstr = fetch.build_query('bold', num_recs=1)
+    assert f"{SERVER_URL}/bold?max_results=1" in qstr
+    qstr = fetch.build_query('bold', num_recs=SERVER_PAGE_SIZE)
+    assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}" in qstr
+    qstr = fetch.build_query('bold', num_recs=999)
+    assert f"{SERVER_URL}/bold?max_results=999" in qstr
+
+
   def test_build_query_pagenum_nums(self):
-    qstr = fetch.build_query('bold', None)
+    qstr = fetch.build_query('bold', page_num=None)
     assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=1" in qstr
-    qstr = fetch.build_query('bold', 0)
+    qstr = fetch.build_query('bold', page_num=0)
     assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=1" in qstr
-    qstr = fetch.build_query('bold', 1)
+    qstr = fetch.build_query('bold', page_num=1)
     assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=1" in qstr
-    qstr = fetch.build_query('bold', 999)
+    qstr = fetch.build_query('bold', page_num=999)
     assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=999" in qstr
 
 
@@ -349,7 +375,16 @@ class TestFetcher(object):
 
 
   def test_get_n_records_0(self):
-    recs = fetch.get_n_records('bold', 0)
+    recs = fetch.get_n_records('bold', num_recs=0)
+    print(recs)
+    assert recs is not None
+    assert type(recs) == list
+    assert len(recs) == 0
+
+
+  def test_get_n_records_norecs(self):
+    qparams = { 'dummy_trs': '==999' }
+    recs = fetch.get_n_records('bold', query_params=qparams)
     print(recs)
     assert recs is not None
     assert type(recs) == list
@@ -357,7 +392,7 @@ class TestFetcher(object):
 
 
   def test_get_n_records_1(self):
-    recs = fetch.get_n_records('bold', 1)
+    recs = fetch.get_n_records('bold', num_recs=1)
     print(recs)
     assert recs is not None
     assert type(recs) == list
@@ -365,7 +400,7 @@ class TestFetcher(object):
 
 
   def test_get_n_records_9(self):
-    recs = fetch.get_n_records('bold', 9)
+    recs = fetch.get_n_records('bold', num_recs=9)
     print(recs)
     assert recs is not None
     assert type(recs) == list
@@ -373,7 +408,7 @@ class TestFetcher(object):
 
 
   def test_get_n_records_pagesize(self):
-    recs = fetch.get_n_records('bold', SERVER_PAGE_SIZE)
+    recs = fetch.get_n_records('bold', num_recs=SERVER_PAGE_SIZE)
     print(recs)
     assert recs is not None
     assert type(recs) == list
@@ -381,7 +416,7 @@ class TestFetcher(object):
 
 
   def test_get_n_records_pagesize_plus(self):
-    recs = fetch.get_n_records('bold', SERVER_PAGE_SIZE+4)
+    recs = fetch.get_n_records('bold', num_recs=(SERVER_PAGE_SIZE+4))
     print(recs)
     assert recs is not None
     assert type(recs) == list
@@ -389,7 +424,7 @@ class TestFetcher(object):
 
 
   def test_get_n_records_pagesize2x(self):
-    recs = fetch.get_n_records('bold', 2 * SERVER_PAGE_SIZE)
+    recs = fetch.get_n_records('bold', num_recs=(2 * SERVER_PAGE_SIZE))
     print(recs)
     assert recs is not None
     assert type(recs) == list
@@ -409,7 +444,7 @@ class TestFetcher(object):
     assert len(recs) == SERVER_PAGE_SIZE
 
 
-  def test_save_to_tsv_1(self, flrec):
+  def test_save_to_tsv_bold(self, flrec):
     with tempfile.TemporaryDirectory() as tmpdir:
       print(f"tmpdir={tmpdir}")
       tmpfile = os.path.join(tmpdir, 'test.tsv')
@@ -427,6 +462,27 @@ class TestFetcher(object):
       assert 'provenance.md5sum' in lines[0]
       assert '59cfad7f265d200019380537' in lines[1]
       assert 'Siemens' in lines[1]
+
+
+  def test_save_to_tsv_struct(self, flrec_t1):
+    with tempfile.TemporaryDirectory() as tmpdir:
+      print(f"tmpdir={tmpdir}")
+      tmpfile = os.path.join(tmpdir, 'test.tsv')
+      fetch.save_to_tsv('T1w', [flrec_t1], tmpfile)
+      files = os.listdir(os.path.join(tmpdir))
+      assert files is not None
+      assert len(files) == 1
+      with open(tmpfile) as tmpf:
+        lines = tmpf.readlines()
+        print(f"LINES[0]={lines[0]}")
+        print(f"LINES[1]={lines[1]}")
+      assert len(lines) == 2
+      assert '_id' in lines[0]
+      assert '_created' in lines[0]
+      assert 'cjv' in lines[0]
+      assert 'bids_meta.EchoTime' in lines[0]
+      assert '611c26e11329e57f6e1f4de6' in lines[1]
+      assert '0.123' in lines[1]
 
 
   def test_server_health_check(self):
