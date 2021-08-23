@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher library code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/7/2021.
-# Last Modified: Test num_recs arg of build_query.
+# Last Modified: Add build_query_num_rec, get_n_records_norecs, save_to_tsv_struct.
 #
 import json
 import os
