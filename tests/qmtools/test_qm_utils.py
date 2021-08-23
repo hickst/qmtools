@@ -1,6 +1,6 @@
 # Tests of Shared utilities for the QMTools programs.
 #   Written by: Tom Hicks and Dianne Patterson. 8/5/2021.
-# Last Modified: Update for strict modality capitalization.
+# Last Modified: Fix: restore cwd after chdir or tests interfere!
 #
 import os
 import pandas
@@ -21,40 +21,56 @@ class TestQMUtils(object):
 
   def test_ensure_fetched_dir(self):
     with tempfile.TemporaryDirectory() as tmpdir:
-      os.chdir(tmpdir)
-      assert not os.path.isdir(FETCHED_DIR)
-      qmu.ensure_fetched_dir('TestQMUtils')
-      assert os.path.isdir(FETCHED_DIR)
-      assert os.access(FETCHED_DIR, os.W_OK)
+      start_dir = os.getcwd()
+      try:
+        os.chdir(tmpdir)               # DANGER: must restore cwd after test
+        assert not os.path.isdir(FETCHED_DIR)
+        qmu.ensure_fetched_dir('TestQMUtils')
+        assert os.path.isdir(FETCHED_DIR)
+        assert os.access(FETCHED_DIR, os.W_OK)
+      finally:
+        os.chdir(start_dir)
 
 
   def test_ensure_fetched_dir_fail(self):
     if (os.environ.get('RUNNING_IN_CONTAINER') is None):
-      with pytest.raises(SystemExit) as se:
-        os.chdir('/')
-        assert not os.path.isdir(FETCHED_DIR)
-        qmu.ensure_fetched_dir('TestQMUtils')
-      assert se.value.code == FETCHED_DIR_EXIT_CODE
+      start_dir = os.getcwd()
+      try:
+        with pytest.raises(SystemExit) as se:
+          os.chdir('/')                # DANGER: must restore cwd after test
+          assert not os.path.isdir(FETCHED_DIR)
+          qmu.ensure_fetched_dir('TestQMUtils')
+        assert se.value.code == FETCHED_DIR_EXIT_CODE
+      finally:
+        os.chdir(start_dir)
     else:
       assert True
 
 
   def test_ensure_reports_dir(self):
     with tempfile.TemporaryDirectory() as tmpdir:
-      os.chdir(tmpdir)
-      assert not os.path.isdir(REPORTS_DIR)
-      qmu.ensure_reports_dir('TestQMUtils')
-      assert os.path.isdir(REPORTS_DIR)
-      assert os.access(REPORTS_DIR, os.W_OK)
+      start_dir = os.getcwd()
+      try:
+        os.chdir(tmpdir)               # DANGER: must restore cwd after test
+        assert not os.path.isdir(REPORTS_DIR)
+        qmu.ensure_reports_dir('TestQMUtils')
+        assert os.path.isdir(REPORTS_DIR)
+        assert os.access(REPORTS_DIR, os.W_OK)
+      finally:
+        os.chdir(start_dir)
 
 
   def test_ensure_reports_dir_fail(self):
     if (os.environ.get('RUNNING_IN_CONTAINER') is None):
-      with pytest.raises(SystemExit) as se:
-        os.chdir('/')
-        assert not os.path.isdir(REPORTS_DIR)
-        qmu.ensure_reports_dir('TestQMUtils')
-      assert se.value.code == REPORTS_DIR_EXIT_CODE
+      start_dir = os.getcwd()
+      try:
+        with pytest.raises(SystemExit) as se:
+          os.chdir('/')                # DANGER: must restore cwd after test
+          assert not os.path.isdir(REPORTS_DIR)
+          qmu.ensure_reports_dir('TestQMUtils')
+        assert se.value.code == REPORTS_DIR_EXIT_CODE
+      finally:
+        os.chdir(start_dir)
     else:
       assert True
 
