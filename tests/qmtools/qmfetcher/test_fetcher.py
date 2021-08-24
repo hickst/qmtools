@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher library code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/7/2021.
-# Last Modified: Add build_query_num_rec, get_n_records_norecs, save_to_tsv_struct.
+# Last Modified: Update tests for build_query refactoring.
 #
 import json
 import os
@@ -126,6 +126,8 @@ class TestFetcher(object):
   def test_build_query_bad_modality(self):
     with pytest.raises(ValueError) as ve:
       fetch.build_query('BAD_MODE')
+    print(ve)
+    assert 'Modality argument must be one of' in str(ve)
 
 
   def test_build_query_modes_default(self):
@@ -138,17 +140,17 @@ class TestFetcher(object):
 
 
   def test_build_query_num_recs(self):
-    qstr = fetch.build_query('bold', num_recs=None)
+    qstr = fetch.build_query('bold', max_results=None)
     assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}" in qstr
-    qstr = fetch.build_query('bold', num_recs=0)
+    qstr = fetch.build_query('bold', max_results=0)
     assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}" in qstr
-    qstr = fetch.build_query('bold', num_recs=-4)
+    qstr = fetch.build_query('bold', max_results=-4)
     assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}" in qstr
-    qstr = fetch.build_query('bold', num_recs=1)
+    qstr = fetch.build_query('bold', max_results=1)
     assert f"{SERVER_URL}/bold?max_results=1" in qstr
-    qstr = fetch.build_query('bold', num_recs=SERVER_PAGE_SIZE)
+    qstr = fetch.build_query('bold', max_results=SERVER_PAGE_SIZE)
     assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}" in qstr
-    qstr = fetch.build_query('bold', num_recs=999)
+    qstr = fetch.build_query('bold', max_results=999)
     assert f"{SERVER_URL}/bold?max_results=999" in qstr
 
 
@@ -369,13 +371,8 @@ class TestFetcher(object):
     assert 'aqi' not in d
 
 
-  def test_get_n_records_bad_modality(self):
-    with pytest.raises(ValueError) as ve:
-      fetch.get_n_records('BAD_MODE')
-
-
   def test_get_n_records_0(self):
-    recs = fetch.get_n_records('bold', num_recs=0)
+    recs = fetch.get_n_records('bold', 0)
     print(recs)
     assert recs is not None
     assert type(recs) == list
@@ -384,7 +381,7 @@ class TestFetcher(object):
 
   def test_get_n_records_norecs(self):
     qparams = { 'dummy_trs': '==999' }
-    recs = fetch.get_n_records('bold', query_params=qparams)
+    recs = fetch.get_n_records('bold', 2, query_params=qparams)
     print(recs)
     assert recs is not None
     assert type(recs) == list
@@ -392,7 +389,7 @@ class TestFetcher(object):
 
 
   def test_get_n_records_1(self):
-    recs = fetch.get_n_records('bold', num_recs=1)
+    recs = fetch.get_n_records('bold', 1)
     print(recs)
     assert recs is not None
     assert type(recs) == list
@@ -400,7 +397,7 @@ class TestFetcher(object):
 
 
   def test_get_n_records_9(self):
-    recs = fetch.get_n_records('bold', num_recs=9)
+    recs = fetch.get_n_records('bold', 9)
     print(recs)
     assert recs is not None
     assert type(recs) == list
@@ -408,7 +405,7 @@ class TestFetcher(object):
 
 
   def test_get_n_records_pagesize(self):
-    recs = fetch.get_n_records('bold', num_recs=SERVER_PAGE_SIZE)
+    recs = fetch.get_n_records('bold', SERVER_PAGE_SIZE)
     print(recs)
     assert recs is not None
     assert type(recs) == list
@@ -416,7 +413,7 @@ class TestFetcher(object):
 
 
   def test_get_n_records_pagesize_plus(self):
-    recs = fetch.get_n_records('bold', num_recs=(SERVER_PAGE_SIZE+4))
+    recs = fetch.get_n_records('bold', SERVER_PAGE_SIZE+4)
     print(recs)
     assert recs is not None
     assert type(recs) == list
@@ -424,7 +421,7 @@ class TestFetcher(object):
 
 
   def test_get_n_records_pagesize2x(self):
-    recs = fetch.get_n_records('bold', num_recs=(2 * SERVER_PAGE_SIZE))
+    recs = fetch.get_n_records('bold', 2 * SERVER_PAGE_SIZE)
     print(recs)
     assert recs is not None
     assert type(recs) == list
@@ -432,13 +429,15 @@ class TestFetcher(object):
 
 
   def test_query_for_page_bad_modality(self):
-    with pytest.raises(ValueError) as ve:
-      fetch.query_for_page('BAD_MODE')
+    with pytest.raises(req.RequestException) as re:
+      fetch.query_for_page('BAD_QUERY')
+    print(re)
 
 
   def test_query_for_page_default(self):
-    recs = fetch.query_for_page('bold')
-    print(recs)
+    query = f"https://mriqc.nimh.nih.gov/api/v1/bold?max_results={SERVER_PAGE_SIZE}"
+    recs = fetch.query_for_page(query)
+    print(f"LEN(recs)={len(recs)}")
     assert recs is not None
     assert type(recs) == list
     assert len(recs) == SERVER_PAGE_SIZE

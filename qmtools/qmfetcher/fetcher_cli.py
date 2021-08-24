@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to query the MRIQC server and download query result records
 #          into a file for further processing.
-# Last Modified: Allow fetch URL generation only.
+# Last Modified: Update for build_query refactoring.
 #
 import argparse
 import os
@@ -129,7 +129,7 @@ def main (argv=None):
     query_params = None
 
   if (args.get('url_only')):           # if generating URL only
-    print(fetch.build_query(modality, num_recs=num_recs, query_params=query_params))
+    print(fetch.build_query(modality, max_results=num_recs, query_params=query_params))
     sys.exit(0)                        # all done: exit out now
 
   if (args.get('verbose')):
@@ -151,8 +151,8 @@ def main (argv=None):
     if (args.get('debug')):
       print(f"ARGS={args}")
 
-    # finally fetch some records from the server:
-    recs = fetch.get_n_records(modality, num_recs, query_params)
+    # build the query and fetch some records from the server:
+    recs = fetch.get_n_records(modality, num_recs, query_params=query_params)
 
     if (args.get('verbose')):
       print(f"Fetched #{len(recs)} records.")
