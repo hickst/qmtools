@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to query the MRIQC server and download query result records
 #          into a file for further processing.
-# Last Modified: Update for build_query refactoring.
+# Last Modified: Update for enhanced server status query.
 #
 import argparse
 import os
@@ -119,6 +119,8 @@ def main (argv=None):
   if (not output_filename):            # if none provided, generate an output filename
     output_filename = qmu.gen_output_filename(modality)
   output_filepath = os.path.join(FETCHED_DIR, output_filename)
+  if (not output_filepath.endswith('.tsv')):
+    output_filepath = output_filepath + '.tsv'
 
   # if query parameters file path given, check the file path for validity
   query_file = args.get('query_file')
@@ -136,9 +138,9 @@ def main (argv=None):
     print(f"({PROG_NAME}): Querying MRIQC server with modality '{modality}', for {num_recs} records.",
       file=sys.stderr)
 
-  # test whether the MRIQC server is up, exit out if not
+  # Use user's query to test whether the MRIQC server is up, exit out if not:
   try:
-    fetch.server_health_check()
+    total_recs = fetch.server_status(modality=modality, query_params=query_params)
   except req.RequestException as re:
     status = re.response.status_code
     if (status == 503):
@@ -155,7 +157,7 @@ def main (argv=None):
     recs = fetch.get_n_records(modality, num_recs, query_params=query_params)
 
     if (args.get('verbose')):
-      print(f"Fetched #{len(recs)} records.")
+      print(f"({PROG_NAME}): Fetched {len(recs)} records out of {total_recs}.")
 
     # save the fetched records into a TSV file:
     fetch.save_to_tsv(modality, recs, output_filepath)

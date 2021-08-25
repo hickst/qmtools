@@ -1,6 +1,6 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: Methods to query the MRIQC server and download query result records.
-# Last Modified: Refactor build_query: replace num_recs with max_results. Simplify query_for_page.
+# Last Modified: Enhance server status to return total records available for current query.
 #
 import csv
 import json
@@ -110,7 +110,7 @@ def extract_records (json_query_result):
   Extract and return a list of records (dictionaries) from the given
   query result dictionary.
   """
-  return json_query_result['_items']
+  return json_query_result.get('_items', [])
 
 
 def flatten_a_record (rec, prefix='', sep='.'):
@@ -204,12 +204,16 @@ def save_to_tsv (modality, records, filepath):
         writer.writerow(rec)
 
 
-def server_health_check ():
+def server_status (modality='bold', query_params=None):
   """
-  Send a minimal request to the server as a health check.
-  Return True is server responds with HTTP 200, else False.
+  Query the server with the user's current query parameters but only fetch
+  one record. This serves as a quick health check.
+  Return the total number of records available that satisfy the query with the
+  given parameters OR raises a requests.RequestException if the request fails.
   """
-  health_check_url = f"{SERVER_URL}/bold?max_results=1"
-  resp = req.get(health_check_url)
-  # resp.raise_for_status()
-  return resp.status_code
+  health_check_query = build_query(modality=modality, max_results=1, query_params=query_params)
+  # the GET request will raise an error if not successful:
+  json_query_result = do_query(health_check_query)
+  meta = json_query_result.get('_meta')
+  total_recs = meta.get('total') if meta else 0
+  return total_recs

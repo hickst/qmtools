@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher library code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/7/2021.
-# Last Modified: Update tests for build_query refactoring.
+# Last Modified: Update for enhanced server status query.
 #
 import json
 import os
@@ -428,7 +428,7 @@ class TestFetcher(object):
     assert len(recs) == 2 * SERVER_PAGE_SIZE
 
 
-  def test_query_for_page_bad_modality(self):
+  def test_query_for_page_bad_query(self):
     with pytest.raises(req.RequestException) as re:
       fetch.query_for_page('BAD_QUERY')
     print(re)
@@ -485,6 +485,14 @@ class TestFetcher(object):
 
 
   def test_server_health_check(self):
-    "No test assertion: just calls code which always returns status code"
-    status = fetch.server_health_check()
-    assert (status == 200 or status == 503)
+    try:
+      total_recs = fetch.server_status()
+      print(f"TOTAL_RECS={total_recs}")
+      assert (total_recs > 900000)       # DB has surpassed this number already
+    except req.RequestException as re:
+      print(str(re))
+      status = re.response.status_code
+      if (status == 503):
+        assert True
+      else:
+        assert False
