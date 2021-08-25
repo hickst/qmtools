@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/4/2021.
-#   Last Modified: Add tests for building query only in main.
+#   Last Modified: Minor rename 2 tests.
 #
 import os
 import matplotlib
@@ -83,7 +83,7 @@ class TestFetcherCLI(object):
     assert 'the following arguments are required: -m/--modality' in syserr
 
 
-  def test_main_bq_noqps(self, capsys):
+  def test_main_urlonly_noqps(self, capsys):
     with pytest.raises(SystemExit) as se:
       sys.argv = [ 'qmtools', '-v', '-m', 'T1w', '-n', '4', '--url-only' ]
       cli.main()
@@ -97,7 +97,7 @@ class TestFetcherCLI(object):
     assert 'max_results=4' in sysout
 
 
-  def test_main_bq_qps(self, capsys):
+  def test_main_urlonly_qps(self, capsys):
     with pytest.raises(SystemExit) as se:
       sys.argv = [ 'qmtools', '-v', '-m', 'bold', '-n', '4',
                    '-q', self.params_query_fyl, '--url-only' ]
@@ -110,15 +110,3 @@ class TestFetcherCLI(object):
     assert SERVER_URL in sysout
     assert '/bold' in sysout
     assert 'max_results=4' in sysout
-
-
-  # def test_main_verbose(self, capsys):
-  #   with tempfile.TemporaryDirectory() as tmpdir:
-  #     os.chdir(tmpdir)
-  #     print(f"tmpdir={tmpdir}")
-  #     sys.argv = ['qmtools', '-v', '-m', 'bold']
-  #     cli.main()
-  #     sysout, syserr = capsys.readouterr()
-  #     print(f"CAPTURED SYS.ERR:\n{syserr}")
-  #     assert "Querying MRIQC server with modality 'bold'" in syserr
-  #     assert f"Saved query results to '{FETCHED_DIR}/bold_" in syserr

@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher library code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/7/2021.
-# Last Modified: Update for enhanced server status query.
+# Last Modified: Split out functional tests of fetcher to separate module.
 #
 import json
 import os
@@ -304,15 +304,6 @@ class TestFetcher(object):
     print(re)
 
 
-  def test_do_query_noresults(self):
-    rec = fetch.do_query(self.noresult_query)
-    assert rec is not None
-    assert type(rec) == dict
-    assert '_items' in rec
-    assert '_meta' in rec
-    assert (rec.get('_meta')).get('total') == 0
-
-
   def test_extract_records_empty(self):
     with open(self.empty_results_fyl) as jfyl:
       results = json.load(jfyl)
@@ -379,68 +370,10 @@ class TestFetcher(object):
     assert len(recs) == 0
 
 
-  def test_get_n_records_norecs(self):
-    qparams = { 'dummy_trs': '==999' }
-    recs = fetch.get_n_records('bold', 2, query_params=qparams)
-    print(recs)
-    assert recs is not None
-    assert type(recs) == list
-    assert len(recs) == 0
-
-
-  def test_get_n_records_1(self):
-    recs = fetch.get_n_records('bold', 1)
-    print(recs)
-    assert recs is not None
-    assert type(recs) == list
-    assert len(recs) == 1
-
-
-  def test_get_n_records_9(self):
-    recs = fetch.get_n_records('bold', 9)
-    print(recs)
-    assert recs is not None
-    assert type(recs) == list
-    assert len(recs) == 9
-
-
-  def test_get_n_records_pagesize(self):
-    recs = fetch.get_n_records('bold', SERVER_PAGE_SIZE)
-    print(recs)
-    assert recs is not None
-    assert type(recs) == list
-    assert len(recs) == SERVER_PAGE_SIZE
-
-
-  def test_get_n_records_pagesize_plus(self):
-    recs = fetch.get_n_records('bold', SERVER_PAGE_SIZE+4)
-    print(recs)
-    assert recs is not None
-    assert type(recs) == list
-    assert len(recs) == SERVER_PAGE_SIZE+4
-
-
-  def test_get_n_records_pagesize2x(self):
-    recs = fetch.get_n_records('bold', 2 * SERVER_PAGE_SIZE)
-    print(recs)
-    assert recs is not None
-    assert type(recs) == list
-    assert len(recs) == 2 * SERVER_PAGE_SIZE
-
-
   def test_query_for_page_bad_query(self):
     with pytest.raises(req.RequestException) as re:
       fetch.query_for_page('BAD_QUERY')
     print(re)
-
-
-  def test_query_for_page_default(self):
-    query = f"https://mriqc.nimh.nih.gov/api/v1/bold?max_results={SERVER_PAGE_SIZE}"
-    recs = fetch.query_for_page(query)
-    print(f"LEN(recs)={len(recs)}")
-    assert recs is not None
-    assert type(recs) == list
-    assert len(recs) == SERVER_PAGE_SIZE
 
 
   def test_save_to_tsv_bold(self, flrec):
@@ -482,17 +415,3 @@ class TestFetcher(object):
       assert 'bids_meta.EchoTime' in lines[0]
       assert '611c26e11329e57f6e1f4de6' in lines[1]
       assert '0.123' in lines[1]
-
-
-  def test_server_health_check(self):
-    try:
-      total_recs = fetch.server_status()
-      print(f"TOTAL_RECS={total_recs}")
-      assert (total_recs > 900000)       # DB has surpassed this number already
-    except req.RequestException as re:
-      print(str(re))
-      status = re.response.status_code
-      if (status == 503):
-        assert True
-      else:
-        assert False
