@@ -1,6 +1,6 @@
 # Tests of the module to read and parse a query parameters file.
 #   Written by: Tom Hicks and Dianne Patterson. 8/17/2021.
-#   Last Modified: Add tests for parse_query_from_file and validate_query_params.
+#   Last Modified: Update tests for control section.
 #
 import configparser
 import os
@@ -12,7 +12,6 @@ import qmtools.qmfetcher.query_parser as qp
 
 SYSEXIT_ERROR_CODE = 2                 # seems to be error exit code from argparse
 
-
 class TestQueryParser(object):
 
   TEST_NAME = 'TestQueryParser'
@@ -23,6 +22,7 @@ class TestQueryParser(object):
   noparamsec_query_fyl = f"{TEST_RESOURCES_DIR}/noparamsec.qp"
   nosec_query_fyl = f"{TEST_RESOURCES_DIR}/nosec.qp"
   params_query_fyl = f"{TEST_RESOURCES_DIR}/manmaf.qp"
+  ctl_query_fyl = f"{TEST_RESOURCES_DIR}/ctlmanrep.qp"
 
   query_params_dict = {
     'snr': '>  5',
@@ -58,7 +58,7 @@ class TestQueryParser(object):
     with pytest.raises(ValueError) as ve:
       qp.load_query_from_file(self.nosec_query_fyl, self.TEST_NAME)
     print(ve)
-    assert "A 'parameters' section header" in str(ve)
+    assert f"A '{qp.QUERY_SECTION}' section header" in str(ve)
 
 
   def test_load_query_from_file_noparamsec(self):
@@ -70,26 +70,43 @@ class TestQueryParser(object):
 
   def test_load_query_from_file_nocolon(self):
     with pytest.raises(ValueError) as ve:
-      pd = qp.load_query_from_file(self.nocolon_query_fyl, self.TEST_NAME)
+      qp.load_query_from_file(self.nocolon_query_fyl, self.TEST_NAME)
     print(ve)
     assert 'Source contains parsing errors' in str(ve)
     assert 'line  4' in str(ve)
 
 
   def test_load_query_from_file_noparams(self):
-    pd = qp.load_query_from_file(self.noparams_query_fyl, self.TEST_NAME)
+    pd, _ = qp.load_query_from_file(self.noparams_query_fyl, self.TEST_NAME)
     assert pd is not None
     assert type(pd) is dict
     assert len(pd) == 0
 
 
   def test_load_query_from_file_params(self):
-    pd = qp.load_query_from_file(self.params_query_fyl, self.TEST_NAME)
+    pd, _ = qp.load_query_from_file(self.params_query_fyl, self.TEST_NAME)
     assert pd is not None
     assert type(pd) is dict
     assert len(pd) == 3
     assert 'dummy_trs' in pd.keys()
     assert 'bids_meta.Manufacturer' in pd.keys()
+
+
+  def test_load_query_from_file_control(self):
+    qpd, cpd = qp.load_query_from_file(self.ctl_query_fyl, self.TEST_NAME)
+    assert qpd is not None
+    assert type(qpd) is dict
+    assert len(qpd) == 3
+    assert 'dummy_trs' in qpd.keys()
+    assert 'bids_meta.Manufacturer' in qpd.keys()
+    assert 'bids_meta.RepetitionTime' in qpd.keys()
+    assert cpd is not None
+    assert type(cpd) is dict
+    assert len(cpd) == 3
+    assert 'dummy_trs' not in cpd.keys()
+    assert 'modality' in cpd.keys()
+    assert 'num_recs' in cpd.keys()
+    assert 'sort' in cpd.keys()
 
 
   def test_parse_value_noop(self):
