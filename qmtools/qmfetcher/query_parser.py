@@ -1,7 +1,7 @@
 #
 # Module with methods to read and parse a query parameters file.
 #   Written by: Tom Hicks. 8/17/2021.
-#   Last Modified: Load optional control section, rename query section.
+#   Last Modified: Rethought design: removed control section.
 #
 import sys
 import configparser as cp
@@ -9,25 +9,24 @@ from configparser import MissingSectionHeaderError, ParsingError
 from qmtools import STRUCTURAL_MODALITIES
 from config.mriqc_keywords import BOLD_KEYWORDS, STRUCTURAL_KEYWORDS
 
-CONTROL_SECTION = 'control'            # name of the control section in parameters file
 QUERY_SECTION = 'query'                # name of the query section in parameters file
 
 
 def parse_query_from_file (modality, query_file, prog_name=''):
   """
-  Load and validate control and query parameters from the given query parameters file.
+  Load and validate a set of query parameters from the given query parameters file.
   Return a dictionary of valid query parameters or raise exceptions.
   """
-  query_params, ctrl_params = load_query_from_file(query_file, prog_name)
+  query_params = load_query_from_file(query_file, prog_name)
   validate_query_params(modality, query_params, prog_name)
   return query_params
 
 
 def load_query_from_file (query_file, prog_name=''):
   """
-  Load control and query parameters from sections of the given query parameters file.
-  Return a tuple of (possibly empty) query and control parameter dictionaries.
-  Raises FileNotFound and ValueError exceptions for various loading problems.
+  Load query parameters from sections of the given query parameters file.
+  Return those parameters in a dictionary OR raise FileNotFound and ValueError
+  exceptions for various loading problems.
   NB: This loading process strips whitespace from both keys and values!
   """
   sys.tracebacklimit = 0
@@ -54,11 +53,7 @@ def load_query_from_file (query_file, prog_name=''):
       f"No section named '{QUERY_SECTION}' found in query parameters file.")
     raise ValueError(errMsg)
 
-  cparams = dict()
-  if (CONTROL_SECTION in config.sections()):
-    cparams = dict(config[CONTROL_SECTION])
-
-  return (qparams, cparams)
+  return qparams
 
 
 def parse_value (val, prog_name=''):

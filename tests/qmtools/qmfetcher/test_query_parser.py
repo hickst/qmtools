@@ -1,6 +1,6 @@
 # Tests of the module to read and parse a query parameters file.
 #   Written by: Tom Hicks and Dianne Patterson. 8/17/2021.
-#   Last Modified: Update tests for control section.
+#   Last Modified: Rethought design: removed control section.
 #
 import configparser
 import os
@@ -22,7 +22,6 @@ class TestQueryParser(object):
   noparamsec_query_fyl = f"{TEST_RESOURCES_DIR}/noparamsec.qp"
   nosec_query_fyl = f"{TEST_RESOURCES_DIR}/nosec.qp"
   params_query_fyl = f"{TEST_RESOURCES_DIR}/manmaf.qp"
-  ctl_query_fyl = f"{TEST_RESOURCES_DIR}/ctlmanrep.qp"
 
   query_params_dict = {
     'snr': '>  5',
@@ -77,36 +76,19 @@ class TestQueryParser(object):
 
 
   def test_load_query_from_file_noparams(self):
-    pd, _ = qp.load_query_from_file(self.noparams_query_fyl, self.TEST_NAME)
+    pd = qp.load_query_from_file(self.noparams_query_fyl, self.TEST_NAME)
     assert pd is not None
     assert type(pd) is dict
     assert len(pd) == 0
 
 
   def test_load_query_from_file_params(self):
-    pd, _ = qp.load_query_from_file(self.params_query_fyl, self.TEST_NAME)
+    pd = qp.load_query_from_file(self.params_query_fyl, self.TEST_NAME)
     assert pd is not None
     assert type(pd) is dict
     assert len(pd) == 3
     assert 'dummy_trs' in pd.keys()
     assert 'bids_meta.Manufacturer' in pd.keys()
-
-
-  def test_load_query_from_file_control(self):
-    qpd, cpd = qp.load_query_from_file(self.ctl_query_fyl, self.TEST_NAME)
-    assert qpd is not None
-    assert type(qpd) is dict
-    assert len(qpd) == 3
-    assert 'dummy_trs' in qpd.keys()
-    assert 'bids_meta.Manufacturer' in qpd.keys()
-    assert 'bids_meta.RepetitionTime' in qpd.keys()
-    assert cpd is not None
-    assert type(cpd) is dict
-    assert len(cpd) == 3
-    assert 'dummy_trs' not in cpd.keys()
-    assert 'modality' in cpd.keys()
-    assert 'num_recs' in cpd.keys()
-    assert 'sort' in cpd.keys()
 
 
   def test_parse_value_noop(self):
