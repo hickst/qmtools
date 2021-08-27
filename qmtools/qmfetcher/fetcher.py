@@ -1,6 +1,6 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: Methods to query the MRIQC server and download query result records.
-# Last Modified: Do not remove any fields; so do not call clean_records anymore.
+# Last Modified: Put most arguments in args dictionary to simplify function signatures.
 #
 import csv
 import json
@@ -14,31 +14,32 @@ from qmtools.qmfetcher import DEFAULT_RESULTS_SIZE, SERVER_PAGE_SIZE
 from qmtools.qm_utils import validate_modality
 
 SERVER_URL = "https://mriqc.nimh.nih.gov/api/v1"
-DEFAULT_FIELDS_TO_REMOVE = []
 
 
-def build_query (modality, latest=True, max_results=SERVER_PAGE_SIZE,
-                 page_num=1, query_params=None):
+def build_query (modality, args, page_num=1):
   """
-  Construct and return a query string given the modality, starting page number,
-  optional maximum results, most recent records flag, and
-  optional dictionary of query parameter keys and values.
+  Construct and return a query string given the modality and a dictionary of
+  optional query arguments; like maximum results, oldest record flag, and
+  dictionary of content query parameter keys and values.
   Returns a single constructed query URL string.
   """
   validate_modality(modality)          # validates or raises ValueError
 
-  # check for a reasonable page number and max results
+  # check for a reasonable page number
   if (not page_num or (page_num < 1)):
     page_num = 1
-  if (not max_results or (max_results < 1)):
-    max_results = SERVER_PAGE_SIZE
+
+  # use the number of records as the max_results argument
+  max_results = get_num_recs_arg(args)
 
   url_str = f"{SERVER_URL}/{modality}?max_results={max_results}&page={page_num}"
 
-  # if latest flag specified, use the most recent records
-  if (latest):                         # uses most recent by default
+  # if use_oldest flag is not specified, sort the records to use the most recent
+  if (not args.get('use_oldest', False)):   # uses most recent by default
     url_str = f"{url_str}&sort=-_created"
 
+  # add any content query parameters in the "special" where clause
+  query_params = args.get('query_params')
   if (query_params is not None):
     pairs = [f"{key}{val}" for key, val in query_params.items()]
     qps = '%20and%20'.join(pairs)
@@ -47,18 +48,22 @@ def build_query (modality, latest=True, max_results=SERVER_PAGE_SIZE,
   return url_str
 
 
-def clean_records (json_recs, fields_to_remove=DEFAULT_FIELDS_TO_REMOVE):
+def clean_records (json_recs, args=None):
   """
   Remove unwanted fields from each record (dictionary) in the given list and
   return the list of cleaned records.
   Arguments:
     json_recs: a list of records, each one representing metrics for a single image.
-    fields_to_remove: a list of field names to remove when cleaning records.
+    args: an optional dictionary of arguments which may contain a list of
+          fields to be removed.
   """
-  for rec in json_recs:
-    for field in fields_to_remove:
-      if (field in rec):
-        rec.pop(field)
+  if (args):
+    fields_to_remove = args.get('fields_to_remove')
+    if (fields_to_remove):
+      for rec in json_recs:
+        for field in fields_to_remove:
+          if (field in rec):
+            rec.pop(field)
   return json_recs
 
 
@@ -142,26 +147,24 @@ def flatten_records (json_recs):
   return [dict(flatten_a_record(rec)) for rec in json_recs]
 
 
-def get_n_records (modality, num_recs, query_params=None,
-                   fields_to_remove=DEFAULT_FIELDS_TO_REMOVE):
+def get_n_records (modality, args):
   """
   Fetch N records from the server using the given parameters. Query then
   clean, flatten, deduplicate and return a list of fetched image quality
   metrics records (dictionaries).
   Arguments:
     modality: the modality to query on (must be one of {ALLOWED_MODALITIES}).
-    num_recs: number of records the user would like returned.
-    query_params: dictionary of additional query parameters (default: None).
-    fields_to_remove: a list of field names to remove when cleaning records.
+    args: a dictionary of optional arguments to create/control the query.
   """
   good_records = []
   next_page_num = 1
   chksums_seen = set()
 
   # loop until we get the number of records requested by the user or we fail to do so:
+  num_recs = get_num_recs_arg(args)
   while (len(good_records) < num_recs):
-    query = build_query(modality, page_num=next_page_num, query_params=query_params)
-    recs = query_for_page(query, fields_to_remove=fields_to_remove)
+    query = build_query(modality, args, page_num=next_page_num)
+    recs = query_for_page(query)
     if (len(recs) < 1):                # if no more records available, then exit
       break
     recs, chksums_seen = deduplicate_records(recs, chksums_seen)
@@ -172,18 +175,31 @@ def get_n_records (modality, num_recs, query_params=None,
   return good_records[:num_recs] if (len(good_records) > num_recs) else good_records
 
 
-def query_for_page (query, fields_to_remove=DEFAULT_FIELDS_TO_REMOVE):
+def get_num_recs_arg (args):
+  """
+  Extract and check the number of records argument in the given arguments dictionary.
+  If the value is missing or not valid, reset it to the default value. Return the
+  extracted (or possibly the default) value.
+  """
+  num_recs = args.get('num_recs', SERVER_PAGE_SIZE)
+  if (num_recs < 1):
+    num_recs = SERVER_PAGE_SIZE
+    args['num_recs'] = num_recs
+  return num_recs
+
+
+def query_for_page (query, args=None):
   """
   Query for the first (or numbered) page of results from
   the MRIQC server, and clean and return the result records.
   Arguments:
     query: pre-built query string to use to fetch a page of results.
-    fields_to_remove: a list of field names to remove when cleaning records.
+    args: a dictionary of arguments to create/control the query, passed to children.
   """
   json_query_result = do_query(query)
   json_recs = extract_records(json_query_result)
   flat_recs = flatten_records(json_recs)
-  # clean_records(flat_recs, fields_to_remove=fields_to_remove)
+  clean_records(flat_recs, args)
   return flat_recs
 
 
@@ -204,14 +220,20 @@ def save_to_tsv (modality, records, filepath):
         writer.writerow(rec)
 
 
-def server_status (modality='bold', query_params=None):
+def server_status (modality='bold', args=None):
   """
   Query the server with the user's current query parameters but only fetch
   one record. This serves as a quick health check.
   Return the total number of records available that satisfy the query with the
   given parameters OR raises a requests.RequestException if the request fails.
+  Arguments:
+    modality: the modality to query on (must be one of {ALLOWED_MODALITIES}).
+    args: a dictionary of arguments to create/control the query, passed to children.
   """
-  health_check_query = build_query(modality=modality, max_results=1, query_params=query_params)
+  if (args is None):
+    args = {}
+  args['num_recs'] = 1                 # reset number of records to fetch to 1
+  health_check_query = build_query(modality, args)
   # the GET request will raise an error if not successful:
   json_query_result = do_query(health_check_query)
   meta = json_query_result.get('_meta')

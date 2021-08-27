@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to query the MRIQC server and download query result records
 #          into a file for further processing.
-# Last Modified: Update for enhanced server status query.
+# Last Modified: Redo to use arguments dictionary. Add use-oldest flag.
 #
 import argparse
 import os
@@ -96,6 +96,12 @@ def main (argv=None):
   )
 
   parser.add_argument(
+    '--use-oldest', dest='use_oldest', action='store_true',
+    default=False,
+    help='Fetch oldest records [default: False (fetches most recent records)].'
+  )
+
+  parser.add_argument(
     '--url-only', dest='url_only', action='store_true',
     default=False,
     help='Generate the query URL and exit program [default: False].'
@@ -118,20 +124,25 @@ def main (argv=None):
   output_filename = args.get('output_filename')
   if (not output_filename):            # if none provided, generate an output filename
     output_filename = qmu.gen_output_filename(modality)
+    args['output_filename'] = output_filename
+
+  # ensure output file has the correct extension
   output_filepath = os.path.join(FETCHED_DIR, output_filename)
   if (not output_filepath.endswith('.tsv')):
     output_filepath = output_filepath + '.tsv'
+  args['output_filepath'] = output_filepath
 
   # if query parameters file path given, check the file path for validity
   query_file = args.get('query_file')
   if (query_file):                     # if filepath provided, validate it
     check_query_file(query_file)       # may exit here and not return!
     query_params = parse_query_from_file(modality, query_file, PROG_NAME)
+    args['query_params'] = query_params
   else:
     query_params = None
 
   if (args.get('url_only')):           # if generating URL only
-    print(fetch.build_query(modality, max_results=num_recs, query_params=query_params))
+    print(fetch.build_query(modality, args))
     sys.exit(0)                        # all done: exit out now
 
   if (args.get('verbose')):
@@ -140,7 +151,7 @@ def main (argv=None):
 
   # Use user's query to test whether the MRIQC server is up, exit out if not:
   try:
-    total_recs = fetch.server_status(modality=modality, query_params=query_params)
+    total_recs = fetch.server_status(modality=modality, args=args)
   except req.RequestException as re:
     status = re.response.status_code
     if (status == 503):

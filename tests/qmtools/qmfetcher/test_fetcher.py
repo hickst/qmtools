@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher library code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/7/2021.
-# Last Modified: Split out functional tests of fetcher to separate module.
+# Last Modified: Update tests for args dictionary.
 #
 import json
 import os
@@ -14,7 +14,7 @@ from pathlib import Path
 from qmtools import ALLOWED_MODALITIES
 from qmtools.qmfetcher import DEFAULT_RESULTS_SIZE, SERVER_PAGE_SIZE
 import qmtools.qmfetcher.fetcher as fetch
-from qmtools.qmfetcher.fetcher import SERVER_URL, DEFAULT_FIELDS_TO_REMOVE
+from qmtools.qmfetcher.fetcher import SERVER_URL
 from tests import TEST_RESOURCES_DIR
 
 SYSEXIT_ERROR_CODE = 2                 # seems to be error exit code from argparse
@@ -125,50 +125,62 @@ class TestFetcher(object):
 
   def test_build_query_bad_modality(self):
     with pytest.raises(ValueError) as ve:
-      fetch.build_query('BAD_MODE')
+      fetch.build_query('BAD_MODE', {})
     print(ve)
     assert 'Modality argument must be one of' in str(ve)
 
 
   def test_build_query_modes_default(self):
-    qstr = fetch.build_query('bold')
+    qstr = fetch.build_query('bold', {})
     assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=1" in qstr
-    qstr = fetch.build_query('T1w')
+    qstr = fetch.build_query('T1w', {})
     assert f"{SERVER_URL}/T1w?max_results={SERVER_PAGE_SIZE}&page=1" in qstr
-    qstr = fetch.build_query('T2w')
+    qstr = fetch.build_query('T2w', {})
     assert f"{SERVER_URL}/T2w?max_results={SERVER_PAGE_SIZE}&page=1" in qstr
 
 
   def test_build_query_num_recs(self):
-    qstr = fetch.build_query('bold', max_results=None)
+    qstr = fetch.build_query('bold', {})
     assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}" in qstr
-    qstr = fetch.build_query('bold', max_results=0)
+    qstr = fetch.build_query('bold', {'num_recs': 0})
     assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}" in qstr
-    qstr = fetch.build_query('bold', max_results=-4)
+    qstr = fetch.build_query('bold', {'num_recs': -4})
     assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}" in qstr
-    qstr = fetch.build_query('bold', max_results=1)
+    qstr = fetch.build_query('bold', {'num_recs': 1})
     assert f"{SERVER_URL}/bold?max_results=1" in qstr
-    qstr = fetch.build_query('bold', max_results=SERVER_PAGE_SIZE)
+    qstr = fetch.build_query('bold', {'num_recs': SERVER_PAGE_SIZE})
     assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}" in qstr
-    qstr = fetch.build_query('bold', max_results=999)
+    qstr = fetch.build_query('bold', {'num_recs': 999})
     assert f"{SERVER_URL}/bold?max_results=999" in qstr
 
 
   def test_build_query_pagenum_nums(self):
-    qstr = fetch.build_query('bold', page_num=None)
+    qstr = fetch.build_query('bold', {}, page_num=None)
     assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=1" in qstr
-    qstr = fetch.build_query('bold', page_num=0)
+    qstr = fetch.build_query('bold', {}, page_num=0)
     assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=1" in qstr
-    qstr = fetch.build_query('bold', page_num=1)
+    qstr = fetch.build_query('bold', {}, page_num=1)
     assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=1" in qstr
-    qstr = fetch.build_query('bold', page_num=999)
+    qstr = fetch.build_query('bold', {}, page_num=999)
     assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=999" in qstr
 
 
-  def test_build_query_latest(self):
-    qstr = fetch.build_query('bold')
+  def test_build_query_latest_default(self):
+    qstr = fetch.build_query('bold', {})
     assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=1&sort=-_created" in qstr
-    qstr = fetch.build_query('bold', latest=False)
+    assert 'sort=' in qstr
+    assert '_created' in qstr
+
+
+  def test_build_query_latest(self):
+    qstr = fetch.build_query('bold', {'use_oldest': False})
+    assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=1&sort=-_created" in qstr
+    assert 'sort=' in qstr
+    assert '_created' in qstr
+
+
+  def test_build_query_oldest(self):
+    qstr = fetch.build_query('bold', {'use_oldest': True})
     assert f"{SERVER_URL}/bold?max_results={SERVER_PAGE_SIZE}&page=1" in qstr
     assert 'sort=' not in qstr
     assert '_created' not in qstr
@@ -180,7 +192,7 @@ class TestFetcher(object):
       'bids_meta.Manufacturer': '=="Siemens"',
       'bids_meta.MultibandAccelerationFactor': '>3'
     }
-    query = fetch.build_query('bold', query_params=qparams)
+    query = fetch.build_query('bold', {'query_params': qparams})
     print(f"QUERY={query}")
     assert 'max_results=' in query
     assert 'sort=-_created' in query
@@ -207,8 +219,6 @@ class TestFetcher(object):
     assert crecs != []
     assert len(crecs) == 1
     for rec in crecs:
-      for field in DEFAULT_FIELDS_TO_REMOVE:
-        assert rec.get(field) is None
       for field in ['bids_meta', '_links', 'provenance']:
         assert rec.get(field) is None
 
@@ -360,14 +370,6 @@ class TestFetcher(object):
     assert 'bids_meta' not in d
     assert 'provenance' not in d
     assert 'aqi' not in d
-
-
-  def test_get_n_records_0(self):
-    recs = fetch.get_n_records('bold', 0)
-    print(recs)
-    assert recs is not None
-    assert type(recs) == list
-    assert len(recs) == 0
 
 
   def test_query_for_page_bad_query(self):
