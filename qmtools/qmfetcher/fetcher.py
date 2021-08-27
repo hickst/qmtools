@@ -1,6 +1,6 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: Methods to query the MRIQC server and download query result records.
-# Last Modified: Enhance server status to return total records available for current query.
+# Last Modified: Do not remove any fields; so do not call clean_records anymore.
 #
 import csv
 import json
@@ -14,8 +14,7 @@ from qmtools.qmfetcher import DEFAULT_RESULTS_SIZE, SERVER_PAGE_SIZE
 from qmtools.qm_utils import validate_modality
 
 SERVER_URL = "https://mriqc.nimh.nih.gov/api/v1"
-DEFAULT_FIELDS_TO_REMOVE = ['_etag', 'bids_meta.Instructions',
-                            '_links.self.title', '_links.self.href']
+DEFAULT_FIELDS_TO_REMOVE = []
 
 
 def build_query (modality, latest=True, max_results=SERVER_PAGE_SIZE,
@@ -184,7 +183,8 @@ def query_for_page (query, fields_to_remove=DEFAULT_FIELDS_TO_REMOVE):
   json_query_result = do_query(query)
   json_recs = extract_records(json_query_result)
   flat_recs = flatten_records(json_recs)
-  return clean_records(flat_recs, fields_to_remove=fields_to_remove)
+  # clean_records(flat_recs, fields_to_remove=fields_to_remove)
+  return flat_recs
 
 
 def save_to_tsv (modality, records, filepath):
