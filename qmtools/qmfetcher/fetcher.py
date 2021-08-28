@@ -1,12 +1,14 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: Methods to query the MRIQC server and download query result records.
-# Last Modified: Put most arguments in args dictionary to simplify function signatures.
+# Last Modified: Fix: side effects bug while testing server status.
 #
 import csv
 import json
 import os
 import requests as req
 import sys
+
+from copy import deepcopy
 
 from config.mriqc_keywords import BOLD_KEYWORDS, STRUCTURAL_KEYWORDS
 from qmtools import ALLOWED_MODALITIES, STRUCTURAL_MODALITIES
@@ -231,9 +233,11 @@ def server_status (modality='bold', args=None):
     args: a dictionary of arguments to create/control the query, passed to children.
   """
   if (args is None):
-    args = {}
-  args['num_recs'] = 1                 # reset number of records to fetch to 1
-  health_check_query = build_query(modality, args)
+    ss_args = {}
+  else:
+    ss_args = deepcopy(args)
+  ss_args['num_recs'] = 1              # reset number of records to fetch to 1
+  health_check_query = build_query(modality, ss_args)
   # the GET request will raise an error if not successful:
   json_query_result = do_query(health_check_query)
   meta = json_query_result.get('_meta')
