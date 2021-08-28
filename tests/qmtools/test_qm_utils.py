@@ -1,6 +1,6 @@
 # Tests of Shared utilities for the QMTools programs.
 #   Written by: Tom Hicks and Dianne Patterson. 8/5/2021.
-# Last Modified: Fix: restore cwd after chdir or tests interfere!
+# Last Modified: Use custom fixture to restore test dir after chdir.
 #
 import os
 import pandas
@@ -12,65 +12,59 @@ from qmtools import FETCHED_DIR, FETCHED_DIR_EXIT_CODE, REPORTS_DIR, REPORTS_DIR
 import qmtools.qm_utils as qmu
 
 
+@pytest.fixture
+def popdir(request):
+  yield
+  os.chdir(request.config.invocation_dir)
+
+
 class TestQMUtils(object):
 
   bold_test_fyl  = f"{TEST_RESOURCES_DIR}/bold_test.tsv"
-  df_cell_count = 855           # size of test dataframe
-  df_shape = (19, 45)           # shape of test dataframe
+  df_cell_count = 855                  # size of test dataframe
+  df_shape = (19, 45)                  # shape of test dataframe
 
 
-  def test_ensure_fetched_dir(self):
+  def test_ensure_fetched_dir(self, popdir):
     with tempfile.TemporaryDirectory() as tmpdir:
-      start_dir = os.getcwd()
-      try:
-        os.chdir(tmpdir)               # DANGER: must restore cwd after test
+      os.chdir(tmpdir)                 # popdir must restore test dir after test
+      print(f"CWD={os.getcwd()}, tmpdir={tmpdir}")
+      assert not os.path.isdir(FETCHED_DIR)
+      qmu.ensure_fetched_dir('TestQMUtils')
+      assert os.path.isdir(FETCHED_DIR)
+      assert os.access(FETCHED_DIR, os.W_OK)
+
+
+  def test_ensure_fetched_dir_fail(self, popdir):
+    if (os.environ.get('RUNNING_IN_CONTAINER') is None):
+      with pytest.raises(SystemExit) as se:
+        os.chdir('/')                  # popdir must restore test dir after test
+        print(f"CWD={os.getcwd()}")
         assert not os.path.isdir(FETCHED_DIR)
         qmu.ensure_fetched_dir('TestQMUtils')
-        assert os.path.isdir(FETCHED_DIR)
-        assert os.access(FETCHED_DIR, os.W_OK)
-      finally:
-        os.chdir(start_dir)
-
-
-  def test_ensure_fetched_dir_fail(self):
-    if (os.environ.get('RUNNING_IN_CONTAINER') is None):
-      start_dir = os.getcwd()
-      try:
-        with pytest.raises(SystemExit) as se:
-          os.chdir('/')                # DANGER: must restore cwd after test
-          assert not os.path.isdir(FETCHED_DIR)
-          qmu.ensure_fetched_dir('TestQMUtils')
-        assert se.value.code == FETCHED_DIR_EXIT_CODE
-      finally:
-        os.chdir(start_dir)
+      assert se.value.code == FETCHED_DIR_EXIT_CODE
     else:
       assert True
 
 
-  def test_ensure_reports_dir(self):
+  def test_ensure_reports_dir(self, popdir):
     with tempfile.TemporaryDirectory() as tmpdir:
-      start_dir = os.getcwd()
-      try:
-        os.chdir(tmpdir)               # DANGER: must restore cwd after test
+      os.chdir(tmpdir)                 # popdir must restore test dir after test
+      print(f"CWD={os.getcwd()}, tmpdir={tmpdir}")
+      assert not os.path.isdir(REPORTS_DIR)
+      qmu.ensure_reports_dir('TestQMUtils')
+      assert os.path.isdir(REPORTS_DIR)
+      assert os.access(REPORTS_DIR, os.W_OK)
+
+
+  def test_ensure_reports_dir_fail(self, popdir):
+    if (os.environ.get('RUNNING_IN_CONTAINER') is None):
+      with pytest.raises(SystemExit) as se:
+        os.chdir('/')                  # popdir must restore test dir after test
+        print(f"CWD={os.getcwd()}")
         assert not os.path.isdir(REPORTS_DIR)
         qmu.ensure_reports_dir('TestQMUtils')
-        assert os.path.isdir(REPORTS_DIR)
-        assert os.access(REPORTS_DIR, os.W_OK)
-      finally:
-        os.chdir(start_dir)
-
-
-  def test_ensure_reports_dir_fail(self):
-    if (os.environ.get('RUNNING_IN_CONTAINER') is None):
-      start_dir = os.getcwd()
-      try:
-        with pytest.raises(SystemExit) as se:
-          os.chdir('/')                # DANGER: must restore cwd after test
-          assert not os.path.isdir(REPORTS_DIR)
-          qmu.ensure_reports_dir('TestQMUtils')
-        assert se.value.code == REPORTS_DIR_EXIT_CODE
-      finally:
-        os.chdir(start_dir)
+      assert se.value.code == REPORTS_DIR_EXIT_CODE
     else:
       assert True
 
