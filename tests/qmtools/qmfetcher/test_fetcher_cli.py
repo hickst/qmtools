@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/4/2021.
-#   Last Modified: Minor rename 2 tests.
+#   Last Modified: Add other tests of CLI main method.
 #
 import os
 import matplotlib
@@ -83,9 +83,20 @@ class TestFetcherCLI(object):
     assert 'the following arguments are required: -m/--modality' in syserr
 
 
+  def test_main_0(self, capsys):
+    with pytest.raises(SystemExit) as se:
+      sys.argv = ['qmtools', '-v', '-m', 'bold', '-n', '0']
+      cli.main()
+    assert se.value.code == NUM_RECS_EXIT_CODE
+    sysout, syserr = capsys.readouterr()
+    print(f"CAPTURED SYS.ERR:\n{syserr}")
+    assert "The total number of records to fetch must be 1 or more" in syserr
+
+
   def test_main_urlonly_noqps(self, capsys):
     with pytest.raises(SystemExit) as se:
-      sys.argv = [ 'qmtools', '-v', '-m', 'T1w', '-n', '4', '--url-only' ]
+      sys.argv = [ 'qmtools', '-v', '-m', 'T1w', '-n', '4',
+                   '-o', 'unused', '--url-only' ]
       cli.main()
     print(se)
     assert se.value.code == 0
@@ -95,6 +106,7 @@ class TestFetcherCLI(object):
     assert SERVER_URL in sysout
     assert '/T1w' in sysout
     assert 'max_results=4' in sysout
+    assert 'sort=' in sysout
 
 
   def test_main_urlonly_qps(self, capsys):
@@ -110,3 +122,18 @@ class TestFetcherCLI(object):
     assert SERVER_URL in sysout
     assert '/bold' in sysout
     assert 'max_results=4' in sysout
+    assert 'sort=' in sysout
+
+
+  def test_main_use_oldest(self, capsys):
+    with pytest.raises(SystemExit) as se:
+      sys.argv = [ 'qmtools', '-v', '-m', 'bold', '--use-oldest', '--url-only' ]
+      cli.main()
+    print(se)
+    assert se.value.code == 0
+    sysout, syserr = capsys.readouterr()
+    print(f"CAPTURED SYS.OUT:\n{sysout}")
+    print(f"CAPTURED SYS.ERR:\n{syserr}")
+    assert SERVER_URL in sysout
+    assert '/bold' in sysout
+    assert 'sort=' not in sysout
