@@ -1,7 +1,7 @@
 # Author: Tom Hicks and Dianne Patterson.
 # Purpose: CLI program to query the MRIQC server and download query result records
 #          into a file for further processing.
-# Last Modified: Redo to use arguments dictionary. Add use-oldest flag.
+# Last Modified: Fix call to get_n_records to use arguments.
 #
 import argparse
 import os
@@ -161,11 +161,9 @@ def main (argv=None):
 
   # query the MRIQC server and output or save the results
   try:
-    if (args.get('debug')):
-      print(f"ARGS={args}")
 
     # build the query and fetch some records from the server:
-    recs = fetch.get_n_records(modality, num_recs, query_params=query_params)
+    recs = fetch.get_n_records(modality, args)
 
     if (args.get('verbose')):
       print(f"({PROG_NAME}): Fetched {len(recs)} records out of {total_recs}.")
@@ -186,8 +184,3 @@ def main (argv=None):
 
 if __name__ == "__main__":
   main()
-
-# Sample MRIQC queries: for development.
-#   url_root = 'https://mriqc.nimh.nih.gov/api/v1/{modality}?{query}'
-#   url_root = 'https://mriqc.nimh.nih.gov/api/v1/bold?max_results=100'
-#
