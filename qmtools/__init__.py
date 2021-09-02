@@ -11,6 +11,10 @@ INPUTS_DIR = 'inputs'
 # Name of the subdirectory which holds output reports.
 REPORTS_DIR = 'reports'
 
+# File extensions for report files and BIDS-compliant data files.
+BIDS_DATA_EXT = '.tsv'
+REPORTS_EXT = '.html'
+
 # Symbolic exit codes for various error exit scenarios
 INPUT_FILE_EXIT_CODE = 10
 OUTPUT_FILE_EXIT_CODE = 11

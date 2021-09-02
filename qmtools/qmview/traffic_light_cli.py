@@ -1,12 +1,13 @@
-# Author: Tom Hicks and Dianne Patterson.
-# Purpose: CLI program to convert an MRIQC output file to normalized scores
-#          for representation in an HTML "traffic-light" report.
-# Last Modified: Correct for strict modality capitalization.
-
+# CLI program to convert an MRIQC file to normalized scores
+# for representation in an HTML "traffic-light" report.
+#   Written by: Tom Hicks and Dianne Patterson.
+#   Last Modified: Update required argument parsing. Make header docs consistent.
+#                  Use symbolic file extensions.
+#
 import argparse
 import sys
 
-from qmtools import ALLOWED_MODALITIES, INPUT_FILE_EXIT_CODE
+from qmtools import ALLOWED_MODALITIES, BIDS_DATA_EXT, INPUT_FILE_EXIT_CODE
 from qmtools import REPORTS_DIR, REPORTS_DIR_EXIT_CODE
 from qmtools.file_utils import good_file_path, good_dir_path
 from qmtools.qm_utils import ensure_reports_dir, validate_modality
@@ -22,7 +23,7 @@ def check_input_file (input_file):
   """
   if (input_file is None or (not good_file_path(input_file))):
     errMsg = "({}): ERROR: {} Exiting...".format(PROG_NAME,
-      "A readable, MRIQC group output file (.tsv) must be specified.")
+      f"A readable, MRIQC group file ({BIDS_DATA_EXT}) must be specified.")
     print(errMsg, file=sys.stderr)
     sys.exit(INPUT_FILE_EXIT_CODE)
 
@@ -34,8 +35,8 @@ def main (argv=None):
   its work.
   This main method takes no arguments so it can be called by setuptools but
   the program expects two arguments from the command line:
-    1) path to the MRIQC group output file in TSV format,
-    2) the modality of the input file (one of 'bold', 'T1w', or 'T2w')
+    1) required modality of the MRIQC group file (one of 'bold', 'T1w', or 'T2w')
+    2) required path to the MRIQC group file (in TSV format) to visualize.
   """
   # the main method takes no arguments so it can be called by setuptools
   if (argv is None):                   # if called by setuptools
@@ -45,7 +46,7 @@ def main (argv=None):
   parser = argparse.ArgumentParser(
     prog=PROG_NAME,
     formatter_class=argparse.RawTextHelpFormatter,
-    description='Normalize an MRIQC group output file and produce HTML reports.'
+    description='Normalize an MRIQC group file and produce HTML reports.'
   )
 
   parser.add_argument(
@@ -55,14 +56,13 @@ def main (argv=None):
   )
 
   parser.add_argument(
-    '-i', '--input-file', dest='group_file', required=True, metavar='filepath',
-    help='Full path to an MRIQC group output file (.tsv) to process.'
+    'modality', choices=ALLOWED_MODALITIES,
+    help=f"Modality of the MRIQC group file. Must be one of: {ALLOWED_MODALITIES}"
   )
 
   parser.add_argument(
-    '-m', '--modality', dest='modality', required=True,
-    choices=ALLOWED_MODALITIES,
-    help=f"Modality of the MRIQC group output file. Must be one of: {ALLOWED_MODALITIES}"
+    'group_file',
+    help=f"Path to an MRIQC group file ({BIDS_DATA_EXT}) to visualize."
   )
 
   # actually parse the arguments from the command line

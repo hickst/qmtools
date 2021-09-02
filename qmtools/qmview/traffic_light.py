@@ -1,7 +1,7 @@
-# Author: Tom Hicks and Dianne Patterson.
-# Purpose: To convert an mriqc output file to normalized scores for
-#          representation in a traffic-light table.
-# Last Modified: Use symbolic structural modalities constant.
+# To convert an mriqc output file to normalized scores for representation in
+# a traffic-light table.
+#   Written by: Tom Hicks and Dianne Patterson.
+#   Last Modified: Make header docs consistent. Use symbolic file extensions.
 #
 import os
 import numpy as np
@@ -12,6 +12,7 @@ from matplotlib import cm
 from matplotlib import pyplot as plt
 
 from qmtools import ALLOWED_MODALITIES, REPORTS_DIR, STRUCTURAL_MODALITIES
+from qmtools import BIDS_DATA_EXT, REPORTS_EXT
 from qmtools.qm_utils import load_tsv, validate_modality
 
 # Constants to "mark" a dataframe as having positive good values or positive bad values
@@ -161,7 +162,7 @@ def write_table_to_tsv (norm_df, filename, dirpath=REPORTS_DIR):
   Write the given normalized dataframe into the named TSV file
   in the optionally specified directory.
   """
-  filepath = os.path.join(dirpath, f"{filename}.tsv")
+  filepath = os.path.join(dirpath, f"{filename}{BIDS_DATA_EXT}")
   norm_df.to_csv(filepath, index=False, sep='\t')
 
 
@@ -170,6 +171,6 @@ def write_table_to_html (styler, filename, dirpath=REPORTS_DIR):
   Render the given pandas.io.formats.style.Styler object as
   HTML and write the HTML to the given filepath.
   """
-  filepath = os.path.join(dirpath, f"{filename}.html")
+  filepath = os.path.join(dirpath, f"{filename}{REPORTS_EXT}")
   with open(filepath, "w") as outfyl:
     outfyl.writelines(styler.render())

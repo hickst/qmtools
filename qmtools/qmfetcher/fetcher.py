@@ -1,6 +1,6 @@
-# Author: Tom Hicks and Dianne Patterson.
-# Purpose: Methods to query the MRIQC server and download query result records.
-# Last Modified: Fix: side effects bug while testing server status.
+# Methods to query the MRIQC server and download query result records.
+#   Written by: Tom Hicks and Dianne Patterson.
+#   Last Modified: Make header docs consistent.
 #
 import csv
 import json

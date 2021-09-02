@@ -1,6 +1,6 @@
-# Author: Tom Hicks and Dianne Patterson.
-# Purpose: Shared utilities for the QMTools programs.
-# Last Modified: Remove spurious param checks in ensure_* fns. Fix error msg in ensure_reports_dir.
+# Shared utilities for the QMTools programs.
+#   Written by: Tom Hicks and Dianne Patterson.
+#   Last Modified: No default dot in extension. Make header docs consistent.
 #
 import datetime
 import os
@@ -56,7 +56,7 @@ def gen_output_filename (modality, extension='tsv'):
   """
   time_now = datetime.datetime.now()
   now_str = time_now.strftime("%Y%m%d_%H%M%S-%f")
-  return f"{modality}_{now_str}.{extension}"
+  return f"{modality}_{now_str}{extension}"
 
 
 def load_tsv (tsv_path):

@@ -13,7 +13,7 @@ def filename_core (apath):
 
 
 def full_path (apath):
-    """ Full expand the given path into an absolute path. Supports the home ('~') shortcut. """
+    """ Fully expand the given path into an absolute path. Supports the home ('~') shortcut. """
     return os.path.abspath(os.path.normpath(os.path.expanduser(apath)))
 
 

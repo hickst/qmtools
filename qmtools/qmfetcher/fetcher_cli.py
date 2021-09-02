@@ -1,7 +1,8 @@
-# Author: Tom Hicks and Dianne Patterson.
-# Purpose: CLI program to query the MRIQC server and download query result records
-#          into a file for further processing.
-# Last Modified: Fix call to get_n_records to use arguments.
+# CLI program to query the MRIQC server and download query result records into
+# a file for further processing.
+#   Written by: Tom Hicks and Dianne Patterson.
+#   Last Modified: Update required argument parsing. Make header docs consistent.
+#                  Use symbolic file extensions.
 #
 import argparse
 import os
@@ -10,7 +11,8 @@ import sys
 
 import qmtools.qm_utils as qmu
 import qmtools.qmfetcher.fetcher as fetch
-from qmtools import ALLOWED_MODALITIES, FETCHED_DIR, NUM_RECS_EXIT_CODE, QUERY_FILE_EXIT_CODE
+from qmtools import ALLOWED_MODALITIES, BIDS_DATA_EXT, FETCHED_DIR
+from qmtools import NUM_RECS_EXIT_CODE, QUERY_FILE_EXIT_CODE
 from qmtools.file_utils import good_file_path
 from qmtools.qmfetcher import SERVER_PAGE_SIZE
 from qmtools.qmfetcher.query_parser import parse_query_from_file
@@ -48,11 +50,13 @@ def main (argv=None):
   processes the command line arguments and calls into the qmview library to do
   its work.
   This main method takes no arguments so it can be called by setuptools but
-  the program expects two arguments from the command line:
-    1) the modality of the output file (one of 'bold', 'T1w', or 'T2w')
-    2) optional number of records to fetch (default: {SERVER_PAGE_SIZE})
-    3) optional output filename (default: NONE (one will be generated))
-    4) path to parameter file (default: query_params.toml)
+  the program takes arguments from the command line:
+    1) required modality of the IQM records to fetch (one of 'bold', 'T1w', or 'T2w')
+    2) optional number of records to fetch [default: {SERVER_PAGE_SIZE}]
+    3) optional output filename [default: NONE (one will be generated)]
+    4) optional path to query parameters file [default: NONE]
+    5) optional flag to use the oldest records [default: False (use latest records)]
+    6) optional flag to produce query URL only and then exit.
   """
   # the main method takes no arguments so it can be called by setuptools
   if (argv is None):                   # if called by setuptools
@@ -72,9 +76,8 @@ def main (argv=None):
   )
 
   parser.add_argument(
-    '-m', '--modality', dest='modality', required=True,
-    choices=ALLOWED_MODALITIES,
-    help=f"Modality of the MRIQC group output file. Must be one of: {ALLOWED_MODALITIES}"
+    'modality', choices=ALLOWED_MODALITIES,
+    help=f"Modality of the MRIQC IQM records to fetch. Must be one of: {ALLOWED_MODALITIES}"
   )
 
   parser.add_argument(
@@ -126,10 +129,10 @@ def main (argv=None):
     output_filename = qmu.gen_output_filename(modality)
     args['output_filename'] = output_filename
 
-  # ensure output file has the correct extension
+  # ensure output file path has the correct extension
   output_filepath = os.path.join(FETCHED_DIR, output_filename)
-  if (not output_filepath.endswith('.tsv')):
-    output_filepath = output_filepath + '.tsv'
+  if (not output_filepath.endswith(BIDS_DATA_EXT)):
+    output_filepath = output_filepath + BIDS_DATA_EXT
   args['output_filepath'] = output_filepath
 
   # if query parameters file path given, check the file path for validity
