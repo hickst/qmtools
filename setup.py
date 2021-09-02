@@ -10,7 +10,8 @@ setup(
     entry_points={
         'console_scripts': [
             'qmtraffic = qmtools.qmview.traffic_light_cli:main',
-            'qmfetcher = qmtools.qmfetcher.fetcher_cli:main'
+            'qmfetcher = qmtools.qmfetcher.fetcher_cli:main',
+            'qmviolin  = qmtools.qmviolin.violin_cli:main'
         ]
     },
 )
