@@ -1,6 +1,6 @@
 # Tests of the traffic-light CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/27/2021.
-#   Last Modified: Update for fixed reports directory (again).
+#   Last Modified: Update for required argument parsing refactoring. Use symbolic file extensions.
 #
 import os
 import matplotlib
@@ -11,7 +11,8 @@ import sys
 import tempfile
 from pathlib import Path
 
-from qmtools import INPUT_FILE_EXIT_CODE, REPORTS_DIR_EXIT_CODE, REPORTS_DIR
+from qmtools import BIDS_DATA_EXT, INPUT_FILE_EXIT_CODE
+from qmtools import REPORTS_DIR_EXIT_CODE, REPORTS_DIR, REPORTS_EXT
 import qmtools.qmview.traffic_light_cli as cli
 from tests import TEST_RESOURCES_DIR
 
@@ -80,39 +81,39 @@ class TestTrafficLightCLI(object):
     assert f"usage: {cli.PROG_NAME}" in sysout
 
 
-  def test_main_no_inputfile(self, capsys, clear_argv):
-    with pytest.raises(SystemExit) as se:
-      sys.argv = ['qmtools', '-m', 'bold']
-      cli.main()
-    assert se.value.code == SYSEXIT_ERROR_CODE
-    sysout, syserr = capsys.readouterr()
-    print(f"CAPTURED SYS.ERR:\n{syserr}")
-    assert 'the following arguments are required: -i/--input-file' in syserr
-
-
   def test_main_no_modality(self, capsys, clear_argv):
     with pytest.raises(SystemExit) as se:
-      sys.argv = ['qmtools', '-i', self.bold_test_fyl]
+      sys.argv = ['qmtools']
       cli.main()
     assert se.value.code == SYSEXIT_ERROR_CODE
     sysout, syserr = capsys.readouterr()
     print(f"CAPTURED SYS.ERR:\n{syserr}")
-    assert 'the following arguments are required: -m/--modality' in syserr
+    assert 'the following arguments are required: modality' in syserr
+
+
+  def test_main_no_inputfile(self, capsys, clear_argv):
+    with pytest.raises(SystemExit) as se:
+      sys.argv = ['qmtools', 'bold']
+      cli.main()
+    assert se.value.code == SYSEXIT_ERROR_CODE
+    sysout, syserr = capsys.readouterr()
+    print(f"CAPTURED SYS.ERR:\n{syserr}")
+    assert 'the following arguments are required: group_file' in syserr
 
 
   def test_main(self, capsys, clear_argv):
     with tempfile.TemporaryDirectory() as tmpdir:
       os.chdir(tmpdir)
       print(f"tmpdir={tmpdir}")
-      sys.argv = ['qmtools', '-i', self.bold_test_fyl, '-m', 'bold']
+      sys.argv = ['qmtools', 'bold', self.bold_test_fyl]
       cli.main()
       files = os.listdir(os.path.join(tmpdir, REPORTS_DIR))
       print(f"FILES={files}")
       assert files is not None
       assert len(files) == 6
       # count how many files of each type written (expect: 2 html, 2 tsv, 2 png)
-      assert 2 == len(list(filter(lambda f: str(f).endswith('.html'),files)))
-      assert 2 == len(list(filter(lambda f: str(f).endswith('.tsv'),files)))
+      assert 2 == len(list(filter(lambda f: str(f).endswith(REPORTS_EXT),files)))
+      assert 2 == len(list(filter(lambda f: str(f).endswith(BIDS_DATA_EXT),files)))
       assert 2 == len(list(filter(lambda f: str(f).endswith('.png'),files)))
 
 
@@ -120,7 +121,7 @@ class TestTrafficLightCLI(object):
     with tempfile.TemporaryDirectory() as tmpdir:
       os.chdir(tmpdir)
       print(f"tmpdir={tmpdir}")
-      sys.argv = ['qmtools', '-v', '-i', self.bold_test_fyl, '-m', 'bold']
+      sys.argv = ['qmtools', '-v', 'bold', self.bold_test_fyl]
       cli.main()
       sysout, syserr = capsys.readouterr()
       print(f"CAPTURED SYS.ERR:\n{syserr}")

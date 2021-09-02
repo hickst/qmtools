@@ -1,6 +1,6 @@
 # Tests of Shared utilities for the QMTools programs.
 #   Written by: Tom Hicks and Dianne Patterson. 8/5/2021.
-# Last Modified: Use custom fixture to restore test dir after chdir.
+# Last Modified: Use dot in explicit file extensions.
 #
 import os
 import pandas
@@ -84,7 +84,7 @@ class TestQMUtils(object):
 
 
   def test_gen_output_filename_ext(self):
-    fname = qmu.gen_output_filename('T1w', 'csv')
+    fname = qmu.gen_output_filename('T1w', '.csv')
     print(fname)
     assert 'T1w' in fname
     assert '.csv' in fname

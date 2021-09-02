@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/4/2021.
-#   Last Modified: Add other tests of CLI main method.
+#   Last Modified: Update for required argument parsing refactoring.
 #
 import os
 import matplotlib
@@ -75,17 +75,17 @@ class TestFetcherCLI(object):
 
   def test_main_no_modality(self, capsys):
     with pytest.raises(SystemExit) as se:
-      sys.argv = ['qmtools', '-i', self.bold_test_fyl]
+      sys.argv = ['qmtools']
       cli.main()
     assert se.value.code == SYSEXIT_ERROR_CODE
     sysout, syserr = capsys.readouterr()
     print(f"CAPTURED SYS.ERR:\n{syserr}")
-    assert 'the following arguments are required: -m/--modality' in syserr
+    assert 'the following arguments are required: modality' in syserr
 
 
   def test_main_0(self, capsys):
     with pytest.raises(SystemExit) as se:
-      sys.argv = ['qmtools', '-v', '-m', 'bold', '-n', '0']
+      sys.argv = ['qmtools', '-v', 'bold', '-n', '0']
       cli.main()
     assert se.value.code == NUM_RECS_EXIT_CODE
     sysout, syserr = capsys.readouterr()
@@ -95,7 +95,7 @@ class TestFetcherCLI(object):
 
   def test_main_urlonly_noqps(self, capsys):
     with pytest.raises(SystemExit) as se:
-      sys.argv = [ 'qmtools', '-v', '-m', 'T1w', '-n', '4',
+      sys.argv = [ 'qmtools', '-v', 'T1w', '-n', '4',
                    '-o', 'unused', '--url-only' ]
       cli.main()
     print(se)
@@ -111,7 +111,7 @@ class TestFetcherCLI(object):
 
   def test_main_urlonly_qps(self, capsys):
     with pytest.raises(SystemExit) as se:
-      sys.argv = [ 'qmtools', '-v', '-m', 'bold', '-n', '4',
+      sys.argv = [ 'qmtools', '-v', 'bold', '-n', '4',
                    '-q', self.params_query_fyl, '--url-only' ]
       cli.main()
     print(se)
@@ -127,7 +127,7 @@ class TestFetcherCLI(object):
 
   def test_main_use_oldest(self, capsys):
     with pytest.raises(SystemExit) as se:
-      sys.argv = [ 'qmtools', '-v', '-m', 'bold', '--use-oldest', '--url-only' ]
+      sys.argv = [ 'qmtools', '-v', 'bold', '--use-oldest', '--url-only' ]
       cli.main()
     print(se)
     assert se.value.code == 0

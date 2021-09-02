@@ -1,13 +1,13 @@
 # Shared utilities for the QMTools programs.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: No default dot in extension. Make header docs consistent.
+#   Last Modified: Use symbolic file extensions.
 #
 import datetime
 import os
 import pandas as pd
 import sys
 
-from qmtools import ALLOWED_MODALITIES, FETCHED_DIR, FETCHED_DIR_EXIT_CODE
+from qmtools import ALLOWED_MODALITIES, BIDS_DATA_EXT, FETCHED_DIR, FETCHED_DIR_EXIT_CODE
 from qmtools import REPORTS_DIR, REPORTS_DIR_EXIT_CODE
 from qmtools.file_utils import good_dir_path
 
@@ -50,7 +50,7 @@ def ensure_reports_dir (program_name):
       sys.exit(REPORTS_DIR_EXIT_CODE)
 
 
-def gen_output_filename (modality, extension='tsv'):
+def gen_output_filename (modality, extension=BIDS_DATA_EXT):
   """
   Generate and return a default name based on modality, timestamp, and optional extension.
   """

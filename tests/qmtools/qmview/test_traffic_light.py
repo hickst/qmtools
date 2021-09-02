@@ -1,6 +1,6 @@
 # Tests of the traffic-light table code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/19/2021.
-# Last Modified: Update for strict modality capitalization.
+# Last Modified: Use symbolic file extensions.
 #
 import os
 import matplotlib
@@ -10,7 +10,7 @@ import pytest
 import tempfile
 from pathlib import Path
 
-from qmtools import REPORTS_DIR
+from qmtools import BIDS_DATA_EXT, REPORTS_DIR, REPORTS_EXT
 from qmtools.qm_utils import load_tsv
 from tests import TEST_RESOURCES_DIR
 import qmtools.qmview.traffic_light as traf
@@ -63,8 +63,8 @@ class TestTrafficLight(object):
       assert files is not None
       assert len(files) == 4
       # count how many files of each type written (expect: 2 html, 2 tsv)
-      assert 2 == len(list(filter(lambda f: str(f).endswith('.html'),files)))
-      assert 2 == len(list(filter(lambda f: str(f).endswith('.tsv'),files)))
+      assert 2 == len(list(filter(lambda f: str(f).endswith(REPORTS_EXT),files)))
+      assert 2 == len(list(filter(lambda f: str(f).endswith(BIDS_DATA_EXT),files)))
       for fyl in files:
         fpath = os.path.join(tmpdir, fyl)
         if (str(fyl).endswith('html')):
@@ -84,8 +84,8 @@ class TestTrafficLight(object):
       assert files is not None
       assert len(files) == 4
       # count how many files of each type written (expect: 2 html, 2 tsv)
-      assert 2 == len(list(filter(lambda f: str(f).endswith('.html'),files)))
-      assert 2 == len(list(filter(lambda f: str(f).endswith('.tsv'),files)))
+      assert 2 == len(list(filter(lambda f: str(f).endswith(REPORTS_EXT),files)))
+      assert 2 == len(list(filter(lambda f: str(f).endswith(BIDS_DATA_EXT),files)))
       for fyl in files:
         fpath = os.path.join(tmpdir, fyl)
         if (str(fyl).endswith('html')):
@@ -161,7 +161,7 @@ class TestTrafficLight(object):
       assert files is not None
       assert len(files) == 1
       for fyl in files:
-        assert str(fyl).endswith('.tsv')
+        assert str(fyl).endswith(BIDS_DATA_EXT)
         fpath = os.path.join(tmpdir, fyl)
         assert os.path.getsize(fpath) > self.tsv_min_size
 
@@ -178,6 +178,6 @@ class TestTrafficLight(object):
       assert files is not None
       assert len(files) == 1
       for fyl in files:
-        assert str(fyl).endswith('.html')
+        assert str(fyl).endswith(REPORTS_EXT)
         fpath = os.path.join(tmpdir, fyl)
         assert os.path.getsize(fpath) > self.html_min_size

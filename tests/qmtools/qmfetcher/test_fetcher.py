@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher library code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/7/2021.
-# Last Modified: Update tests for args dictionary.
+# Last Modified: Update 1 test for tiny coverage gain.
 #
 import json
 import os
@@ -214,7 +214,7 @@ class TestFetcher(object):
 
 
   def test_clean_records(self, flrec):
-    crecs = fetch.clean_records([flrec])
+    crecs = fetch.clean_records([flrec], args={'dummy': 88})
     assert crecs is not None
     assert crecs != []
     assert len(crecs) == 1

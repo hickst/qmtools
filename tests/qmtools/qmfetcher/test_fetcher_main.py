@@ -1,6 +1,6 @@
 # Functional tests of the MRIQC data fetcher code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/24/2021.
-# Last Modified: Redo tests as tests of CLI main method. Use custom fixture to restore test dir after chdir.
+#   Last Modified: Update for required argument parsing refactoring.
 #
 import os
 import pytest
@@ -50,7 +50,7 @@ class TestFetcherMain(object):
     with tempfile.TemporaryDirectory() as tmpdir:
       os.chdir(tmpdir)
       print(f"tmpdir={tmpdir}")
-      sys.argv = ['qmtools', '-v', '-m', 'bold', '-n', '1', '-o', 'test']
+      sys.argv = ['qmtools', '-v', 'bold', '-n', '1', '-o', 'test']
       cli.main()
       sysout, syserr = capsys.readouterr()
       print(f"CAPTURED SYS.ERR:\n{syserr}")
@@ -73,7 +73,7 @@ class TestFetcherMain(object):
       os.chdir(tmpdir)
       print(f"tmpdir={tmpdir}")
       print(f"S_P_S={SERVER_PAGE_SIZE}")
-      sys.argv = ['qmtools', '-v', '-m', 'T2w', '-n', str(SERVER_PAGE_SIZE), '-o', 'test.tsv']
+      sys.argv = ['qmtools', '-v', 'T2w', '-n', str(SERVER_PAGE_SIZE), '-o', 'test.tsv']
       cli.main()
       sysout, syserr = capsys.readouterr()
       print(f"CAPTURED SYS.ERR:\n{syserr}")
@@ -96,7 +96,7 @@ class TestFetcherMain(object):
       os.chdir(tmpdir)
       print(f"tmpdir={tmpdir}")
       print(f"S_P_S={SERVER_PAGE_SIZE}")
-      sys.argv = ['qmtools', '-v', '-m', 'bold', '-n', str(SERVER_PAGE_SIZE + 4), '-o', 'test.tsv']
+      sys.argv = ['qmtools', '-v', 'bold', '-n', str(SERVER_PAGE_SIZE + 4), '-o', 'test.tsv']
       cli.main()
       sysout, syserr = capsys.readouterr()
       print(f"CAPTURED SYS.ERR:\n{syserr}")
@@ -118,7 +118,7 @@ class TestFetcherMain(object):
       os.chdir(tmpdir)
       print(f"tmpdir={tmpdir}")
       print(f"S_P_S={SERVER_PAGE_SIZE}")
-      sys.argv = ['qmtools', '-v', '-m', 'bold', '-n', str(2 * SERVER_PAGE_SIZE), '-o', 'test.tsv']
+      sys.argv = ['qmtools', '-v', 'bold', '-n', str(2 * SERVER_PAGE_SIZE), '-o', 'test.tsv']
       cli.main()
       sysout, syserr = capsys.readouterr()
       print(f"CAPTURED SYS.ERR:\n{syserr}")
