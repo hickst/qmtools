@@ -1,6 +1,6 @@
 # Tests of the traffic-light table code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/19/2021.
-#   Last Modified: Updated for HI/LO constant refactoring.
+#   Last Modified: Update for move of load_tsv to utils.
 #
 import os
 import matplotlib
@@ -11,9 +11,9 @@ import tempfile
 from pathlib import Path
 
 from qmtools import BIDS_DATA_EXT, REPORTS_DIR, REPORTS_EXT
-from qmtools.qm_utils import load_tsv
-from tests import TEST_RESOURCES_DIR
+import qmtools.qm_utils as qmu
 import qmtools.qmview.traffic_light as traf
+from tests import TEST_RESOURCES_DIR
 
 class TestTrafficLight(object):
 
@@ -94,7 +94,7 @@ class TestTrafficLight(object):
           assert os.path.getsize(fpath) > self.tsv_min_size
 
   def test_normalize_to_zscores(self):
-    qm_df = traf.load_tsv(self.bold_test_fyl)
+    qm_df = qmu.load_tsv(self.bold_test_fyl)
     norm_df = traf.normalize_to_zscores(qm_df)
     assert type(norm_df) == pandas.core.frame.DataFrame
     assert norm_df.size == self.df_cell_count
@@ -106,7 +106,7 @@ class TestTrafficLight(object):
 
 
   def test_pos_neg_split_bold(self):
-    qm_df = traf.load_tsv(self.bold_test_fyl)
+    qm_df = qmu.load_tsv(self.bold_test_fyl)
     (pos_good_df, pos_bad_df) = traf.pos_neg_split(qm_df, 'bold')
 
     assert pos_good_df is not None
@@ -121,7 +121,7 @@ class TestTrafficLight(object):
 
 
   def test_pos_neg_split_struct(self):
-    qm_df = traf.load_tsv(self.struct_test_fyl)
+    qm_df = qmu.load_tsv(self.struct_test_fyl)
     (pos_good_df, pos_bad_df) = traf.pos_neg_split(qm_df, 'T1w')
 
     assert pos_good_df is not None
@@ -153,7 +153,7 @@ class TestTrafficLight(object):
   def test_write_table_to_tsv(self):
     with tempfile.TemporaryDirectory() as tmpdir:
       print(f"tmpdir={tmpdir}")
-      qm_df = traf.load_tsv(self.bold_test_fyl)
+      qm_df = qmu.load_tsv(self.bold_test_fyl)
       norm_df = traf.normalize_to_zscores(qm_df)
       traf.write_table_to_tsv(norm_df, "table", dirpath=tmpdir)
       files = os.listdir(tmpdir)
@@ -169,7 +169,7 @@ class TestTrafficLight(object):
   def test_write_table_to_html(self):
     with tempfile.TemporaryDirectory() as tmpdir:
       print(f"tmpdir={tmpdir}")
-      qm_df = traf.load_tsv(self.bold_test_fyl)
+      qm_df = qmu.load_tsv(self.bold_test_fyl)
       norm_df = traf.normalize_to_zscores(qm_df)
       styler = traf.style_table_by_std_deviations(norm_df)
       traf.write_table_to_html(styler, "table", dirpath=tmpdir)

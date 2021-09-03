@@ -1,7 +1,7 @@
 # To convert an mriqc output file to normalized scores for representation in
 # a traffic-light table.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Move HI/LO constants to config.
+#   Last Modified: Import QM utils module.
 #
 import os
 import numpy as np
@@ -15,7 +15,7 @@ from config.mriqc_keywords import STRUCT_HI_GOOD_COLUMNS, STRUCT_LO_GOOD_COLUMNS
 from config.mriqc_keywords import BOLD_HI_GOOD_COLUMNS, BOLD_LO_GOOD_COLUMNS
 from qmtools import ALLOWED_MODALITIES, REPORTS_DIR, STRUCTURAL_MODALITIES
 from qmtools import BIDS_DATA_EXT, REPORTS_EXT
-from qmtools.qm_utils import load_tsv, validate_modality
+import qmtools.qm_utils as qmu
 
 # create our own small color maps for positive good and positive bad
 TURNIP8_COLORMAP = cm.get_cmap('PiYG', 8)
@@ -29,8 +29,8 @@ def make_traffic_light_table (tsvfile, modality, dirpath=REPORTS_DIR):
   The modality string specifies which columns will be selected and must be
   one of: 'T1w', 'T2w', or 'bold'.
   """
-  modality = validate_modality(modality)
-  qm_df = load_tsv(tsvfile)
+  modality = qmu.validate_modality(modality)
+  qm_df = qmu.load_tsv(tsvfile)
   (pos_good_df, pos_bad_df) = pos_neg_split(qm_df, modality)
   gen_traffic_light_table(pos_good_df, True, f"pos_good_{modality}", dirpath)
   gen_traffic_light_table(pos_bad_df, False, f"pos_bad_{modality}", dirpath)
