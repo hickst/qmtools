@@ -1,6 +1,6 @@
 # CLI program to produce a report with violin plots comparing two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/1/2021.
-#   Last Modified: Initial creation of infrastructure stub.
+#   Last Modified: Import and call top-level violin plot stub.
 #
 import argparse
 import os
@@ -10,6 +10,7 @@ import qmtools.qm_utils as qmu
 from qmtools import ALLOWED_MODALITIES, BIDS_DATA_EXT, FETCHED_DIR, FETCHED_DIR_EXIT_CODE
 from qmtools import INPUT_FILE_EXIT_CODE, REPORTS_DIR, REPORTS_DIR_EXIT_CODE, REPORTS_EXT
 from qmtools.file_utils import good_file_path
+from qmtools.qmviolin import violin
 
 PROG_NAME = 'qmviolin'
 
@@ -113,10 +114,10 @@ def main (argv=None):
   # query the MRIQC server and output or save the results
   try:
 
-    # read data, merge records, and create the violin plots:
-    # TODO: IMPLEMENT LATER 
-    #recs = violin.plot(modality, args)
     print(f"ARGS={args}")              # REMOVE LATER
+
+    # read data, merge records, and create the violin plots:
+    recs = violin.vplot(modality, args)
 
     if (args.get('verbose')):
       print(f"({PROG_NAME}): Compared user records against fetched records.")
