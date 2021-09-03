@@ -4,7 +4,7 @@
 #     https://github.com/poldracklab/mriqcwebapi/blob/master/dockereve-master/eve-app/settings.py
 #
 #   Written by: Tom Hicks. 8/19/2021.
-#   Last Modified: Merge Bids keywords into Bold and structural keywords.
+#   Last Modified: Refactor HI/LO constants to here.
 #
 BIDS_KEYWORDS = set([
   'bids_meta.modality',
@@ -225,3 +225,24 @@ STRUCTURAL_KEYWORDS = set([
 # Add all Bids keywords to Bold keywords and Structural (T1w, T2w) keywords
 BOLD_KEYWORDS.update(BIDS_KEYWORDS)
 STRUCTURAL_KEYWORDS.update(BIDS_KEYWORDS)
+
+# structural columns whose values are better when higher
+STRUCT_HI_GOOD_COLUMNS = [
+  'bids_name', 'cnr', 'snr_csf', 'snr_gm', 'snr_total', 'snr_wm',
+  'snrd_csf', 'snrd_gm', 'snrd_total','snrd_wm', 'tpm_overlap_csf',
+  'tpm_overlap_gm', 'tpm_overlap_wm'
+]
+# structural columns whose values are better when lower
+STRUCT_LO_GOOD_COLUMNS = [
+  'bids_name', 'cjv', 'rpve_csf', 'rpve_gm', 'rpve_wm', 'fwhm_x',
+  'fwhm_y', 'fwhm_z', 'inu_med', 'inu_range', 'qi_1', 'qi_2'
+]
+
+# functional columns whose values are better when higher
+BOLD_HI_GOOD_COLUMNS = ['bids_name', 'fber', 'snr', 'tsnr']
+
+# functional columns whose values are better when lower
+BOLD_LO_GOOD_COLUMNS = [
+  'bids_name', 'aor', 'aqi', 'dvars_nstd', 'dvars_std', 'dvars_vstd',
+  'efc', 'fd_mean', 'fd_num', 'fd_perc', 'fwhm_avg', 'gcor', 'gsr_x', 'gsr_y'
+]

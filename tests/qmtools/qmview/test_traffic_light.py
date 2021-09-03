@@ -1,6 +1,6 @@
 # Tests of the traffic-light table code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/19/2021.
-# Last Modified: Use symbolic file extensions.
+#   Last Modified: Updated for HI/LO constant refactoring.
 #
 import os
 import matplotlib
@@ -26,15 +26,15 @@ class TestTrafficLight(object):
   df_cell_count = 855           # size of test zscore dataframe
   df_shape = (19, 45)           # shape of test zscore dataframe
 
-  bold_pos_good_df_cell_count = 19 * len(traf.BOLD_POS_GOOD_COLUMNS)
-  bold_pos_good_df_shape = (19, len(traf.BOLD_POS_GOOD_COLUMNS))
-  bold_pos_bad_df_cell_count = 19 * len(traf.BOLD_POS_BAD_COLUMNS)
-  bold_pos_bad_df_shape = (19, len(traf.BOLD_POS_BAD_COLUMNS))
+  bold_pos_good_df_cell_count = 19 * len(traf.BOLD_HI_GOOD_COLUMNS)
+  bold_pos_good_df_shape = (19, len(traf.BOLD_HI_GOOD_COLUMNS))
+  bold_pos_bad_df_cell_count = 19 * len(traf.BOLD_LO_GOOD_COLUMNS)
+  bold_pos_bad_df_shape = (19, len(traf.BOLD_LO_GOOD_COLUMNS))
 
-  struct_pos_good_df_cell_count = 19 * len(traf.STRUCTURAL_POS_GOOD_COLUMNS)
-  struct_pos_good_df_shape = (19, len(traf.STRUCTURAL_POS_GOOD_COLUMNS))
-  struct_pos_bad_df_cell_count = 19 * len(traf.STRUCTURAL_POS_BAD_COLUMNS)
-  struct_pos_bad_df_shape = (19, len(traf.STRUCTURAL_POS_BAD_COLUMNS))
+  struct_pos_good_df_cell_count = 19 * len(traf.STRUCT_HI_GOOD_COLUMNS)
+  struct_pos_good_df_shape = (19, len(traf.STRUCT_HI_GOOD_COLUMNS))
+  struct_pos_bad_df_cell_count = 19 * len(traf.STRUCT_LO_GOOD_COLUMNS)
+  struct_pos_bad_df_shape = (19, len(traf.STRUCT_LO_GOOD_COLUMNS))
 
 
   def test_make_legends_tmp(self):

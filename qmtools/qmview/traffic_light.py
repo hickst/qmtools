@@ -1,7 +1,7 @@
 # To convert an mriqc output file to normalized scores for representation in
 # a traffic-light table.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Make header docs consistent. Use symbolic file extensions.
+#   Last Modified: Move HI/LO constants to config.
 #
 import os
 import numpy as np
@@ -11,35 +11,15 @@ import scipy.stats as stats
 from matplotlib import cm
 from matplotlib import pyplot as plt
 
+from config.mriqc_keywords import STRUCT_HI_GOOD_COLUMNS, STRUCT_LO_GOOD_COLUMNS
+from config.mriqc_keywords import BOLD_HI_GOOD_COLUMNS, BOLD_LO_GOOD_COLUMNS
 from qmtools import ALLOWED_MODALITIES, REPORTS_DIR, STRUCTURAL_MODALITIES
 from qmtools import BIDS_DATA_EXT, REPORTS_EXT
 from qmtools.qm_utils import load_tsv, validate_modality
 
-# Constants to "mark" a dataframe as having positive good values or positive bad values
-POS_GOOD_FLAG = True
-POS_BAD_FLAG = False
-
 # create our own small color maps for positive good and positive bad
 TURNIP8_COLORMAP = cm.get_cmap('PiYG', 8)
 TURNIP8_COLORMAP_R = cm.get_cmap('PiYG_r', 8)
-
-# structural columns whose values are better when positive, or negative
-STRUCTURAL_POS_GOOD_COLUMNS = [
-  'bids_name', 'cnr', 'snr_csf', 'snr_gm', 'snr_total', 'snr_wm',
-  'snrd_csf', 'snrd_gm', 'snrd_total','snrd_wm', 'tpm_overlap_csf',
-   'tpm_overlap_gm', 'tpm_overlap_wm'
-  ]
-STRUCTURAL_POS_BAD_COLUMNS = [
-  'bids_name', 'cjv', 'rpve_csf', 'rpve_gm', 'rpve_wm', 'fwhm_x',
-  'fwhm_y', 'fwhm_z', 'inu_med', 'inu_range', 'qi_1', 'qi_2'
-  ]
-
-# functional columns whose values are better when positive, or negative
-BOLD_POS_GOOD_COLUMNS = ['bids_name', 'fber', 'snr', 'tsnr']
-BOLD_POS_BAD_COLUMNS = [
-  'bids_name', 'aor', 'aqi', 'dvars_nstd', 'dvars_std', 'dvars_vstd',
-  'efc', 'fd_mean', 'fd_num', 'fd_perc', 'fwhm_avg', 'gcor', 'gsr_x', 'gsr_y'
-]
 
 
 def make_traffic_light_table (tsvfile, modality, dirpath=REPORTS_DIR):
@@ -52,18 +32,18 @@ def make_traffic_light_table (tsvfile, modality, dirpath=REPORTS_DIR):
   modality = validate_modality(modality)
   qm_df = load_tsv(tsvfile)
   (pos_good_df, pos_bad_df) = pos_neg_split(qm_df, modality)
-  gen_traffic_light_table(pos_good_df, POS_GOOD_FLAG, f"pos_good_{modality}", dirpath)
-  gen_traffic_light_table(pos_bad_df, POS_BAD_FLAG, f"pos_bad_{modality}", dirpath)
+  gen_traffic_light_table(pos_good_df, True, f"pos_good_{modality}", dirpath)
+  gen_traffic_light_table(pos_bad_df, False, f"pos_bad_{modality}", dirpath)
 
 
-def gen_traffic_light_table (qm_df, iam_pos_good, outfilename, dirpath=REPORTS_DIR):
+def gen_traffic_light_table (qm_df, iam_hi_good, outfilename, dirpath=REPORTS_DIR):
   """
   Normalize to Z-scores, stylize, and write the given QM dataframe
   as an HTML table, in the named output file.
   """
   norm_df = normalize_to_zscores(qm_df)
   write_table_to_tsv(norm_df, outfilename, dirpath)
-  which_cmap = TURNIP8_COLORMAP if iam_pos_good else TURNIP8_COLORMAP_R
+  which_cmap = TURNIP8_COLORMAP if iam_hi_good else TURNIP8_COLORMAP_R
   styler = style_table_by_std_deviations(norm_df, cmap=which_cmap)
   write_table_to_html(styler, outfilename, dirpath)
 
@@ -120,11 +100,11 @@ def pos_neg_split (qm_df, modality):
   Return a tuple of the positive good and positive bad dataframes.
   """
   if (modality in STRUCTURAL_MODALITIES):
-    pos_good_df = qm_df[STRUCTURAL_POS_GOOD_COLUMNS]
-    pos_bad_df = qm_df[STRUCTURAL_POS_BAD_COLUMNS]
+    pos_good_df = qm_df[STRUCT_HI_GOOD_COLUMNS]
+    pos_bad_df = qm_df[STRUCT_LO_GOOD_COLUMNS]
   else:
-    pos_good_df = qm_df[BOLD_POS_GOOD_COLUMNS]
-    pos_bad_df = qm_df[BOLD_POS_BAD_COLUMNS]
+    pos_good_df = qm_df[BOLD_HI_GOOD_COLUMNS]
+    pos_bad_df = qm_df[BOLD_LO_GOOD_COLUMNS]
 
   return (pos_good_df, pos_bad_df)
 
