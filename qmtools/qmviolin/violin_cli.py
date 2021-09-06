@@ -1,14 +1,14 @@
 # CLI program to produce a report with violin plots comparing two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/1/2021.
-#   Last Modified: Import and call top-level violin plot stub.
+#   Last Modified: Reorganize imports.
 #
 import argparse
 import os
 import sys
 
 import qmtools.qm_utils as qmu
-from qmtools import ALLOWED_MODALITIES, BIDS_DATA_EXT, FETCHED_DIR, FETCHED_DIR_EXIT_CODE
-from qmtools import INPUT_FILE_EXIT_CODE, REPORTS_DIR, REPORTS_DIR_EXIT_CODE, REPORTS_EXT
+from qmtools import (ALLOWED_MODALITIES, BIDS_DATA_EXT,
+                     INPUT_FILE_EXIT_CODE, REPORTS_DIR, REPORTS_EXT)
 from qmtools.file_utils import good_file_path
 from qmtools.qmviolin import violin
 
