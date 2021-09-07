@@ -1,14 +1,16 @@
 # Shared utilities for the QMTools programs.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Use symbolic file extensions.
+#   Last Modified: Reorganize imports.
 #
 import datetime
 import os
-import pandas as pd
 import sys
 
-from qmtools import ALLOWED_MODALITIES, BIDS_DATA_EXT, FETCHED_DIR, FETCHED_DIR_EXIT_CODE
-from qmtools import REPORTS_DIR, REPORTS_DIR_EXIT_CODE
+import pandas as pd
+
+from qmtools import (ALLOWED_MODALITIES, BIDS_DATA_EXT,
+                     FETCHED_DIR, FETCHED_DIR_EXIT_CODE,
+                     REPORTS_DIR, REPORTS_DIR_EXIT_CODE)
 from qmtools.file_utils import good_dir_path
 
 
