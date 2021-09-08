@@ -13,6 +13,7 @@ REPORTS_DIR = 'reports'
 
 # File extensions for report files and BIDS-compliant data files.
 BIDS_DATA_EXT = '.tsv'
+PLOT_EXT = '.png'
 REPORTS_EXT = '.html'
 
 # Symbolic exit codes for various error exit scenarios

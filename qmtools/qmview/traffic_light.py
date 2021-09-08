@@ -1,7 +1,7 @@
 # To convert an mriqc output file to normalized scores for representation in
 # a traffic-light table.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Re-add bids_name to column constants. Reorganize imports.
+#   Last Modified: Use plot file extension constant.
 #
 import os
 import numpy as np
@@ -13,7 +13,7 @@ from matplotlib import pyplot as plt
 
 from config.mriqc_keywords import (STRUCT_HI_GOOD_COLUMNS, STRUCT_LO_GOOD_COLUMNS,
                                    BOLD_HI_GOOD_COLUMNS, BOLD_LO_GOOD_COLUMNS)
-from qmtools import BIDS_DATA_EXT, REPORTS_DIR, REPORTS_EXT, STRUCTURAL_MODALITIES
+from qmtools import BIDS_DATA_EXT, PLOT_EXT, REPORTS_DIR, REPORTS_EXT, STRUCTURAL_MODALITIES
 import qmtools.qm_utils as qmu
 
 # create our own small color maps for positive good and positive bad
@@ -50,10 +50,10 @@ def gen_traffic_light_table (qm_df, iam_hi_good, outfilename, dirpath=REPORTS_DI
 def make_legends (dirpath=REPORTS_DIR):
   """
   Generate and save a positive-good legend and a positive-bad legend
-  as .png files in the reports directory.
+  as plot files (default: PNG) in the reports directory.
   """
-  make_a_legend("pos_good.png", TURNIP8_COLORMAP, dirpath)
-  make_a_legend("pos_bad.png", TURNIP8_COLORMAP_R, dirpath)
+  make_a_legend(f"pos_good{PLOT_EXT}", TURNIP8_COLORMAP, dirpath)
+  make_a_legend(f"pos_bad{PLOT_EXT}", TURNIP8_COLORMAP_R, dirpath)
 
 
 def make_a_legend (filename, colormap, dirpath=REPORTS_DIR):
@@ -130,8 +130,8 @@ def style_table_by_std_deviations (norm_df, cmap=TURNIP8_COLORMAP):
 def write_figure_to_file (fig, filename, dirpath=REPORTS_DIR):
   """
   Write the given matplotlib figure to a file with the given filename
-  in the reports directory. The output format is determined by the file
-  extension (.png is the default).
+  in the reports directory. The output format is determined by the
+  plot file extension (default: PNG).
   """
   filepath = os.path.join(dirpath, filename)
   fig.savefig(filepath, bbox_inches='tight')    # .png is default
