@@ -1,19 +1,17 @@
 # Tests of the MRIQC data fetcher library code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/7/2021.
-# Last Modified: Update 1 test for tiny coverage gain.
+# Last Modified: Move do query tests to test fetcher main module.
 #
 import json
 import os
-import pandas
-import pytest
-import requests as req
-import sys
 import tempfile
 from pathlib import Path
 
-from qmtools import ALLOWED_MODALITIES
-from qmtools.qmfetcher import DEFAULT_RESULTS_SIZE, SERVER_PAGE_SIZE
+import pytest
+import requests as req
+
 import qmtools.qmfetcher.fetcher as fetch
+from qmtools.qmfetcher import SERVER_PAGE_SIZE
 from qmtools.qmfetcher.fetcher import SERVER_URL
 from tests import TEST_RESOURCES_DIR
 
@@ -305,13 +303,6 @@ class TestFetcher(object):
     print(recs)
     assert recs is not None
     assert len(recs) == 0
-
-
-  def test_do_query_bad_url(self):
-    bad_url = 'https://mriqc.nimh.nih.gov/badjunk?max_records=1'
-    with pytest.raises(req.RequestException) as re:
-      fetch.do_query(bad_url)
-    print(re)
 
 
   def test_extract_records_empty(self):

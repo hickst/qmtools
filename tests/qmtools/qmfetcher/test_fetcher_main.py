@@ -1,6 +1,6 @@
 # Functional tests of the MRIQC data fetcher code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/24/2021.
-#   Last Modified: Update for required argument parsing refactoring.
+#   Last Modified: Move all do_query tests here.
 #
 import os
 import pytest
@@ -8,7 +8,7 @@ import requests as req
 import sys
 import tempfile
 
-from qmtools import FETCHED_DIR, NUM_RECS_EXIT_CODE
+from qmtools import FETCHED_DIR
 from qmtools.qmfetcher import SERVER_PAGE_SIZE
 import qmtools.qmfetcher.fetcher_cli as cli
 import qmtools.qmfetcher.fetcher as fetch
@@ -24,6 +24,12 @@ def popdir(request):
 class TestFetcherMain(object):
 
   query_file = f"{TEST_RESOURCES_DIR}/manmaf.qp"
+
+  def test_do_query_bad_url(self):
+    bad_url = 'https://mriqc.nimh.nih.gov/badjunk?max_records=1'
+    with pytest.raises(req.RequestException) as re:
+      fetch.do_query(bad_url)
+    print(re)
 
 
   def test_do_query_noresults(self):
