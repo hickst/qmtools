@@ -1,6 +1,6 @@
 # Methods to create IMQ violin plots from two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/3/2021.
-#   Last Modified: Reorganize imports. Pivot merged frame to long form for plotting.
+#   Last Modified: Continue developing: select IQMs and begin do_plots.
 #
 # import csv
 # import os
@@ -14,7 +14,6 @@ from config.mriqc_keywords import (BOLD_HI_GOOD_COLUMNS, BOLD_LO_GOOD_COLUMNS,
                                    STRUCT_HI_GOOD_COLUMNS, STRUCT_LO_GOOD_COLUMNS)
 import qmtools.qm_utils as qmu
 from qmtools import ALLOWED_MODALITIES, STRUCTURAL_MODALITIES
-from qmtools.qmfetcher import DEFAULT_RESULTS_SIZE, SERVER_PAGE_SIZE
 from qmtools.qmview.traffic_light import write_table_to_tsv  # REMOVE LATER
 
 # Tuple of column name prefix strings which should be removed from fetched data files:
@@ -48,10 +47,12 @@ def vplot (modality, args):
   # pivot the merged dataframe to index by bids_name and source
   melted_df = merged_df.melt(id_vars=['bids_name', 'source'])
 
-  print('MELTED DataFrame:\n')           # REMOVE LATER
+  print('\nMELTED DataFrame:\n')           # REMOVE LATER
   print(melted_df)                        # REMOVE LATER
   rpt_name = args.get('report_filename', 'melty')
   write_table_to_tsv(melted_df, rpt_name)  # REMOVE LATER
+
+  do_plots(modality, melted_df)
 
 
 def clean_df (df):
@@ -68,8 +69,35 @@ def clean_df (df):
   del_list = [col for col in list(df.columns) if col.startswith(COLUMNS_TO_REMOVE)]
   df.drop(columns=del_list, errors='ignore', inplace=True)
 
-def do_plots (df):
+
+def do_plots (modality, plot_df, plot_iqms=None):
   """
-  Takes a merged and melted MRIQC dataset and a list of IQMs to plot.
+  Takes a merged and melted MRIQC dataset and an optional list of IQMs to plot
+  and plots the given or default IQMs.
   """
-  
+  iqms_to_plot = select_iqms_to_plot(modality, plot_iqms)
+  print(f"IQMs={iqms_to_plot}")        # REMOVE LATER
+  # for iqm in iqms_to_plot:
+  #   TODO: IMPLEMENT LATER
+  #   do_a_plot(modality, plot_df, iqm)
+
+
+def select_iqms_to_plot (modality, plot_iqms=None):
+  """
+  Decide which IQMs will be plotted based on modality OR
+  check and/or filter a user-provided list of IQMs against modality.
+  """
+  bold_iqms = sorted(BOLD_HI_GOOD_COLUMNS + BOLD_LO_GOOD_COLUMNS)
+  struct_iqms = sorted(STRUCT_HI_GOOD_COLUMNS + STRUCT_LO_GOOD_COLUMNS)
+
+  if (modality in STRUCTURAL_MODALITIES):
+    iqms_to_plot = struct_iqms
+    if (plot_iqms is not None):
+      iqms_to_plot = sorted([iqm for iqm in plot_iqms if iqm in struct_iqms])
+  else:
+    iqms_to_plot = bold_iqms
+    if (plot_iqms is not None):
+      iqms_to_plot = sorted([iqm for iqm in plot_iqms if iqm in bold_iqms])
+
+  # return the validated and sorted list of iqms:
+  return iqms_to_plot
