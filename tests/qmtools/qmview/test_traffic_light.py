@@ -1,19 +1,20 @@
 # Tests of the traffic-light table code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/19/2021.
-#   Last Modified: Update for move of load_tsv to utils.
+#   Last Modified: Update for changes to pos_neg_split. Reorganize imports.
 #
 import os
-import matplotlib
-import numpy
-import pandas
-import pytest
 import tempfile
 from pathlib import Path
 
-from qmtools import BIDS_DATA_EXT, REPORTS_DIR, REPORTS_EXT
+import matplotlib
+import numpy
+import pandas
+
 import qmtools.qm_utils as qmu
 import qmtools.qmview.traffic_light as traf
+from qmtools import BIDS_DATA_EXT, REPORTS_EXT
 from tests import TEST_RESOURCES_DIR
+
 
 class TestTrafficLight(object):
 
@@ -26,15 +27,15 @@ class TestTrafficLight(object):
   df_cell_count = 855           # size of test zscore dataframe
   df_shape = (19, 45)           # shape of test zscore dataframe
 
-  bold_pos_good_df_cell_count = 19 * len(traf.BOLD_HI_GOOD_COLUMNS)
-  bold_pos_good_df_shape = (19, len(traf.BOLD_HI_GOOD_COLUMNS))
-  bold_pos_bad_df_cell_count = 19 * len(traf.BOLD_LO_GOOD_COLUMNS)
-  bold_pos_bad_df_shape = (19, len(traf.BOLD_LO_GOOD_COLUMNS))
+  bold_pos_good_df_cell_count = 19 * (1 + len(traf.BOLD_HI_GOOD_COLUMNS))
+  bold_pos_good_df_shape = (19, (1 + len(traf.BOLD_HI_GOOD_COLUMNS)))
+  bold_pos_bad_df_cell_count = 19 * (1 + len(traf.BOLD_LO_GOOD_COLUMNS))
+  bold_pos_bad_df_shape = (19, (1 + len(traf.BOLD_LO_GOOD_COLUMNS)))
 
-  struct_pos_good_df_cell_count = 19 * len(traf.STRUCT_HI_GOOD_COLUMNS)
-  struct_pos_good_df_shape = (19, len(traf.STRUCT_HI_GOOD_COLUMNS))
-  struct_pos_bad_df_cell_count = 19 * len(traf.STRUCT_LO_GOOD_COLUMNS)
-  struct_pos_bad_df_shape = (19, len(traf.STRUCT_LO_GOOD_COLUMNS))
+  struct_pos_good_df_cell_count = 19 * (1 + len(traf.STRUCT_HI_GOOD_COLUMNS))
+  struct_pos_good_df_shape = (19, (1 + len(traf.STRUCT_HI_GOOD_COLUMNS)))
+  struct_pos_bad_df_cell_count = 19 * (1 + len(traf.STRUCT_LO_GOOD_COLUMNS))
+  struct_pos_bad_df_shape = (19, (1 + len(traf.STRUCT_LO_GOOD_COLUMNS)))
 
 
   def test_make_legends_tmp(self):
@@ -108,6 +109,8 @@ class TestTrafficLight(object):
   def test_pos_neg_split_bold(self):
     qm_df = qmu.load_tsv(self.bold_test_fyl)
     (pos_good_df, pos_bad_df) = traf.pos_neg_split(qm_df, 'bold')
+    print(f"POS_GOOD.columns={pos_good_df.columns}")
+    print(f"POS_BAD.columns={pos_bad_df.columns}")
 
     assert pos_good_df is not None
     assert type(pos_good_df) == pandas.core.frame.DataFrame
@@ -123,6 +126,8 @@ class TestTrafficLight(object):
   def test_pos_neg_split_struct(self):
     qm_df = qmu.load_tsv(self.struct_test_fyl)
     (pos_good_df, pos_bad_df) = traf.pos_neg_split(qm_df, 'T1w')
+    print(f"POS_GOOD.columns={pos_good_df.columns}")
+    print(f"POS_BAD.columns={pos_bad_df.columns}")
 
     assert pos_good_df is not None
     assert type(pos_good_df) == pandas.core.frame.DataFrame

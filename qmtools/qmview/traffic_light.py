@@ -1,7 +1,7 @@
 # To convert an mriqc output file to normalized scores for representation in
 # a traffic-light table.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Import QM utils module.
+#   Last Modified: Re-add bids_name to column constants. Reorganize imports.
 #
 import os
 import numpy as np
@@ -11,10 +11,9 @@ import scipy.stats as stats
 from matplotlib import cm
 from matplotlib import pyplot as plt
 
-from config.mriqc_keywords import STRUCT_HI_GOOD_COLUMNS, STRUCT_LO_GOOD_COLUMNS
-from config.mriqc_keywords import BOLD_HI_GOOD_COLUMNS, BOLD_LO_GOOD_COLUMNS
-from qmtools import ALLOWED_MODALITIES, REPORTS_DIR, STRUCTURAL_MODALITIES
-from qmtools import BIDS_DATA_EXT, REPORTS_EXT
+from config.mriqc_keywords import (STRUCT_HI_GOOD_COLUMNS, STRUCT_LO_GOOD_COLUMNS,
+                                   BOLD_HI_GOOD_COLUMNS, BOLD_LO_GOOD_COLUMNS)
+from qmtools import BIDS_DATA_EXT, REPORTS_DIR, REPORTS_EXT, STRUCTURAL_MODALITIES
 import qmtools.qm_utils as qmu
 
 # create our own small color maps for positive good and positive bad
@@ -99,12 +98,13 @@ def pos_neg_split (qm_df, modality):
   are better and the other where negative values are better.
   Return a tuple of the positive good and positive bad dataframes.
   """
+  KEEP_LIST = ['bids_name']
   if (modality in STRUCTURAL_MODALITIES):
-    pos_good_df = qm_df[STRUCT_HI_GOOD_COLUMNS]
-    pos_bad_df = qm_df[STRUCT_LO_GOOD_COLUMNS]
+    pos_good_df = qm_df[(KEEP_LIST + STRUCT_HI_GOOD_COLUMNS)]
+    pos_bad_df = qm_df[(KEEP_LIST + STRUCT_LO_GOOD_COLUMNS)]
   else:
-    pos_good_df = qm_df[BOLD_HI_GOOD_COLUMNS]
-    pos_bad_df = qm_df[BOLD_LO_GOOD_COLUMNS]
+    pos_good_df = qm_df[(KEEP_LIST + BOLD_HI_GOOD_COLUMNS)]
+    pos_bad_df = qm_df[(KEEP_LIST + BOLD_LO_GOOD_COLUMNS)]
 
   return (pos_good_df, pos_bad_df)
 
