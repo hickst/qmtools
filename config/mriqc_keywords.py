@@ -4,7 +4,7 @@
 #     https://github.com/poldracklab/mriqcwebapi/blob/master/dockereve-master/eve-app/settings.py
 #
 #   Written by: Tom Hicks. 8/19/2021.
-#   Last Modified: Remove bids_name from column constants.
+#   Last Modified: Add missing fber to structural IQMs.
 #
 BIDS_KEYWORDS = set([
   'bids_meta.modality',
@@ -228,7 +228,7 @@ STRUCTURAL_KEYWORDS.update(BIDS_KEYWORDS)
 
 # structural columns whose values are better when higher
 STRUCT_HI_GOOD_COLUMNS = [
-  'cnr', 'snr_csf', 'snr_gm', 'snr_total', 'snr_wm',
+  'cnr', 'fber', 'snr_csf', 'snr_gm', 'snr_total', 'snr_wm',
   'snrd_csf', 'snrd_gm', 'snrd_total','snrd_wm', 'tpm_overlap_csf',
   'tpm_overlap_gm', 'tpm_overlap_wm'
 ]
