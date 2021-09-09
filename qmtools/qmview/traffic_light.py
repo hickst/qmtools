@@ -1,7 +1,7 @@
 # To convert an mriqc output file to normalized scores for representation in
 # a traffic-light table.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Use plot file extension constant.
+#   Last Modified: Update for move of write_figure_to_file to QM utils.
 #
 import os
 import numpy as np
@@ -64,7 +64,7 @@ def make_a_legend (filename, colormap, dirpath=REPORTS_DIR):
   fig = plt.figure()
   ax = fig.add_axes([0, 0, 1, 1])
   make_legend_on_axis(ax, colormap)
-  write_figure_to_file(fig, filename, dirpath)
+  qmu.write_figure_to_file(fig, filename, dirpath)
 
 
 def make_legend_on_axis (ax, cmap):
@@ -125,16 +125,6 @@ def style_table_by_std_deviations (norm_df, cmap=TURNIP8_COLORMAP):
   styler = norm_df.style.background_gradient(cmap=cmap, axis=None, vmin=-4.0, vmax=4.0)
   styler.set_table_styles([clean_font], overwrite=False)
   return styler
-
-
-def write_figure_to_file (fig, filename, dirpath=REPORTS_DIR):
-  """
-  Write the given matplotlib figure to a file with the given filename
-  in the reports directory. The output format is determined by the
-  plot file extension (default: PNG).
-  """
-  filepath = os.path.join(dirpath, filename)
-  fig.savefig(filepath, bbox_inches='tight')    # .png is default
 
 
 def write_table_to_tsv (norm_df, filename, dirpath=REPORTS_DIR):

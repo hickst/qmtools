@@ -1,6 +1,6 @@
 # Shared utilities for the QMTools programs.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Reorganize imports.
+#   Last Modified: Move write_figure_to_file here.
 #
 import datetime
 import os
@@ -76,3 +76,13 @@ def validate_modality (modality):
   if (modality in ALLOWED_MODALITIES):
     return modality
   raise ValueError(f"Modality argument must be one of: {ALLOWED_MODALITIES}")
+
+
+def write_figure_to_file (fig, filename, dirpath=REPORTS_DIR):
+  """
+  Write the given matplotlib figure to a file with the given filename
+  in the given or default reports directory. The output format is determined by
+  the plot file extension (default: PNG).
+  """
+  filepath = os.path.join(dirpath, filename)
+  fig.savefig(filepath, bbox_inches='tight')    # .png is default

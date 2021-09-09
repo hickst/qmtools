@@ -1,6 +1,6 @@
 # Methods to create IMQ violin plots from two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/3/2021.
-#   Last Modified: Produce all violin plot files.
+#   Last Modified: Update for move of write_figure_to_file to QM utils.
 #
 # import csv
 # import os
@@ -13,9 +13,7 @@ import seaborn as sb
 from config.mriqc_keywords import (BOLD_HI_GOOD_COLUMNS, BOLD_LO_GOOD_COLUMNS,
                                    STRUCT_HI_GOOD_COLUMNS, STRUCT_LO_GOOD_COLUMNS)
 import qmtools.qm_utils as qmu
-from qmtools.qmview.traffic_light import write_figure_to_file  # REMOVE LATER
 from qmtools import PLOT_EXT, STRUCTURAL_MODALITIES
-from qmtools.qmview.traffic_light import write_table_to_tsv  # REMOVE LATER
 
 # Tuple of column name prefix strings which should be removed from fetched data files:
 COLUMNS_TO_REMOVE = ('_', 'bids_meta', 'provenance', 'rating')
@@ -88,7 +86,7 @@ def do_a_plot (modality, args, iqms_df, iqm):
   vplot = sb.catplot(x="IQM", y="value", hue="source", data=plot_df,
                      kind="violin", inner="quartile", split=True, palette="pastel")
   filename = gen_plot_filename(modality, iqm)
-  write_figure_to_file(vplot, filename)
+  qmu.write_figure_to_file(vplot, filename)
   # TODO: gen_html_for_iqm(modality, args, iqm, filename)
 
 
