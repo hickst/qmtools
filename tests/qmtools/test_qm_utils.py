@@ -1,14 +1,16 @@
 # Tests of Shared utilities for the QMTools programs.
 #   Written by: Tom Hicks and Dianne Patterson. 8/5/2021.
-# Last Modified: Update test for expanded ensure_reports_dir.
+# Last Modified: Add missing test for write_figure_to_file.
 #
 import os
 import pandas
 import pytest
 import tempfile
+import seaborn as sb
 
 from tests import TEST_RESOURCES_DIR
-from qmtools import FETCHED_DIR, FETCHED_DIR_EXIT_CODE, REPORTS_DIR, REPORTS_DIR_EXIT_CODE
+from qmtools import (FETCHED_DIR, FETCHED_DIR_EXIT_CODE,
+                     PLOT_EXT, REPORTS_DIR, REPORTS_DIR_EXIT_CODE)
 import qmtools.qm_utils as qmu
 
 
@@ -23,6 +25,7 @@ class TestQMUtils(object):
   bold_test_fyl  = f"{TEST_RESOURCES_DIR}/bold_test.tsv"
   df_cell_count = 855                  # size of test dataframe
   df_shape = (19, 45)                  # shape of test dataframe
+  fig_min_size = 20000                 # min bytes for our test figure in a .png file
 
 
   def test_ensure_fetched_dir(self, popdir):
@@ -143,3 +146,25 @@ class TestQMUtils(object):
 
     with pytest.raises(ValueError, match='Modality argument must be one of'):
       qmu.validate_modality('T2')
+
+
+  def make_fig(self):
+    tips = sb.load_dataset("tips")
+    return sb.catplot(x="smoker", y="tip", order=["No", "Yes"], data=tips)
+
+
+  def test_write_figure_to_file(self):
+    with tempfile.TemporaryDirectory() as tmpdir:
+      print(f"tmpdir={tmpdir}")
+      fig = self.make_fig()
+      qmu.write_figure_to_file(fig, "figure", dirpath=tmpdir)
+      files = os.listdir(tmpdir)
+      print(f"FILES={files}")
+      assert files is not None
+      assert len(files) == 1
+      for fyl in files:
+        assert str(fyl).endswith(PLOT_EXT)
+        fpath = os.path.join(tmpdir, fyl)
+        fsize = os.path.getsize(fpath)
+        print(f"FSIZE={fsize}")
+        assert fsize > self.fig_min_size
