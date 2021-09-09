@@ -1,6 +1,6 @@
 # Shared utilities for the QMTools programs.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Move write_figure_to_file here.
+#   Last Modified: Expand ensure_reports_dir to allow a dir path.
 #
 import datetime
 import os
@@ -33,19 +33,19 @@ def ensure_fetched_dir (program_name):
       sys.exit(FETCHED_DIR_EXIT_CODE)
 
 
-def ensure_reports_dir (program_name):
+def ensure_reports_dir (program_name, dir_path=REPORTS_DIR):
   """
   Check that the default reports directory is a writeable directory.
   If not, then attempt to create the subdirectory in the current directory.
   If unable to create the directory, then exit out.
   """
-  if (not good_dir_path(REPORTS_DIR, writeable=True)):
+  if (not good_dir_path(dir_path, writeable=True)):
     try:
-      os.mkdir(REPORTS_DIR, mode=0o775)
+      os.makedirs(dir_path, mode=0o775, exist_ok=True)
     except OSError:
-      helpMsg =  """
-        There must be a writeable child subdirectory called 'reports'
-        to hold the output reports.
+      helpMsg =  f"""
+        Unable to create reports directory '{dir_path}'. If there is an existing
+        child subdirectory called 'reports', it must be writeable.
         """
       errMsg = "({}): ERROR: {} Exiting...".format(program_name, helpMsg)
       print(errMsg, file=sys.stderr)

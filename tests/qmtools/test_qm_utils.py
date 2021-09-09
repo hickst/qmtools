@@ -1,6 +1,6 @@
 # Tests of Shared utilities for the QMTools programs.
 #   Written by: Tom Hicks and Dianne Patterson. 8/5/2021.
-# Last Modified: Use dot in explicit file extensions.
+# Last Modified: Update test for expanded ensure_reports_dir.
 #
 import os
 import pandas
@@ -55,6 +55,17 @@ class TestQMUtils(object):
       qmu.ensure_reports_dir('TestQMUtils')
       assert os.path.isdir(REPORTS_DIR)
       assert os.access(REPORTS_DIR, os.W_OK)
+
+
+  def test_ensure_reports_dirs(self, popdir):
+    with tempfile.TemporaryDirectory() as tmpdir:
+      os.chdir(tmpdir)                 # popdir must restore test dir after test
+      print(f"CWD={os.getcwd()}, tmpdir={tmpdir}")
+      dpath = f"{REPORTS_DIR}/child/newdir"
+      assert not os.path.isdir(dpath)
+      qmu.ensure_reports_dir('TestQMUtils', dir_path=dpath)
+      assert os.path.isdir(dpath)
+      assert os.access(dpath, os.W_OK)
 
 
   def test_ensure_reports_dir_fail(self, popdir):
