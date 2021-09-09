@@ -1,18 +1,18 @@
 # CLI program to query the MRIQC server and download query result records into
 # a file for further processing.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Update required argument parsing. Make header docs consistent.
-#                  Use symbolic file extensions.
+# Last Modified: Update for rename of gen_output_name, change of extension default. Reorganize imports.
 #
 import argparse
 import os
-import requests as req
 import sys
+
+import requests as req
 
 import qmtools.qm_utils as qmu
 import qmtools.qmfetcher.fetcher as fetch
-from qmtools import ALLOWED_MODALITIES, BIDS_DATA_EXT, FETCHED_DIR
-from qmtools import NUM_RECS_EXIT_CODE, QUERY_FILE_EXIT_CODE
+from qmtools import (ALLOWED_MODALITIES, BIDS_DATA_EXT, FETCHED_DIR,
+                     NUM_RECS_EXIT_CODE, QUERY_FILE_EXIT_CODE)
 from qmtools.file_utils import good_file_path
 from qmtools.qmfetcher import SERVER_PAGE_SIZE
 from qmtools.qmfetcher.query_parser import parse_query_from_file
@@ -126,7 +126,7 @@ def main (argv=None):
   # use output file name given or generate one
   output_filename = args.get('output_filename')
   if (not output_filename):            # if none provided, generate an output filename
-    output_filename = qmu.gen_output_filename(modality)
+    output_filename = qmu.gen_output_name(modality, BIDS_DATA_EXT)
     args['output_filename'] = output_filename
 
   # ensure output file path has the correct extension

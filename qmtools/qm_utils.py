@@ -1,6 +1,6 @@
 # Shared utilities for the QMTools programs.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Expand ensure_reports_dir to allow a dir path.
+#   Last Modified: Rename gen_output_name, change its extension argument default.
 #
 import datetime
 import os
@@ -52,9 +52,10 @@ def ensure_reports_dir (program_name, dir_path=REPORTS_DIR):
       sys.exit(REPORTS_DIR_EXIT_CODE)
 
 
-def gen_output_filename (modality, extension=BIDS_DATA_EXT):
+def gen_output_name (modality, extension=''):
   """
-  Generate and return a default name based on modality, timestamp, and optional extension.
+  Generate and return a default file or directory name based on modality,
+  timestamp, and optional extension.
   """
   time_now = datetime.datetime.now()
   now_str = time_now.strftime("%Y%m%d_%H%M%S-%f")

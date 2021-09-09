@@ -1,6 +1,6 @@
 # Tests of Shared utilities for the QMTools programs.
 #   Written by: Tom Hicks and Dianne Patterson. 8/5/2021.
-# Last Modified: Add missing test for write_figure_to_file.
+# Last Modified: Update for rename of gen_output_name, change of extension default.
 #
 import os
 import pandas
@@ -9,7 +9,7 @@ import tempfile
 import seaborn as sb
 
 from tests import TEST_RESOURCES_DIR
-from qmtools import (FETCHED_DIR, FETCHED_DIR_EXIT_CODE,
+from qmtools import (BIDS_DATA_EXT, FETCHED_DIR, FETCHED_DIR_EXIT_CODE,
                      PLOT_EXT, REPORTS_DIR, REPORTS_DIR_EXIT_CODE)
 import qmtools.qm_utils as qmu
 
@@ -83,25 +83,33 @@ class TestQMUtils(object):
       assert True
 
 
-  def test_gen_output_filename(self):
-    fname = qmu.gen_output_filename('bold')
+  def test_gen_output_name(self):
+    fname = qmu.gen_output_name('bold', BIDS_DATA_EXT)
     print(fname)
     assert 'bold' in fname
     assert '.tsv' in fname
 
 
-  def test_gen_output_filename_badmode(self):
-    fname = qmu.gen_output_filename('BOLDER')
+  def test_gen_output_name_badmode(self):
+    fname = qmu.gen_output_name('BOLDER', BIDS_DATA_EXT)
     print(fname)
     assert 'BOLDER' in fname
     assert '.tsv' in fname
 
 
-  def test_gen_output_filename_ext(self):
-    fname = qmu.gen_output_filename('T1w', '.csv')
+  def test_gen_output_name_ext(self):
+    fname = qmu.gen_output_name('T1w', '.csv')
     print(fname)
     assert 'T1w' in fname
     assert '.csv' in fname
+
+
+  def test_gen_output_name_noext(self):
+    fname = qmu.gen_output_name('aDir')
+    print(fname)
+    assert 'aDir' in fname
+    assert '.csv' not in fname
+    assert '.tsv' not in fname
 
 
   def test_load_tsv(self):

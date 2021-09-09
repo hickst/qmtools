@@ -1,6 +1,6 @@
 # CLI program to produce a report with violin plots comparing two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/1/2021.
-#   Last Modified: Modify to take/check/use report subdirectory argument.
+# Last Modified: Update for rename of gen_output_name, change of extension default.
 #
 import argparse
 import os
@@ -8,7 +8,7 @@ import sys
 
 import qmtools.qm_utils as qmu
 from qmtools import (ALLOWED_MODALITIES, BIDS_DATA_EXT,
-                     INPUT_FILE_EXIT_CODE, REPORTS_DIR, REPORTS_EXT)
+                     INPUT_FILE_EXIT_CODE, REPORTS_DIR)
 from qmtools.file_utils import good_file_path
 from qmtools.qmviolin import violin
 
@@ -88,7 +88,7 @@ def main (argv=None):
   # use given output directory name or generate one
   report_dir = args.get('report_dir')
   if (not report_dir):            # if none provided, generate an output filename
-    report_dir = qmu.gen_output_filename(modality, extension='')
+    report_dir = qmu.gen_output_name(modality)
     args['report_dir'] = report_dir
 
   # create the path to the report subdirectory in the main reports directory
