@@ -1,6 +1,6 @@
 # Methods to create IMQ violin plots from two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/3/2021.
-#   Last Modified: Update for move of write_figure_to_file to QM utils.
+#   Last Modified: Write outputs to report subdirectory.
 #
 # import csv
 # import os
@@ -13,7 +13,7 @@ import seaborn as sb
 from config.mriqc_keywords import (BOLD_HI_GOOD_COLUMNS, BOLD_LO_GOOD_COLUMNS,
                                    STRUCT_HI_GOOD_COLUMNS, STRUCT_LO_GOOD_COLUMNS)
 import qmtools.qm_utils as qmu
-from qmtools import PLOT_EXT, STRUCTURAL_MODALITIES
+from qmtools import PLOT_EXT, REPORTS_DIR, STRUCTURAL_MODALITIES
 
 # Tuple of column name prefix strings which should be removed from fetched data files:
 COLUMNS_TO_REMOVE = ('_', 'bids_meta', 'provenance', 'rating')
@@ -73,12 +73,13 @@ def do_plots (modality, args, iqms_df, plot_iqms=None):
   and plots the given or default IQMs.
   """
   iqms_to_plot = select_iqms_to_plot(modality, plot_iqms)
-  print(f"IQMs={iqms_to_plot}")        # REMOVE LATER
+  report_dirpath = args.get('report_dirpath', REPORTS_DIR)
   for iqm in iqms_to_plot:
-    do_a_plot(modality, args, iqms_df, iqm)
+    do_a_plot(modality, args, iqms_df, iqm, report_dirpath=report_dirpath)
+  # TODO: gen_html_for_iqm(modality, args, iqm, filename)
 
 
-def do_a_plot (modality, args, iqms_df, iqm):
+def do_a_plot (modality, iqms_df, iqm, report_dirpath=REPORTS_DIR):
   """
   Select the data for the specified IQM from the given IQMs dataset and plot it.
   """
@@ -86,16 +87,13 @@ def do_a_plot (modality, args, iqms_df, iqm):
   vplot = sb.catplot(x="IQM", y="value", hue="source", data=plot_df,
                      kind="violin", inner="quartile", split=True, palette="pastel")
   filename = gen_plot_filename(modality, iqm)
-  qmu.write_figure_to_file(vplot, filename)
-  # TODO: gen_html_for_iqm(modality, args, iqm, filename)
+  qmu.write_figure_to_file(vplot, filename, dirpath=report_dirpath)
 
 
 def gen_plot_filename (modality, iqm_name, extension=PLOT_EXT):
   """
   Generate and return a default name based on modality, IQM name, and optional extension.
   """
-  # time_now = datetime.datetime.now()
-  # now_str = time_now.strftime("%Y%m%d_%H%M%S-%f")
   return f"{modality}_{iqm_name}{extension}"
 
 

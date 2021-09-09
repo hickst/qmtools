@@ -1,6 +1,6 @@
 # CLI program to produce a report with violin plots comparing two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/1/2021.
-#   Last Modified: Reorganize imports.
+#   Last Modified: Modify to take/check/use report subdirectory argument.
 #
 import argparse
 import os
@@ -71,9 +71,9 @@ def main (argv=None):
   )
 
   parser.add_argument(
-    '-r', '--report-filename', dest='report_filename',
+    '-r', '--report-dir', dest='report_dir',
     default=argparse.SUPPRESS,
-    help='Optional name of output report file in reports directory [default: none].'
+    help='Optional name of report subdirectory in main reports directory [default: none].'
   )
 
   # actually parse the arguments from the command line
@@ -85,17 +85,15 @@ def main (argv=None):
   # check if the reports directory exists and is writeable or try to create it
   qmu.ensure_reports_dir(PROG_NAME)    # may exit here if unable to create dir
 
-  # use output file name given or generate one
-  report_filename = args.get('report_filename')
-  if (not report_filename):            # if none provided, generate an output filename
-    report_filename = qmu.gen_output_filename(modality, REPORTS_EXT)
-    args['report_filename'] = report_filename
+  # use given output directory name or generate one
+  report_dir = args.get('report_dir')
+  if (not report_dir):            # if none provided, generate an output filename
+    report_dir = qmu.gen_output_filename(modality, extension='')
+    args['report_dir'] = report_dir
 
-  # ensure output file path has the correct extension
-  report_filepath = os.path.join(REPORTS_DIR, report_filename)
-  if (not report_filepath.endswith(REPORTS_EXT)):
-    report_filepath = report_filepath + REPORTS_EXT
-  args['report_filepath'] = report_filepath
+  # create the path to the report subdirectory in the main reports directory
+  report_dirpath = os.path.join(REPORTS_DIR, report_dir)
+  args['report_dirpath'] = report_dirpath
 
   # if MRIQC fetched input file path given, check the file path for validity and
   # exit if the file path is not valid!
@@ -106,6 +104,9 @@ def main (argv=None):
   # exit if the file path is not valid!
   group_file = args.get('group_file')
   check_input_file(group_file, f"A readable, MRIQC group file ({BIDS_DATA_EXT}) must be specified.")
+
+  # check if the reports directory exists and is writeable or try to create it
+  qmu.ensure_reports_dir(PROG_NAME, report_dir)  # may exit here if unable to create dir
 
   if (args.get('verbose')):
     print(f"({PROG_NAME}): Comparing MRIQC records with modality '{modality}'.",
@@ -124,7 +125,7 @@ def main (argv=None):
 
     # generate the HTML report into the reports directory:
     # TODO: IMPLEMENT LATER 
-    #violin.make_violin_report(modality, recs, report_filepath)
+    #violin.make_violin_report(modality, recs, report_dir)
 
   except Exception as err:
     errMsg = "({}): ERROR: Processing Error: {}".format(PROG_NAME, str(err))
@@ -132,8 +133,8 @@ def main (argv=None):
     sys.exit(1)
 
   if (args.get('verbose')):
-    if (report_filename is not None):
-      print(f"({PROG_NAME}): Produced violin report to '{report_filepath}'.",
+    if (report_dir is not None):
+      print(f"({PROG_NAME}): Produced violin report to '{report_dir}'.",
         file=sys.stderr)
 
 
