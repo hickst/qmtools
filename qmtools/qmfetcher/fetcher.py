@@ -1,6 +1,6 @@
 # Methods to query the MRIQC server and download query result records.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Add/use request timeout.
+#   Last Modified: Add request timeout as optional argument to do_query.
 #
 import csv
 import json
@@ -98,12 +98,13 @@ def is_not_duplicate (record, chksums):
     return True
 
 
-def do_query (query_str):
+def do_query (query_str, timeout=REQUEST_TIMEOUT):
   """
-  Query the server with the given query string, return the parsed JSON data
-  if successful, otherwise raise a RequestException.
+  Query the server with the given query string, waiting for the specified
+  or default time, then return the parsed JSON data if successful, otherwise
+ raise a RequestException.
   """
-  resp = req.get(query_str, timeout=REQUEST_TIMEOUT)
+  resp = req.get(query_str, timeout=timeout)
   if (resp.status_code == req.codes.ok):
     json_query_result = json.loads(resp.text)
     return json_query_result
