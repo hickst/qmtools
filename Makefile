@@ -89,13 +89,13 @@ stop:
 	docker stop ${NAME}
 
 testall:
-	pytest -vv ${TESTS} ${ARGS} --cov-report term-missing --cov ${SCOPE}
+	pytest -vv -x ${TESTS} ${ARGS} --cov-report term-missing --cov ${SCOPE}
 
 test1:
-	pytest -vv ${TESTS} -k ${ONLY} --cov-report term-missing --cov ${SCOPE}
+	pytest -vv -x ${TESTS} -k ${ONLY} --cov-report term-missing --cov ${SCOPE}
 
 tests:
-	pytest -vv --ignore ${IGNORE} ${TESTS} ${ARGS} --cov-report term-missing --cov ${SCOPE}
+	pytest -vv -x --ignore ${IGNORE} ${TESTS} ${ARGS} --cov-report term-missing --cov ${SCOPE}
 
 watch:
 	docker logs -f ${NAME}
