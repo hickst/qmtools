@@ -58,7 +58,7 @@ cleanfetch:
 	@rm -f ${FETCHED}/*
 
 cleanrpts:
-	@rm -f ${RPTS}/*
+	@rm -rf ${RPTS}/*
 
 docker:
 	docker build -t ${IMG} .
