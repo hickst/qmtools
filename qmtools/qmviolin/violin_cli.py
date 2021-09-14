@@ -1,6 +1,6 @@
 # CLI program to produce a report with violin plots comparing two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/1/2021.
-# Last Modified: Update for rename of gen_output_name, change of extension default.
+#   Last Modified: Begin HTML report generation.
 #
 import argparse
 import os
@@ -106,26 +106,26 @@ def main (argv=None):
   check_input_file(group_file, f"A readable, MRIQC group file ({BIDS_DATA_EXT}) must be specified.")
 
   # check if the reports directory exists and is writeable or try to create it
-  qmu.ensure_reports_dir(PROG_NAME, report_dir)  # may exit here if unable to create dir
+  qmu.ensure_reports_dir(PROG_NAME, report_dirpath)  # may exit here if unable to create dir
 
   if (args.get('verbose')):
     print(f"({PROG_NAME}): Comparing MRIQC records with modality '{modality}'.",
-      file=sys.stderr)
+          file=sys.stderr)
 
   # query the MRIQC server and output or save the results
   try:
-
-    print(f"ARGS={args}")              # REMOVE LATER
+    # print(f"ARGS={args}", file=sys.stderr)  # REMOVE LATER
 
     # read data, merge records, and create the violin plots:
-    recs = violin.vplot(modality, args)
-
-    if (args.get('verbose')):
-      print(f"({PROG_NAME}): Compared user records against fetched records.")
+    plot_info = violin.vplot(modality, args)
 
     # generate the HTML report into the reports directory:
-    # TODO: IMPLEMENT LATER 
-    #violin.make_violin_report(modality, recs, report_dir)
+    # TODO: IMPLEMENT HTML generation
+    violin.make_html_report(modality, args, plot_info)
+
+    if (args.get('verbose')):
+      print(f"({PROG_NAME}): Compared user records against fetched records.",
+            file=sys.stderr)
 
   except Exception as err:
     errMsg = "({}): ERROR: Processing Error: {}".format(PROG_NAME, str(err))
@@ -134,8 +134,8 @@ def main (argv=None):
 
   if (args.get('verbose')):
     if (report_dir is not None):
-      print(f"({PROG_NAME}): Produced violin report to '{report_dir}'.",
-        file=sys.stderr)
+      print(f"({PROG_NAME}): Produced violin report to '{report_dirpath}'.",
+            file=sys.stderr)
 
 
 

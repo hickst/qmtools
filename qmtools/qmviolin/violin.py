@@ -1,12 +1,7 @@
-# Methods to create IMQ violin plots from two MRIQC datasets.
+# Methods to create IQM violin plots from two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/3/2021.
-#   Last Modified: Write outputs to report subdirectory.
+#   Last Modified: Begin HTML report generation.
 #
-# import csv
-# import os
-# import sys
-
-# import numpy as np
 import pandas as pd
 import seaborn as sb
 
@@ -14,6 +9,8 @@ from config.mriqc_keywords import (BOLD_HI_GOOD_COLUMNS, BOLD_LO_GOOD_COLUMNS,
                                    STRUCT_HI_GOOD_COLUMNS, STRUCT_LO_GOOD_COLUMNS)
 import qmtools.qm_utils as qmu
 from qmtools import PLOT_EXT, REPORTS_DIR, STRUCTURAL_MODALITIES
+import qmtools.qmviolin.gen_html as genh
+
 
 # Tuple of column name prefix strings which should be removed from fetched data files:
 COLUMNS_TO_REMOVE = ('_', 'bids_meta', 'provenance', 'rating')
@@ -46,10 +43,7 @@ def vplot (modality, args):
   # pivot the merged dataframe to index by bids_name and source
   melted_df = merged_df.melt(id_vars=['bids_name', 'source'], var_name='IQM')
 
-  print('\nMELTED DataFrame:\n')       # REMOVE LATER
-  print(melted_df)                     # REMOVE LATER
-
-  do_plots(modality, args, melted_df)
+  return do_plots(modality, args, melted_df)
 
 
 def clean_df (df):
@@ -70,24 +64,29 @@ def clean_df (df):
 def do_plots (modality, args, iqms_df, plot_iqms=None):
   """
   Takes a merged and melted MRIQC dataset and an optional list of IQMs to plot
-  and plots the given or default IQMs.
+  and plots the given, or default, IQMs, returning a dictionary of IQM names
+  and plot filenames.
   """
+  plot_info = dict()
   iqms_to_plot = select_iqms_to_plot(modality, plot_iqms)
   report_dirpath = args.get('report_dirpath', REPORTS_DIR)
   for iqm in iqms_to_plot:
-    do_a_plot(modality, args, iqms_df, iqm, report_dirpath=report_dirpath)
-  # TODO: gen_html_for_iqm(modality, args, iqm, filename)
+    filename = do_a_plot(modality, iqms_df, iqm, report_dirpath=report_dirpath)
+    plot_info[iqm] = filename
+  return plot_info
 
 
 def do_a_plot (modality, iqms_df, iqm, report_dirpath=REPORTS_DIR):
   """
   Select the data for the specified IQM from the given IQMs dataset and plot it.
+  Return the filename where the plot is saved.
   """
   plot_df = iqms_df[iqms_df['IQM'] == iqm]
   vplot = sb.catplot(x="IQM", y="value", hue="source", data=plot_df,
                      kind="violin", inner="quartile", split=True, palette="pastel")
   filename = gen_plot_filename(modality, iqm)
   qmu.write_figure_to_file(vplot, filename, dirpath=report_dirpath)
+  return filename                      # return the name of the generated plot file
 
 
 def gen_plot_filename (modality, iqm_name, extension=PLOT_EXT):
@@ -95,6 +94,12 @@ def gen_plot_filename (modality, iqm_name, extension=PLOT_EXT):
   Generate and return a default name based on modality, IQM name, and optional extension.
   """
   return f"{modality}_{iqm_name}{extension}"
+
+
+def make_html_report (modality, args, plot_info):
+  html_text = genh.gen_html(modality, args, plot_info)
+  # report_dirpath = args.get('report_dirpath', REPORTS_DIR)
+  print(html_text)                     # REMOVE LATER
 
 
 def select_iqms_to_plot (modality, plot_iqms=None):

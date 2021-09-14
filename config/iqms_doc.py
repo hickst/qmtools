@@ -1,3 +1,7 @@
+# Descriptions strings for the various Image Quality Metrics, accessible as a dictionary.
+#   Written by: Tom Hicks and Dianne Patterson. 9/13/2021.
+#   Last Modified: WIP: Needs expansion. Add file documentation.
+#
 IQMS_DOC_DICT = {
   "aor": "AFNI's outlier ratio is the mean fraction of outliers per volume from AFNI’s 3dToutcount. Low values are better.",
   "aqi": "AFNI's quality index calculates a quality index for each volume using AFNI’s 3dTqual. MRIqc reports the mean of these values. Low values are better.",
