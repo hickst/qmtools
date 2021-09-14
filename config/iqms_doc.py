@@ -1,4 +1,4 @@
-IQMS_DOC_DICT {
+IQMS_DOC_DICT = {
   "aor": "AFNI's outlier ratio is the mean fraction of outliers per volume from AFNI’s 3dToutcount. Low values are better.",
   "aqi": "AFNI's quality index calculates a quality index for each volume using AFNI’s 3dTqual. MRIqc reports the mean of these values. Low values are better.",
   "cjv": "Coefficient of Joint Variation between WM and GM. Higher values indicate more head motion and/or INU (bias-field) artifacts. Ganzetti, 2016. Low values are better.",
@@ -19,7 +19,8 @@ IQMS_DOC_DICT {
   "qi2": "Mortamet’s Quality Index 2 identifies artifacts and artifact clusters in the air background of T1w images (collected without parallel imaging or pre-scan normalization). QI2 reliably identifies very poor quality images. Mortamet, 2009. Low values are better.",
   "rpve": "Residual partial voluming error is a tissue-wise sum of partial volumes that fall in the range [5%-95%] of the total volume of a voxel, computed from FSL FAST partial volume map for CSF, WM and GM. Low values are better.",
   "snr": "Signal-to-noise ratio is the mean intensity in each tissue (CSF, GM, WM, and total) signal divided by SD of the air background (noise). SNR is important for estimating the statistical power. A higher value indicates a more stable signal over repeated measurements, thus higher reliability of the measure. High values are better.",
-  "snrd": "Dietrich’s Signal to Noise ratio (for CSF, GM, WM, and total) is more robust than conventional SNR for MRI: especially for filtered, multi-channel, and parallel images. Dietrich, 2007. High values are better.",
+  "snrd_csf": "Dietrich’s Signal to Noise ratio (for CSF, GM, WM, and total) is more robust than conventional SNR for MRI: especially for filtered, multi-channel, and parallel images. Dietrich, 2007. High values are better.",
+  "snrd_gm": "Dietrich’s Signal to Noise ratio (for CSF, GM, WM, and total) is more robust than conventional SNR for MRI: especially for filtered, multi-channel, and parallel images. Dietrich, 2007. High values are better.",
   "summary_stats": "K (kurtosis), M, SD, 5% , and 95% for average intensities in air background, CSF, GM, and WM. Larger differences represent better tissue contrast.",
   "tpm_overlap": "Overlap of tissue probability maps indicates how well the native Tissue Probability Maps (TPMS) overlap with the MNI ICBM 2009 template. Higher values indicate better quality spatial normalization.",
   "tsnr": "Temporal signal-to-noise ratio is the median SNR over time and is adversely affected by subject motion. Low tSNR may bias the data. Kruger, 2001. High values are better.",
