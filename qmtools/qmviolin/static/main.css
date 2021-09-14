@@ -11,7 +11,7 @@ h1 {
 }
 
 .descrip {
-  margin: 0 20 0 20;
+  margin: 0px 20px 0px 30px;
 }
 
 .iqm {
@@ -22,20 +22,11 @@ h1 {
   color: #9f009f
 }
 
-img.legend {
-  width: 500px;
-  height: 100px;
-  margin-top: 30px;
-  margin-bottom: 40px;
-  margin-left: 100px;
-  border-style: none;
+.legend {
+  width: 120px;
+  padding-left: 30px;
 }
 
-iframe.table {
-  border-style: none;
-  height: 750px;
-  width: 100%;
-  margin-top: 0;
-  margin-bottom: 40px;
-  margin-left: 40px;
+.iqm_row {
+  align-self: center;
 }
