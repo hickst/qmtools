@@ -1,6 +1,6 @@
 # Methods to generate an HTML report to display IMQ violin plots comparing two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/13/2021.
-#   Last Modified: Initial creation.
+#   Last Modified: Continue to generate HTML and format it.
 #
 from jinja2 import Template
 
@@ -20,28 +20,28 @@ PAGE_TEMPLATE = """
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="IQM Violin Plot Comparisons">
     <link rel="stylesheet" href="main.css" type="text/css">
-    <title>QMViolin {{targs.modality}}</title>
+    <title>QMViolin {{modality}}</title>
   </head>
 
   <body>
     <div>
-      <h1>Comparison of MRIQC IQM datasets ({{targs.modality}} modality)</h1>
+      <h1>Comparison of MRIQC IQM datasets (<span class="modality">{{modality}}</span>)</h1>
 
-      {% for iqm in targs.values() %}
-      <div id="{{iqm.name}} class="iqm">
-        <table id="iqms" width="500px">
+{% for iqm in iqms.values() %}
+      <div id="{{iqm.name}}" class="iqm">
+        <table id="iqms" width="100%">
           <tr class="iqm_row" valign="middle">
             <td class="legend" width="60px">
               <img id="" class="legend_img" src="{{iqm.legend_path}}"></img><br/>
             <td>
             <td class="plot">
               <img id="" class="vplot" src="{{iqm.plot_path}}"></img><br/>
-              <p>{{iqm.description}}</p>
+              <p class="descrip">{{iqm.description}}</p>
             <td>
           </tr>
         </table>
       </div>
-      {% endfor %}
+{% endfor %}
 
     </div>
   </body>
@@ -49,19 +49,19 @@ PAGE_TEMPLATE = """
 
 
 def gen_html (modality, args, plot_info, docs=IQMS_DOC_DICT):
-  targs = dict()
+  iqms = dict()                        # dictionary of IQM properties
 
   for iqm, plot_path in plot_info.items():
-    targs[iqm] = {'name': iqm, 'plot_path': plot_path}
+    iqms[iqm] = {'name': iqm, 'plot_path': plot_path}
 
   for iqm in plot_info:
     description = docs.get(iqm)
     if (description):
-      targs[iqm]['description'] = description
-    targs[iqm]['legend_path'] = get_legend_path(iqm)
+      iqms[iqm]['description'] = description
+    iqms[iqm]['legend_path'] = get_legend_path(iqm)
 
   template = Template(PAGE_TEMPLATE)
-  html_text = template.render(targs=targs)
+  html_text = template.render(iqms=iqms, modality=modality)
   return html_text
 
 

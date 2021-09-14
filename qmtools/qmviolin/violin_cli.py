@@ -124,7 +124,7 @@ def main (argv=None):
     violin.make_html_report(modality, args, plot_info)
 
     if (args.get('verbose')):
-      print(f"({PROG_NAME}): Compared user records against fetched records.",
+      print(f"({PROG_NAME}): Compared group records against fetched records.",
             file=sys.stderr)
 
   except Exception as err:
