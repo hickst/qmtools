@@ -1,7 +1,9 @@
 # Methods to create IQM violin plots from two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/3/2021.
-#   Last Modified: Begin HTML report generation.
+#   Last Modified: Write the generated HTML to a file in the report directory.
 #
+import os
+
 import pandas as pd
 import seaborn as sb
 
@@ -14,6 +16,8 @@ import qmtools.qmviolin.gen_html as genh
 
 # Tuple of column name prefix strings which should be removed from fetched data files:
 COLUMNS_TO_REMOVE = ('_', 'bids_meta', 'provenance', 'rating')
+
+DEFAULT_HTML_FILENAME = 'violin.html'
 
 
 def vplot (modality, args):
@@ -97,9 +101,15 @@ def gen_plot_filename (modality, iqm_name, extension=PLOT_EXT):
 
 
 def make_html_report (modality, args, plot_info):
+  """
+  Generate HTML text for the given modality and plot information and write
+  it to the reports directory path named in args.
+  """
   html_text = genh.gen_html(modality, args, plot_info)
-  # report_dirpath = args.get('report_dirpath', REPORTS_DIR)
-  print(html_text)                     # REMOVE LATER
+  report_dirpath = args.get('report_dirpath')
+  if (not report_dirpath):
+    raise FileNotFoundError("Required reports dirpath not found in arguments dictionary")
+  write_html(html_text, report_dirpath)
 
 
 def select_iqms_to_plot (modality, plot_iqms=None):
@@ -121,3 +131,13 @@ def select_iqms_to_plot (modality, plot_iqms=None):
 
   # return the validated and sorted list of iqms:
   return iqms_to_plot
+
+
+def write_html (html_text, dirpath, filename=DEFAULT_HTML_FILENAME):
+  """
+  Write the given html text string to the named file in the given directory path.
+  """
+  filepath = os.path.join(dirpath, filename)
+  with open(filepath, 'w', newline='') as htmlfile:
+    written = htmlfile.write(html_text)
+  return written

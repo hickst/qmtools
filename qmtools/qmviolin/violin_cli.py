@@ -120,7 +120,6 @@ def main (argv=None):
     plot_info = violin.vplot(modality, args)
 
     # generate the HTML report into the reports directory:
-    # TODO: IMPLEMENT HTML generation
     violin.make_html_report(modality, args, plot_info)
 
     if (args.get('verbose')):
