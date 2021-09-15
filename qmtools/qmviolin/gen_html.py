@@ -1,6 +1,6 @@
 # Methods to generate an HTML report to display IMQ violin plots comparing two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/13/2021.
-#   Last Modified: Remove fixed styling. Use legend PNGs.
+#   Last Modified: Replace legends with up/down arrows and hi/lo labels.
 #
 from jinja2 import Template
 
@@ -32,7 +32,8 @@ PAGE_TEMPLATE = """
         <table id="iqms" width="100%">
           <tr class="iqm_row">
             <td class="legend">
-              <img id="" class="legend_img" src="{{iqm.legend_path}}"></img><br/>
+              <img class="legend_img" src="{{iqm.legend_path}}"></img><br/>
+              <p class="hi_lo_text">{{iqm.hi_lo_text}}</p>
             <td>
             <td class="plot">
               <img id="" class="vplot" src="{{iqm.plot_path}}"></img><br/>
@@ -59,16 +60,26 @@ def gen_html (modality, args, plot_info, docs=IQMS_DOC_DICT):
     if (description):
       iqms[iqm]['description'] = description
     iqms[iqm]['legend_path'] = get_legend_path(iqm)
+    iqms[iqm]['hi_lo_text'] = get_hi_lo_text(iqm)
 
   template = Template(PAGE_TEMPLATE)
   html_text = template.render(iqms=iqms, modality=modality)
   return html_text
 
 
+def get_hi_lo_text (iqm):
+  if (iqm in BOLD_LO_GOOD_COLUMNS or (iqm in STRUCT_LO_GOOD_COLUMNS)):
+    return 'Low values are better'
+  elif (iqm in BOLD_HI_GOOD_COLUMNS or (iqm in STRUCT_HI_GOOD_COLUMNS)):
+    return 'High values are better'
+  else:
+    return ''
+
+
 def get_legend_path (iqm):
   if (iqm in BOLD_LO_GOOD_COLUMNS or (iqm in STRUCT_LO_GOOD_COLUMNS)):
-    return 'lo_good_legend.png'
+    return 'down_arrow.png'
   elif (iqm in BOLD_HI_GOOD_COLUMNS or (iqm in STRUCT_HI_GOOD_COLUMNS)):
-    return 'hi_good_legend.png'
+    return 'up_arrow.png'
   else:
     return 'no_legend.png'

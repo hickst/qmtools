@@ -14,6 +14,13 @@ h1 {
   margin: 0px 20px 0px 30px;
 }
 
+.hi_lo_text {
+  color: #007f00;
+  font-size: 10pt;
+  width: 80px;
+  margin: 0px 40px 0px 60px;
+}
+
 .iqm {
   margin-bottom: 100px;
 }
@@ -23,8 +30,13 @@ h1 {
 }
 
 .legend {
-  width: 120px;
-  padding-left: 30px;
+  width: 180px;
+}
+
+.legend_img {
+  width: 64px;
+  height: 240px;
+  margin: 0px 60px 0px 60px;
 }
 
 .iqm_row {
