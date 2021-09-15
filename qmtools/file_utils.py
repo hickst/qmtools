@@ -1,9 +1,19 @@
 #
 # Module to provide general file utility functions.
 #   Written by: Tom Hicks. 1/29/2020.
-#   Last Modified: Update is_acceptable_filename.
+#   Last Modified: Add copy_tree method.
 #
 import os
+import shutil
+
+
+def copy_tree (from_dir, to_dir):
+  """
+  Copy all files and subdirectories from the given source directory to
+  the given target directory.
+  """
+  shutil.copytree(from_dir, to_dir, dirs_exist_ok=True)
+
 
 def filename_core (apath):
     """ Return the core filename string without the path prefix or extension. """

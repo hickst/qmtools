@@ -1,6 +1,6 @@
 # Methods to create IQM violin plots from two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/3/2021.
-#   Last Modified: Write the generated HTML to a file in the report directory.
+#   Last Modified: Copy all needed HTML support files to the output report directory.
 #
 import os
 
@@ -9,8 +9,9 @@ import seaborn as sb
 
 from config.mriqc_keywords import (BOLD_HI_GOOD_COLUMNS, BOLD_LO_GOOD_COLUMNS,
                                    STRUCT_HI_GOOD_COLUMNS, STRUCT_LO_GOOD_COLUMNS)
-import qmtools.qm_utils as qmu
 from qmtools import PLOT_EXT, REPORTS_DIR, STRUCTURAL_MODALITIES
+from qmtools.file_utils import copy_tree
+import qmtools.qm_utils as qmu
 import qmtools.qmviolin.gen_html as genh
 
 
@@ -102,14 +103,20 @@ def gen_plot_filename (modality, iqm_name, extension=PLOT_EXT):
 
 def make_html_report (modality, args, plot_info):
   """
-  Generate HTML text for the given modality and plot information and write
-  it to the reports directory path named in args.
+  Generate HTML text for the given modality and plot information and write it to
+  the reports directory named in args. Also, copy all needed support files to the
+  same reports directory.
   """
-  html_text = genh.gen_html(modality, args, plot_info)
   report_dirpath = args.get('report_dirpath')
   if (not report_dirpath):
-    raise FileNotFoundError("Required reports dirpath not found in arguments dictionary")
+    raise FileNotFoundError("Required reports directory path not found in arguments dictionary")
+
+  # generate the HTML and write it to a file in the current report directory
+  html_text = genh.gen_html(modality, args, plot_info)
   write_html(html_text, report_dirpath)
+
+  # copy the required report support files to the current report directory
+  copy_tree(genh.AUX_DIR_PATH, report_dirpath)
 
 
 def select_iqms_to_plot (modality, plot_iqms=None):

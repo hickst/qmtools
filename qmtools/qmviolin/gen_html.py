@@ -1,14 +1,16 @@
 # Methods to generate an HTML report to display IMQ violin plots comparing two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/13/2021.
-#   Last Modified: Replace legends with up/down arrows and hi/lo labels.
+#   Last Modified: Add constant for directory path to HTML support files.
 #
 from jinja2 import Template
 
 from config.iqms_doc import IQMS_DOC_DICT
 from config.mriqc_keywords import (BOLD_HI_GOOD_COLUMNS, BOLD_LO_GOOD_COLUMNS,
                                    STRUCT_HI_GOOD_COLUMNS, STRUCT_LO_GOOD_COLUMNS)
-# import qmtools.qm_utils as qmu
 
+
+# directory containing style and/or script files used by the generated HTML:
+AUX_DIR_PATH = 'qmtools/qmviolin/static'
 
 PAGE_TEMPLATE = """
 <!DOCTYPE html>
@@ -62,6 +64,7 @@ def gen_html (modality, args, plot_info, docs=IQMS_DOC_DICT):
     iqms[iqm]['legend_path'] = get_legend_path(iqm)
     iqms[iqm]['hi_lo_text'] = get_hi_lo_text(iqm)
 
+  # generate the HTML using the Jinja template
   template = Template(PAGE_TEMPLATE)
   html_text = template.render(iqms=iqms, modality=modality)
   return html_text
