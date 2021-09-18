@@ -1,6 +1,6 @@
 # Methods to generate an HTML report to display IMQ violin plots comparing two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/13/2021.
-#   Last Modified: Add constant for directory path to HTML support files.
+#   Last Modified: Remove unused args parameter from gen_html call.
 #
 from jinja2 import Template
 
@@ -51,7 +51,7 @@ PAGE_TEMPLATE = """
 """
 
 
-def gen_html (modality, args, plot_info, docs=IQMS_DOC_DICT):
+def gen_html (modality, plot_info, docs=IQMS_DOC_DICT):
   iqms = dict()                        # dictionary of IQM properties
 
   for iqm, plot_path in plot_info.items():

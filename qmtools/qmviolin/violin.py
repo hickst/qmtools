@@ -1,6 +1,6 @@
 # Methods to create IQM violin plots from two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/3/2021.
-#   Last Modified: Copy all needed HTML support files to the output report directory.
+#   Last Modified: Remove args argument in gen_html call.
 #
 import os
 
@@ -112,7 +112,7 @@ def make_html_report (modality, args, plot_info):
     raise FileNotFoundError("Required reports directory path not found in arguments dictionary")
 
   # generate the HTML and write it to a file in the current report directory
-  html_text = genh.gen_html(modality, args, plot_info)
+  html_text = genh.gen_html(modality, plot_info)
   write_html(html_text, report_dirpath)
 
   # copy the required report support files to the current report directory
