@@ -1,6 +1,6 @@
 # Tests of the module to generate the HTML violin report.
 #   Written by: Tom Hicks and Dianne Patterson. 9/18/2021.
-#   Last Modified: Initial creation: test_gen_html only.
+#   Last Modified: Test get_hi_lo_text and get_legend_path to complete tests.
 #
 import os
 
@@ -57,3 +57,37 @@ class TestGenHTML(object):
     assert "High values are better" in html_text
     assert '{{modality}}' not in html_text
     assert 'cjv' not in html_text
+
+
+  def test_get_hi_lo_text(self):
+    res = gh.get_hi_lo_text('aqi')
+    print(res)
+    assert res is not None
+    assert res == 'Low values are better'
+
+    res = gh.get_hi_lo_text('fber')
+    print(res)
+    assert res is not None
+    assert res == 'High values are better'
+
+    res = gh.get_hi_lo_text('dummy_trs')
+    print(res)
+    assert res is not None
+    assert res == ''
+
+
+  def test_get_legend_path(self):
+    res = gh.get_legend_path('aqi')
+    print(res)
+    assert res is not None
+    assert res == 'down_arrow.png'
+
+    res = gh.get_legend_path('fber')
+    print(res)
+    assert res is not None
+    assert res == 'up_arrow.png'
+
+    res = gh.get_legend_path('dummy_trs')
+    print(res)
+    assert res is not None
+    assert res == 'no_legend.png'
