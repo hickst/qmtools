@@ -7,6 +7,7 @@ TESTDIR=${TOPLVL}/tests
 
 ARGS=
 APP_ROOT=/qmtools
+CONFETCHED=${APP_ROOT}/fetched
 CONINPUTS=${APP_ROOT}/inputs
 CONRPTS=${APP_ROOT}/reports
 ENVLOC=/etc/trhenv
@@ -49,7 +50,7 @@ help:
 	@echo '     watch     - show logfile for a running container'
 
 bash:
-	docker run -it --rm --name ${NAME} -v ${INPUTS}:${CONINPUTS}:ro -v ${RPTS}:${CONRPTS} --entrypoint ${SHELL} ${TSTIMG} ${ARGS}
+	docker run -it --rm --name ${NAME} -v ${FETCHED}:${CONFETCHED} -v ${INPUTS}:${CONINPUTS}:ro -v ${RPTS}:${CONRPTS} --entrypoint ${SHELL} ${TSTIMG} ${ARGS}
 
 cleancache:
 	find . -name __pycache__ -print | grep -v .venv | xargs rm -rf
@@ -71,19 +72,19 @@ exec:
 	docker exec -it ${NAME} ${EP}
 
 run:
-	@docker run -it --rm --name ${NAME} -v ${INPUTS}:${CONINPUTS}:ro -v ${RPTS}:${CONRPTS} ${IMG} ${ARGS}
+	@docker run -it --rm --name ${NAME} -v ${FETCHED}:${CONFETCHED} -v ${INPUTS}:${CONINPUTS}:ro -v ${RPTS}:${CONRPTS} ${IMG} ${ARGS}
 
 runt:
-	@docker run -it --rm --name ${NAME} -v ${INPUTS}:${CONINPUTS}:ro -v ${RPTS}:${CONRPTS} ${TSTIMG} ${ARGS}
+	@docker run -it --rm --name ${NAME} -v ${FETCHED}:${CONFETCHED} -v ${INPUTS}:${CONINPUTS}:ro -v ${RPTS}:${CONRPTS} ${TSTIMG} ${ARGS}
 
 runtep:
-	@docker run -it --rm --name ${NAME} -v ${INPUTS}:${CONINPUTS}:ro -v ${RPTS}:${CONRPTS} --entrypoint ${EP} ${TSTIMG} ${ARGS}
+	@docker run -it --rm --name ${NAME} -v ${FETCHED}:${CONFETCHED} -v ${INPUTS}:${CONINPUTS}:ro -v ${RPTS}:${CONRPTS} --entrypoint ${EP} ${TSTIMG} ${ARGS}
 
 runt1:
-	docker run -it --rm --name ${NAME} -v ${INPUTS}:${CONINPUTS}:ro  -v ${RPTS}:${CONRPTS} --entrypoint pytest ${TSTIMG} -vv ${TESTS}
+	docker run -it --rm --name ${NAME} -v ${FETCHED}:${CONFETCHED} -v ${INPUTS}:${CONINPUTS}:ro  -v ${RPTS}:${CONRPTS} --entrypoint pytest ${TSTIMG} -vv ${TESTS}
 
 runtc:
-	docker run -it --rm --name ${NAME} -v ${INPUTS}:${CONINPUTS}:ro  -v ${RPTS}:${CONRPTS} --entrypoint pytest ${TSTIMG} -vv --cov-report term-missing --cov ${SCOPE}
+	docker run -it --rm --name ${NAME} -v ${FETCHED}:${CONFETCHED} -v ${INPUTS}:${CONINPUTS}:ro  -v ${RPTS}:${CONRPTS} --entrypoint pytest ${TSTIMG} -vv --cov-report term-missing --cov ${SCOPE}
 
 stop:
 	docker stop ${NAME}
