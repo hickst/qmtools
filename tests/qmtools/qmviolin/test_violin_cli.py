@@ -1,9 +1,10 @@
 # Tests of the violin CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 9/18/21.
-#   Last Modified: Add test of main with mocks.
+#   Last Modified: Cleanup reports subdir using args returned from main.
 #
 import os
 import pytest
+import shutil
 import sys
 from pathlib import Path
 
@@ -151,10 +152,14 @@ class TestViolinCLI(object):
   def test_main(self, capsys, clear_argv, mock_violin):
     print(f"TEST_MAIN: in {os.getcwd()}", file=sys.stderr)  # REMOVE LATER
     sys.argv = ['qmviolin', '-v', 'bold', self.fetch_test_fyl, self.bold_test_fyl]
-    cli.main()
+    args = cli.main()
+    print(f"ARGS={args}")
     sysout, syserr = capsys.readouterr()
     print(f"CAPTURED SYS.OUT:\n{sysout}")
     print(f"CAPTURED SYS.ERR:\n{syserr}")
     assert "Comparing MRIQC records with modality 'bold'" in syserr
     assert "Compared group records against fetched records" in syserr
     assert "Produced violin report to 'reports/bold_" in syserr
+    report_dirpath = args.get('report_dirpath')
+    if (report_dirpath):
+      shutil.rmtree(report_dirpath, ignore_errors=True)
