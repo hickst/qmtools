@@ -1,11 +1,8 @@
 # Tests of the traffic-light CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/27/2021.
-#   Last Modified: Update for required argument parsing refactoring. Use symbolic file extensions.
+#   Last Modified: Add and use popdir fixture.
 #
 import os
-import matplotlib
-import numpy
-import pandas
 import pytest
 import sys
 import tempfile
@@ -22,6 +19,12 @@ SYSEXIT_ERROR_CODE = 2                 # seems to be error exit code from argpar
 @pytest.fixture
 def clear_argv():
   sys.argv = []
+
+
+@pytest.fixture
+def popdir(request):
+  yield
+  os.chdir(request.config.invocation_dir)
 
 
 class TestTrafficLightCLI(object):
@@ -101,7 +104,7 @@ class TestTrafficLightCLI(object):
     assert 'the following arguments are required: group_file' in syserr
 
 
-  def test_main(self, capsys, clear_argv):
+  def test_main(self, capsys, clear_argv, popdir):
     with tempfile.TemporaryDirectory() as tmpdir:
       os.chdir(tmpdir)
       print(f"tmpdir={tmpdir}")
@@ -117,7 +120,7 @@ class TestTrafficLightCLI(object):
       assert 2 == len(list(filter(lambda f: str(f).endswith('.png'),files)))
 
 
-  def test_main_verbose(self, capsys, clear_argv):
+  def test_main_verbose(self, capsys, clear_argv, popdir):
     with tempfile.TemporaryDirectory() as tmpdir:
       os.chdir(tmpdir)
       print(f"tmpdir={tmpdir}")
