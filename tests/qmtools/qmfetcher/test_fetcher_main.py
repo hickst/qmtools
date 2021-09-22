@@ -1,6 +1,6 @@
 # Functional tests of the MRIQC data fetcher code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/24/2021.
-#   Last Modified: Set low timeout on bad do_query_bad_url.
+#   Last Modified: Inject popdir fixture last.
 #
 import os
 import pytest
@@ -52,7 +52,7 @@ class TestFetcherMain(object):
     assert len(recs) == 0
 
 
-  def test_main_1(self, popdir, capsys):
+  def test_main_1(self, capsys, popdir):
     with tempfile.TemporaryDirectory() as tmpdir:
       os.chdir(tmpdir)
       print(f"tmpdir={tmpdir}")
@@ -74,7 +74,7 @@ class TestFetcherMain(object):
       assert 'aor' in lines[0]         # bold only
 
 
-  def test_main_pagesize(self, popdir, capsys):
+  def test_main_pagesize(self, capsys, popdir):
     with tempfile.TemporaryDirectory() as tmpdir:
       os.chdir(tmpdir)
       print(f"tmpdir={tmpdir}")
@@ -97,7 +97,7 @@ class TestFetcherMain(object):
       assert 'aor' not in lines[0]     # bold only
 
 
-  def test_main_pagesize_plus(self, popdir, capsys):
+  def test_main_pagesize_plus(self, capsys, popdir):
     with tempfile.TemporaryDirectory() as tmpdir:
       os.chdir(tmpdir)
       print(f"tmpdir={tmpdir}")
@@ -119,7 +119,7 @@ class TestFetcherMain(object):
       assert 'aor' in lines[0]           # bold only
 
 
-  def test_main_pagesize_2x(self, popdir, capsys):
+  def test_main_pagesize_2x(self, capsys, popdir):
     with tempfile.TemporaryDirectory() as tmpdir:
       os.chdir(tmpdir)
       print(f"tmpdir={tmpdir}")
