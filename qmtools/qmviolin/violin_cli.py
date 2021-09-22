@@ -1,6 +1,6 @@
 # CLI program to produce a report with violin plots comparing two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/1/2021.
-#   Last Modified: Begin HTML report generation.
+#   Last Modified: Remove unnecessary try/catch.
 #
 import argparse
 import os
@@ -85,9 +85,9 @@ def main (argv=None):
   # check if the reports directory exists and is writeable or try to create it
   qmu.ensure_reports_dir(PROG_NAME)    # may exit here if unable to create dir
 
-  # use given output directory name or generate one
+  # use given output subdirectory name or generate one
   report_dir = args.get('report_dir')
-  if (not report_dir):            # if none provided, generate an output filename
+  if (not report_dir):            # if none provided, generate an output dirname
     report_dir = qmu.gen_output_name(modality)
     args['report_dir'] = report_dir
 
@@ -112,26 +112,17 @@ def main (argv=None):
     print(f"({PROG_NAME}): Comparing MRIQC records with modality '{modality}'.",
           file=sys.stderr)
 
-  # query the MRIQC server and output or save the results
-  try:
-    # print(f"ARGS={args}", file=sys.stderr)  # REMOVE LATER
+  # print(f"ARGS={args}", file=sys.stderr)  # REMOVE LATER
 
-    # read data, merge records, and create the violin plots:
-    plot_info = violin.vplot(modality, args)
+  # read data, merge records, and create the violin plots:
+  plot_info = violin.vplot(modality, args)
 
-    # generate the HTML report into the reports directory:
-    violin.make_html_report(modality, args, plot_info)
-
-    if (args.get('verbose')):
-      print(f"({PROG_NAME}): Compared group records against fetched records.",
-            file=sys.stderr)
-
-  except Exception as err:
-    errMsg = "({}): ERROR: Processing Error: {}".format(PROG_NAME, str(err))
-    print(errMsg, file=sys.stderr)
-    sys.exit(1)
+  # generate the HTML report into the reports directory:
+  violin.make_html_report(modality, args, plot_info)
 
   if (args.get('verbose')):
+    print(f"({PROG_NAME}): Compared group records against fetched records.",
+          file=sys.stderr)
     if (report_dir is not None):
       print(f"({PROG_NAME}): Produced violin report to '{report_dirpath}'.",
             file=sys.stderr)
