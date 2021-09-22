@@ -2,7 +2,6 @@
 #   Written by: Tom Hicks and Dianne Patterson. 9/7/2021.
 #   Last Modified: Add tests for gen_plot_filename.
 #
-import qmtools.qm_utils as qmu
 import qmtools.qmviolin.violin as violin
 from qmtools import PLOT_EXT
 
