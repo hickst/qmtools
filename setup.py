@@ -2,9 +2,9 @@ from setuptools import setup, find_packages
 
 setup(
     name='QMTools',
-    version='0.0.11',
+    version='0.0.14',
     packages=find_packages(),
-    package_data={'qmtools': ['resources/*.txt', 'resources/*.properties']},
+    package_data={'qmtools': ['qmtools/qmviolin/static/*', 'qmtools/qmview/static/*']},
     include_package_data=True,
     install_requires=[],
     entry_points={
