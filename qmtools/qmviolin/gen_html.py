@@ -1,6 +1,6 @@
 # Methods to generate an HTML report to display IMQ violin plots comparing two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/13/2021.
-#   Last Modified: Remove unused args parameter from gen_html call.
+#   Last Modified: Add doc strings.
 #
 from jinja2 import Template
 
@@ -12,6 +12,7 @@ from config.mriqc_keywords import (BOLD_HI_GOOD_COLUMNS, BOLD_LO_GOOD_COLUMNS,
 # directory containing style and/or script files used by the generated HTML:
 AUX_DIR_PATH = 'qmtools/qmviolin/static'
 
+# the Jinja template string for generating the HTML page:
 PAGE_TEMPLATE = """
 <!DOCTYPE html>
 <html>
@@ -52,6 +53,11 @@ PAGE_TEMPLATE = """
 
 
 def gen_html (modality, plot_info, docs=IQMS_DOC_DICT):
+  """
+  From the given plot information and modality, assemble information about the IQMs
+  (such as their names, descriptions, hi/lo status) and then render each IQM plot
+  and its information into an HTML page (a single string), which is returned.
+  """
   iqms = dict()                        # dictionary of IQM properties
 
   for iqm, plot_path in plot_info.items():
@@ -71,6 +77,10 @@ def gen_html (modality, plot_info, docs=IQMS_DOC_DICT):
 
 
 def get_hi_lo_text (iqm):
+  """
+  For the given IQM, return a string identifying whether low or high values
+  (or neither) are better for the metric.
+  """
   if (iqm in BOLD_LO_GOOD_COLUMNS or (iqm in STRUCT_LO_GOOD_COLUMNS)):
     return 'Low values are better'
   elif (iqm in BOLD_HI_GOOD_COLUMNS or (iqm in STRUCT_HI_GOOD_COLUMNS)):
@@ -80,6 +90,10 @@ def get_hi_lo_text (iqm):
 
 
 def get_legend_path (iqm):
+  """
+  For the given IQM, return an arrow image which shows that low or high values
+  (or neither) are better for the metric.
+  """
   if (iqm in BOLD_LO_GOOD_COLUMNS or (iqm in STRUCT_LO_GOOD_COLUMNS)):
     return 'down_arrow.png'
   elif (iqm in BOLD_HI_GOOD_COLUMNS or (iqm in STRUCT_HI_GOOD_COLUMNS)):
