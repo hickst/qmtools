@@ -1,7 +1,6 @@
-﻿
-# Quality Metrics Tools
+﻿# Quality Metrics Tools
 
-This is a public code repository of the [Translational Bioimaging Resource–MRI](http://astrolabe.arizona.edu/) core group at the [University of Arizona](https://research.arizona.edu/facilities/core-facilities/translational-bioimaging-resource-mri).
+This is a public code repository of the [Translational Bioimaging Resource–MRI](https://research.arizona.edu/facilities/core-facilities/translational-bioimaging-resource-mri) core group at the [University of Arizona](https://www.arizona.edu/).
 
 **Authors**: [Tom Hicks](https://github.com/hickst) and [Dianne Patterson](https://github.com/dkp)
 
@@ -46,7 +45,7 @@ The **reports** directory will be used to hold visualizations and reports genera
 
 Having completed the setup phase, you are now ready to run one or more of the QMTools.
 
-In general, you will utilize the QMTools by copying IMQ data files (i.e., MRIQC group files) into the **inputs** directory and/or by fetching IMQ data from the MRIQC database server into the **fetched** directory. Reports produced by the QMTools will be output into a sub-directory of the **reports** directory.
+In general, you will utilize the QMTools by copying IQM data files (i.e., MRIQC group files) into the **inputs** directory and/or by fetching IQM data from the MRIQC database server into the **fetched** directory. Reports produced by the QMTools will be output into a sub-directory of the **reports** directory.
 
 
 [QMTraffic]() - Normalizes a set of MRIQC image quality metrics and creates a tabular HTML report visualizing how much each image's metrics deviate from the mean for all the images.
@@ -77,6 +76,8 @@ More knowledgable users can install the main QMTools project (*not the Support p
 ## Relevant References
 
 - Esteban O, Blair RW, Nielson DM, Varada JC, Marrett S, Thomas AG et al. (2019). Crowdsourced MRI quality metrics and expert quality annotations for training of humans and machines. Sci Data 6: 30.
+
+- Esteban O, Birman D, Schaer M, Koyejo OO, Poldrack RA, Gorgolewski KJ (2017). MRIQC: Advancing the automatic prediction of image quality in MRI from unseen sites. PLoS ONE 12: 9.
 
 ## License
 
