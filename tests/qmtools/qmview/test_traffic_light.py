@@ -1,6 +1,6 @@
 # Tests of the traffic-light table code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/19/2021.
-#   Last Modified: Update for changes to pos_neg_split. Reorganize imports.
+#   Last Modified: Update dumb min size test for updated libs.
 #
 import os
 import tempfile
@@ -21,7 +21,7 @@ class TestTrafficLight(object):
   bold_test_fyl  = f"{TEST_RESOURCES_DIR}/bold_test.tsv"
   struct_test_fyl  = f"{TEST_RESOURCES_DIR}/struct_test.tsv"
 
-  html_min_size = 10000         # min bytes for all HTML report files
+  html_min_size = 9000          # min bytes for all HTML report files
   legend_min_size = 6000        # min bytes for legend in a .png file
   tsv_min_size = 1700           # min bytes for all TSV report files
   df_cell_count = 855           # size of test zscore dataframe
@@ -68,6 +68,7 @@ class TestTrafficLight(object):
       assert 2 == len(list(filter(lambda f: str(f).endswith(BIDS_DATA_EXT),files)))
       for fyl in files:
         fpath = os.path.join(tmpdir, fyl)
+        print(f"size({fpath})={os.path.getsize(fpath)}")
         if (str(fyl).endswith('html')):
           assert os.path.getsize(fpath) > self.html_min_size
         else:
