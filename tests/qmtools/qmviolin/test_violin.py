@@ -1,6 +1,6 @@
 # Tests of the IMQ Violin plotting modules.
 #   Written by: Tom Hicks and Dianne Patterson. 9/7/2021.
-#   Last Modified: Add tests for write_html.
+#   Last Modified: Add tests for make_html_report.
 #
 import os
 import pytest
@@ -17,6 +17,9 @@ class TestViolin(object):
   fetch_test_fyl = f"{TEST_RESOURCES_DIR}/manmafmagskyra50.tsv"  # fetched file
 
   html_text = '<html><head></head><body></body></html>'
+
+  aor_plot_info = { 'aor': os.path.join(TEST_RESOURCES_DIR, 'bold_aor.png') }
+
 
   def test_vplot_badmode(self):
     with pytest.raises(ValueError) as ve:
@@ -66,6 +69,18 @@ class TestViolin(object):
     with pytest.raises(FileNotFoundError) as fnf:
       violin.make_html_report('bold', {}, {})
     assert 'Required reports directory path not found' in str(fnf)
+
+
+  def test_make_html_report(self):
+    with tempfile.TemporaryDirectory() as tmpdir:
+      print(f"tmpdir={tmpdir}")
+      args = { 'modality': 'bold', 'report_dirpath': tmpdir }
+      violin.make_html_report('bold', args, self.aor_plot_info)
+      files = os.listdir(tmpdir)
+      print(f"FILES={files}")
+      assert files is not None
+      assert len(files) == 5
+      assert 'violin.html' in files
 
 
   def test_select_iqms_to_plot_bold(self):
