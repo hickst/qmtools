@@ -1,11 +1,13 @@
 # Tests of the IMQ Violin plotting modules.
 #   Written by: Tom Hicks and Dianne Patterson. 9/7/2021.
-#   Last Modified: Add tests for vplot errors.
+#   Last Modified: Add tests for write_html.
 #
+import os
 import pytest
+import tempfile
 
 import qmtools.qmviolin.violin as violin
-from qmtools import PLOT_EXT
+from qmtools import PLOT_EXT, REPORTS_EXT
 from tests import TEST_RESOURCES_DIR
 
 
@@ -13,6 +15,8 @@ class TestViolin(object):
 
   bold_test_fyl = f"{TEST_RESOURCES_DIR}/bold_test.tsv"    # group file
   fetch_test_fyl = f"{TEST_RESOURCES_DIR}/manmafmagskyra50.tsv"  # fetched file
+
+  html_text = '<html><head></head><body></body></html>'
 
   def test_vplot_badmode(self):
     with pytest.raises(ValueError) as ve:
@@ -56,6 +60,12 @@ class TestViolin(object):
     assert 'BOLDER' in fname
     assert 'NOSUCH' in fname
     assert '.crazy' in fname
+
+
+  def test_make_html_report_nodirpath(self):
+    with pytest.raises(FileNotFoundError) as fnf:
+      violin.make_html_report('bold', {}, {})
+    assert 'Required reports directory path not found' in str(fnf)
 
 
   def test_select_iqms_to_plot_bold(self):
@@ -105,3 +115,36 @@ class TestViolin(object):
     assert 'snr' not in iqms
     assert 'bids_name' not in iqms
     assert 'YUCK' not in iqms
+
+
+  def test_write_html_default(self):
+    with tempfile.TemporaryDirectory() as tmpdir:
+      print(f"tmpdir={tmpdir}")
+      violin.write_html(self.html_text, tmpdir)
+      files = os.listdir(tmpdir)
+      print(f"FILES={files}")
+      assert files is not None
+      assert len(files) == 1
+      for fyl in files:
+        assert str(fyl).endswith(REPORTS_EXT)
+        fpath = os.path.join(tmpdir, fyl)
+        fsize = os.path.getsize(fpath)
+        print(f"FSIZE={fsize}")
+        assert fsize >= len(self.html_text)
+
+
+  def test_write_html_filename(self):
+    with tempfile.TemporaryDirectory() as tmpdir:
+      print(f"tmpdir={tmpdir}")
+      violin.write_html(self.html_text, tmpdir, filename='happy.html')
+      files = os.listdir(tmpdir)
+      print(f"FILES={files}")
+      assert files is not None
+      assert len(files) == 1
+      for fyl in files:
+        assert 'happy' in str(fyl)
+        assert str(fyl).endswith(REPORTS_EXT)
+        fpath = os.path.join(tmpdir, fyl)
+        fsize = os.path.getsize(fpath)
+        print(f"FSIZE={fsize}")
+        assert fsize >= len(self.html_text)
