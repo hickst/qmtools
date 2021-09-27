@@ -93,10 +93,10 @@ testall:
 	pytest -vv -x ${TESTS} ${ARGS} --cov-report term-missing --cov ${SCOPE}
 
 test1:
-	pytest -vv -x ${TESTS} -k ${ONLY} --cov-report term-missing --cov ${SCOPE}
+	pytest -vv  ${TESTS} -k ${ONLY} --cov-report term-missing --cov ${SCOPE}
 
 tests:
-	pytest -vv -x --ignore ${IGNORE} ${TESTS} ${ARGS} --cov-report term-missing --cov ${SCOPE}
+	pytest -vv --ignore ${IGNORE} ${TESTS} ${ARGS} --cov-report term-missing --cov ${SCOPE}
 
 watch:
 	docker logs -f ${NAME}
