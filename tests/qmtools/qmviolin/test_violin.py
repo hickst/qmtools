@@ -1,12 +1,36 @@
 # Tests of the IMQ Violin plotting modules.
 #   Written by: Tom Hicks and Dianne Patterson. 9/7/2021.
-#   Last Modified: Add tests for gen_plot_filename.
+#   Last Modified: Add tests for vplot errors.
 #
+import pytest
+
 import qmtools.qmviolin.violin as violin
 from qmtools import PLOT_EXT
+from tests import TEST_RESOURCES_DIR
 
 
 class TestViolin(object):
+
+  bold_test_fyl = f"{TEST_RESOURCES_DIR}/bold_test.tsv"    # group file
+  fetch_test_fyl = f"{TEST_RESOURCES_DIR}/manmafmagskyra50.tsv"  # fetched file
+
+  def test_vplot_badmode(self):
+    with pytest.raises(ValueError) as ve:
+      violin.vplot('BADMODE', {})
+    assert 'Modality argument must be one of' in str(ve)
+
+
+  def test_vplot_noargs(self, capsys):
+    with pytest.raises(FileNotFoundError) as fnf:
+      violin.vplot('bold', {})
+    assert "Required 'fetched_file' filepath not found" in str(fnf)
+
+
+  def test_vplot_nogrpfyl(self, capsys):
+    with pytest.raises(FileNotFoundError) as fnf:
+      violin.vplot('bold', {'fetched_file': self.fetch_test_fyl})
+    assert "Required 'group_file' filepath not found" in str(fnf)
+
 
   def test_gen_plot_filename(self):
     fname = violin.gen_plot_filename('bold', 'aor')
