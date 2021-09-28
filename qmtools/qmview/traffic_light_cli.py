@@ -1,8 +1,7 @@
 # CLI program to convert an MRIQC file to normalized scores
 # for representation in an HTML "traffic-light" report.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Update required argument parsing. Make header docs consistent.
-#                  Use symbolic file extensions.
+#   Last Modified: Remove unhelpful try/catch.
 #
 import argparse
 import sys
@@ -83,14 +82,8 @@ def main (argv=None):
       file=sys.stderr)
 
   # generate the various files for the traffic light report
-  try:
-    traf.make_legends()
-    traf.make_traffic_light_table(group_file, modality)
-  except Exception as err:
-    errMsg = "({}): ERROR: Processing Error ({}): {}".format(
-      PROG_NAME, err.error_code, err.message)
-    print(errMsg, file=sys.stderr)
-    sys.exit(err.error_code)
+  traf.make_legends()
+  traf.make_traffic_light_table(group_file, modality)
 
   if (args.get('verbose')):
     print(f"({PROG_NAME}): Produced reports in reports directory '{REPORTS_DIR}'.",

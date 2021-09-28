@@ -1,7 +1,7 @@
 # CLI program to query the MRIQC server and download query result records into
 # a file for further processing.
 #   Written by: Tom Hicks and Dianne Patterson.
-# Last Modified: Update for rename of gen_output_name, change of extension default. Reorganize imports.
+# Last Modified: Remove unhelpful try/catch.
 #
 import argparse
 import os
@@ -162,22 +162,14 @@ def main (argv=None):
       print(errMsg, file=sys.stderr)
       sys.exit(status)
 
-  # query the MRIQC server and output or save the results
-  try:
+  # build the query and fetch some records from the MRIQC server:
+  recs = fetch.get_n_records(modality, args)
 
-    # build the query and fetch some records from the server:
-    recs = fetch.get_n_records(modality, args)
+  if (args.get('verbose')):
+    print(f"({PROG_NAME}): Fetched {len(recs)} records out of {total_recs}.")
 
-    if (args.get('verbose')):
-      print(f"({PROG_NAME}): Fetched {len(recs)} records out of {total_recs}.")
-
-    # save the fetched records into a TSV file:
-    fetch.save_to_tsv(modality, recs, output_filepath)
-
-  except Exception as err:
-    errMsg = "({}): ERROR: Processing Error: {}".format(PROG_NAME, str(err))
-    print(errMsg, file=sys.stderr)
-    sys.exit(1)
+  # save the fetched records into a TSV file:
+  fetch.save_to_tsv(modality, recs, output_filepath)
 
   if (args.get('verbose')):
     if (output_filename is not None):
