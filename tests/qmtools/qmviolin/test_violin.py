@@ -1,6 +1,6 @@
 # Tests of the IMQ Violin plotting modules.
 #   Written by: Tom Hicks and Dianne Patterson. 9/7/2021.
-#   Last Modified: Add tests for make_html_report.
+#   Last Modified: Add real test for vplot.
 #
 import os
 import pytest
@@ -19,24 +19,9 @@ class TestViolin(object):
   html_text = '<html><head></head><body></body></html>'
 
   aor_plot_info = { 'aor': os.path.join(TEST_RESOURCES_DIR, 'bold_aor.png') }
+  fber_plot_info = { 'fber': os.path.join(TEST_RESOURCES_DIR, 'bold_fber.png') }
 
-
-  def test_vplot_badmode(self):
-    with pytest.raises(ValueError) as ve:
-      violin.vplot('BADMODE', {})
-    assert 'Modality argument must be one of' in str(ve)
-
-
-  def test_vplot_noargs(self, capsys):
-    with pytest.raises(FileNotFoundError) as fnf:
-      violin.vplot('bold', {})
-    assert "Required 'fetched_file' filepath not found" in str(fnf)
-
-
-  def test_vplot_nogrpfyl(self, capsys):
-    with pytest.raises(FileNotFoundError) as fnf:
-      violin.vplot('bold', {'fetched_file': self.fetch_test_fyl})
-    assert "Required 'group_file' filepath not found" in str(fnf)
+  num_auxiliary_files = 4              # 3 png, 1 css copied from resources
 
 
   def test_gen_plot_filename(self):
@@ -79,7 +64,7 @@ class TestViolin(object):
       files = os.listdir(tmpdir)
       print(f"FILES={files}")
       assert files is not None
-      assert len(files) == 5
+      assert len(files) == 1 + self.num_auxiliary_files   # html + aux files
       assert 'violin.html' in files
 
 
@@ -130,6 +115,50 @@ class TestViolin(object):
     assert 'snr' not in iqms
     assert 'bids_name' not in iqms
     assert 'YUCK' not in iqms
+
+
+  def test_vplot_badmode(self):
+    with pytest.raises(ValueError) as ve:
+      violin.vplot('BADMODE', {})
+    assert 'Modality argument must be one of' in str(ve)
+
+
+  def test_vplot_noargs(self):
+    with pytest.raises(FileNotFoundError) as fnf:
+      violin.vplot('bold', {})
+    assert "Required 'fetched_file' filepath not found" in str(fnf)
+
+
+  def test_vplot_nogrpfyl(self):
+    with pytest.raises(FileNotFoundError) as fnf:
+      violin.vplot('bold', {'fetched_file': self.fetch_test_fyl})
+    assert "Required 'group_file' filepath not found" in str(fnf)
+
+
+  def test_vplot(self):
+    iqms = violin.select_iqms_to_plot('bold')
+    with tempfile.TemporaryDirectory() as tmpdir:
+      print(f"tmpdir={tmpdir}")
+      args = {
+       'modality': 'bold', 'report_dirpath': tmpdir,
+       'fetched_file': self.fetch_test_fyl, 'group_file': self.bold_test_fyl
+      }
+      plot_info = violin.vplot('bold', args)
+      print(f"PLOT_INFO={plot_info}")
+
+      # check the returned plot information dictionary:
+      assert plot_info is not None
+      assert len(plot_info) == len(iqms)
+      iqms = list(plot_info.keys())
+      assert 'aor' in iqms
+      assert 'fber' in iqms
+      assert 'qi_1' not in iqms
+
+      # now check the plot/reports files
+      files = os.listdir(tmpdir)
+      print(f"FILES={files}")
+      assert files is not None
+      assert len(files) == len(iqms)
 
 
   def test_write_html_default(self):
