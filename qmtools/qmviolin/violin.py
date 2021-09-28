@@ -1,11 +1,12 @@
 # Methods to create IQM violin plots from two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/3/2021.
-#   Last Modified: Remove args argument in gen_html call.
+#   Last Modified: Close each figure in a Seaborn plot when done with it.
 #
 import os
 
 import pandas as pd
 import seaborn as sb
+from matplotlib import pyplot as plt
 
 from config.mriqc_keywords import (BOLD_HI_GOOD_COLUMNS, BOLD_LO_GOOD_COLUMNS,
                                    STRUCT_HI_GOOD_COLUMNS, STRUCT_LO_GOOD_COLUMNS)
@@ -83,7 +84,7 @@ def do_plots (modality, args, iqms_df, plot_iqms=None):
 
 def do_a_plot (modality, iqms_df, iqm, report_dirpath=REPORTS_DIR):
   """
-  Select the data for the specified IQM from the given IQMs dataset and plot it.
+  Select the data for the specified IQM from the given IQMs dataframe and plot it.
   Return the filename where the plot is saved.
   """
   plot_df = iqms_df[iqms_df['IQM'] == iqm]
@@ -91,6 +92,7 @@ def do_a_plot (modality, iqms_df, iqm, report_dirpath=REPORTS_DIR):
                      kind="violin", inner="quartile", split=True, palette="pastel")
   filename = gen_plot_filename(modality, iqm)
   qmu.write_figure_to_file(vplot, filename, dirpath=report_dirpath)
+  plt.close(vplot.fig)                 # close the figure when done with it
   return filename                      # return the name of the generated plot file
 
 

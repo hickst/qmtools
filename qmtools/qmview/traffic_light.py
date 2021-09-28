@@ -1,7 +1,7 @@
 # To convert an mriqc output file to normalized scores for representation in
 # a traffic-light table.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Update for move of write_figure_to_file to QM utils.
+#   Last Modified: Close the figure when done with it.
 #
 import os
 import numpy as np
@@ -65,6 +65,7 @@ def make_a_legend (filename, colormap, dirpath=REPORTS_DIR):
   ax = fig.add_axes([0, 0, 1, 1])
   make_legend_on_axis(ax, colormap)
   qmu.write_figure_to_file(fig, filename, dirpath)
+  plt.close(fig)                       # close the figure when done with it
 
 
 def make_legend_on_axis (ax, cmap):
