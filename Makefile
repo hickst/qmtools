@@ -84,7 +84,7 @@ runt1:
 	docker run -it --rm --name ${NAME} -v ${FETCHED}:${CONFETCHED} -v ${INPUTS}:${CONINPUTS}:ro  -v ${RPTS}:${CONRPTS} --entrypoint pytest ${TSTIMG} -vv ${TESTS}
 
 runtc:
-	docker run -it --rm --name ${NAME} -v ${FETCHED}:${CONFETCHED} -v ${INPUTS}:${CONINPUTS}:ro  -v ${RPTS}:${CONRPTS} --entrypoint pytest ${TSTIMG} -vv --cov-report term-missing --cov ${SCOPE}
+	docker run -it --rm --name ${NAME} -v ${FETCHED}:${CONFETCHED} -v ${INPUTS}:${CONINPUTS}:ro  -v ${RPTS}:${CONRPTS} --entrypoint pytest ${TSTIMG} -vv -x --cov-report term-missing --cov ${SCOPE}
 
 stop:
 	docker stop ${NAME}
