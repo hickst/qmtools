@@ -24,11 +24,11 @@ More knowledgable users can install the main QMTools project (*not the Support p
 
 The source code for the [QMTools Support project](https://github.com/hickst/qmtools-support) in GitHub.
 
-The [QMTools project](https://github.com/hickst/qmtools/tree/main) was inspired by a 2019 Neurohackademy project available [here](https://github.com/elizabethbeard/mriqception).
+The QMTools project was inspired by a 2019 Neurohackademy project available [here](https://github.com/elizabethbeard/mriqception).
 
 The [Swagger UI for the MRIQC web API](https://mriqc.nimh.nih.gov). Scroll down to the `Models` section, which documents the database schema (structure and field names) that can be queried with **QMFetcher**.
 
-The source code for the [MRIQC web API](https://mriqc.nimh.nih.gov/), which provides the API that **QMFetcher** uses to query the MRIQC database.
+The source code for the [MRIQC web API](https://github.com/nipreps/mriqcwebapi), which provides the API that **QMFetcher** uses to query the MRIQC database.
 
 Some old [Discussions and Jupyter notebooks](https://www.kaggle.com/chrisfilo/mriqc/code) which utilize the same MRIQC web API that this project uses.
 
