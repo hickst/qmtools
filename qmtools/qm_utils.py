@@ -1,6 +1,6 @@
 # Shared utilities for the QMTools programs.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Rename gen_output_name, change its extension argument default.
+#   Last Modified: Remove unused imports.
 #
 import datetime
 import os
@@ -8,7 +8,7 @@ import sys
 
 import pandas as pd
 
-from qmtools import (ALLOWED_MODALITIES, BIDS_DATA_EXT,
+from qmtools import (ALLOWED_MODALITIES,
                      FETCHED_DIR, FETCHED_DIR_EXIT_CODE,
                      REPORTS_DIR, REPORTS_DIR_EXIT_CODE)
 from qmtools.file_utils import good_dir_path

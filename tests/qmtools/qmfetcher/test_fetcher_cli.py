@@ -1,14 +1,9 @@
 # Tests of the MRIQC data fetcher CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/4/2021.
-#   Last Modified: Update for required argument parsing refactoring.
+#   Last Modified: Remove unused libraries.
 #
-import os
-import matplotlib
-import numpy
-import pandas
 import pytest
 import sys
-import tempfile
 from pathlib import Path
 
 from qmtools import ALLOWED_MODALITIES, FETCHED_DIR, NUM_RECS_EXIT_CODE, QUERY_FILE_EXIT_CODE

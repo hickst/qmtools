@@ -1,11 +1,8 @@
 # Tests of the module to read and parse a query parameters file.
 #   Written by: Tom Hicks and Dianne Patterson. 8/17/2021.
-#   Last Modified: Rethought design: removed control section.
+#   Last Modified: Remove unused imports.
 #
-import configparser
-import os
 import pytest
-import sys
 
 from tests import TEST_RESOURCES_DIR
 import qmtools.qmfetcher.query_parser as qp

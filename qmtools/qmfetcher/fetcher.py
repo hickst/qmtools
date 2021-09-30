@@ -1,12 +1,10 @@
 # Methods to query the MRIQC server and download query result records.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Add request timeout as optional argument to do_query.
+#   Last Modified: Remove unused imports.
 #
 import csv
 import json
-import os
 import requests as req
-import sys
 
 from copy import deepcopy
 
