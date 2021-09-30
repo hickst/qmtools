@@ -1,6 +1,6 @@
 # Tests of the module to generate the HTML violin report.
 #   Written by: Tom Hicks and Dianne Patterson. 9/18/2021.
-#   Last Modified: Test get_hi_lo_text and get_legend_path to complete tests.
+#   Last Modified: Remove stupid size test of HTML template.
 #
 import os
 
@@ -35,7 +35,7 @@ class TestGenHTML(object):
   def test_gen_html_bold_docs(self):
     html_text = gh.gen_html('bold', self.aor_plot_info, docs=self.aor_docs)
     assert html_text is not None
-    assert len(html_text) >= self.len_template
+    assert len(html_text) > 0
     assert 'Comparison of MRIQC IQM datasets' in html_text
     assert 'bold' in html_text
     assert 'bold_aor.png' in html_text
