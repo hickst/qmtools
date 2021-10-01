@@ -1,7 +1,7 @@
 # To convert an mriqc output file to normalized scores for representation in
 # a traffic-light table.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Close the figure when done with it.
+#   Last Modified: Copy static resources to reports directory.
 #
 import os
 import numpy as np
@@ -14,7 +14,10 @@ from matplotlib import pyplot as plt
 from config.mriqc_keywords import (STRUCT_HI_GOOD_COLUMNS, STRUCT_LO_GOOD_COLUMNS,
                                    BOLD_HI_GOOD_COLUMNS, BOLD_LO_GOOD_COLUMNS)
 from qmtools import BIDS_DATA_EXT, PLOT_EXT, REPORTS_DIR, REPORTS_EXT, STRUCTURAL_MODALITIES
+from qmtools.file_utils import copy_tree
 import qmtools.qm_utils as qmu
+
+AUX_DIR_PATH = 'qmtools/qmview/static'
 
 # create our own small color maps for positive good and positive bad
 TURNIP8_COLORMAP = cm.get_cmap('PiYG', 8)
@@ -33,6 +36,9 @@ def make_traffic_light_table (tsvfile, modality, dirpath=REPORTS_DIR):
   (pos_good_df, pos_bad_df) = pos_neg_split(qm_df, modality)
   gen_traffic_light_table(pos_good_df, True, f"pos_good_{modality}", dirpath)
   gen_traffic_light_table(pos_bad_df, False, f"pos_bad_{modality}", dirpath)
+
+  # copy the required report support files to the current report directory
+  copy_tree(AUX_DIR_PATH, dirpath)
 
 
 def gen_traffic_light_table (qm_df, iam_hi_good, outfilename, dirpath=REPORTS_DIR):
