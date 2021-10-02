@@ -1,6 +1,6 @@
 # Methods to generate an HTML report to display a table of Z-score normalized IQM data.
 #   Written by: Tom Hicks and Dianne Patterson. 10/1/2021.
-#   Last Modified: Initial creation.
+#   Last Modified: Embed CSS in generated HTML.
 #
 from jinja2 import Template
 
@@ -17,8 +17,38 @@ PAGE_TEMPLATE = """
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Image Quality Metrics Table Viewer">
-    <link rel="stylesheet" href="traffic.css" type="text/css">
     <title>QMTraffic {{modality}}</title>
+    <style>
+      body {
+        background-color:#ffffff;
+        color:black;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size:76%;
+        margin:0;
+      }
+      h1 {
+        margin-left: 20px;
+      }
+      img.legend {
+        width: 500px;
+        height: 100px;
+        margin-top: 30px;
+        margin-bottom: 40px;
+        margin-left: 100px;
+        border-style: none;
+      }
+      iframe.table {
+        border-style: none;
+        height: 750px;
+        width: 100%;
+        margin-top: 0;
+        margin-bottom: 40px;
+        margin-left: 40px;
+      }
+      .modality {
+        color: #9f009f
+      }
+    </style>
   </head>
 
   <body>
