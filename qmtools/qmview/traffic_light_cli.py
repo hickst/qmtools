@@ -1,13 +1,13 @@
 # CLI program to convert an MRIQC file to normalized scores
 # for representation in an HTML "traffic-light" report.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Remove unused imports.
+#   Last Modified: Add instruction to open report.
 #
 import argparse
 import sys
 
-from qmtools import ALLOWED_MODALITIES, BIDS_DATA_EXT, INPUT_FILE_EXIT_CODE
-from qmtools import REPORTS_DIR
+from qmtools import ( ALLOWED_MODALITIES, BIDS_DATA_EXT, INPUT_FILE_EXIT_CODE,
+                      REPORTS_DIR, REPORTS_EXT )
 from qmtools.file_utils import good_file_path
 from qmtools.qm_utils import ensure_reports_dir, validate_modality
 import qmtools.qmview.traffic_light as traf
@@ -87,6 +87,8 @@ def main (argv=None):
 
   if (args.get('verbose')):
     print(f"({PROG_NAME}): Produced reports in reports directory '{REPORTS_DIR}'.",
+      file=sys.stderr)
+    print(f"({PROG_NAME}): To see the report: open '{REPORTS_DIR}/{modality}{REPORTS_EXT}' in a browser.",
       file=sys.stderr)
 
 
