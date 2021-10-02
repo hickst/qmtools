@@ -1,6 +1,6 @@
 # Tests of the IMQ Violin plotting modules.
 #   Written by: Tom Hicks and Dianne Patterson. 9/7/2021.
-#   Last Modified: Update for refactoring of write_html_to_file.
+#   Last Modified: Move tests due to last refactoring.
 #
 import os
 import pytest
@@ -8,7 +8,7 @@ import tempfile
 
 import qmtools.qm_utils as qmu
 import qmtools.qmviolin.violin as violin
-from qmtools import PLOT_EXT, REPORTS_EXT
+from qmtools import PLOT_EXT 
 from tests import TEST_RESOURCES_DIR
 
 
@@ -16,8 +16,6 @@ class TestViolin(object):
 
   bold_test_fyl = f"{TEST_RESOURCES_DIR}/bold_test.tsv"    # group file
   fetch_test_fyl = f"{TEST_RESOURCES_DIR}/manmafmagskyra50.tsv"  # fetched file
-
-  html_text = '<html><head></head><body></body></html>'
 
   aor_plot_info = { 'aor': os.path.join(TEST_RESOURCES_DIR, 'bold_aor.png') }
   fber_plot_info = { 'fber': os.path.join(TEST_RESOURCES_DIR, 'bold_fber.png') }
@@ -160,36 +158,3 @@ class TestViolin(object):
       print(f"FILES={files}")
       assert files is not None
       assert len(files) == len(iqms)
-
-
-  def test_write_html_to_file_default(self):
-    with tempfile.TemporaryDirectory() as tmpdir:
-      print(f"tmpdir={tmpdir}")
-      qmu.write_html_to_file(self.html_text, violin.DEFAULT_HTML_FILENAME, tmpdir)
-      files = os.listdir(tmpdir)
-      print(f"FILES={files}")
-      assert files is not None
-      assert len(files) == 1
-      for fyl in files:
-        assert str(fyl).endswith(REPORTS_EXT)
-        fpath = os.path.join(tmpdir, fyl)
-        fsize = os.path.getsize(fpath)
-        print(f"FSIZE={fsize}")
-        assert fsize >= len(self.html_text)
-
-
-  def test_write_html_to_file_filename(self):
-    with tempfile.TemporaryDirectory() as tmpdir:
-      print(f"tmpdir={tmpdir}")
-      qmu.write_html_to_file(self.html_text, 'happy.html', tmpdir)
-      files = os.listdir(tmpdir)
-      print(f"FILES={files}")
-      assert files is not None
-      assert len(files) == 1
-      for fyl in files:
-        assert 'happy' in str(fyl)
-        assert str(fyl).endswith(REPORTS_EXT)
-        fpath = os.path.join(tmpdir, fyl)
-        fsize = os.path.getsize(fpath)
-        print(f"FSIZE={fsize}")
-        assert fsize >= len(self.html_text)

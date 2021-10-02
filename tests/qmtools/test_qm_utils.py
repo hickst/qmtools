@@ -1,6 +1,6 @@
 # Tests of Shared utilities for the QMTools programs.
 #   Written by: Tom Hicks and Dianne Patterson. 8/5/2021.
-# Last Modified: Update for rename of gen_output_name, change of extension default.
+#   Last Modified: Move tests due to last refactoring.
 #
 import os
 import pandas
@@ -10,7 +10,7 @@ import seaborn as sb
 
 from tests import TEST_RESOURCES_DIR
 from qmtools import (BIDS_DATA_EXT, FETCHED_DIR, FETCHED_DIR_EXIT_CODE,
-                     PLOT_EXT, REPORTS_DIR, REPORTS_DIR_EXIT_CODE)
+                     PLOT_EXT, REPORTS_DIR, REPORTS_DIR_EXIT_CODE, REPORTS_EXT)
 import qmtools.qm_utils as qmu
 
 
@@ -26,6 +26,8 @@ class TestQMUtils(object):
   df_cell_count = 855                  # size of test dataframe
   df_shape = (19, 45)                  # shape of test dataframe
   fig_min_size = 20000                 # min bytes for our test figure in a .png file
+
+  html_text = '<html><head></head><body></body></html>'
 
 
   def test_ensure_fetched_dir(self, popdir):
@@ -176,3 +178,36 @@ class TestQMUtils(object):
         fsize = os.path.getsize(fpath)
         print(f"FSIZE={fsize}")
         assert fsize > self.fig_min_size
+
+
+  def test_write_html_to_file_default(self):
+    with tempfile.TemporaryDirectory() as tmpdir:
+      print(f"tmpdir={tmpdir}")
+      qmu.write_html_to_file(self.html_text, 'BOLD_OUT.html', tmpdir)
+      files = os.listdir(tmpdir)
+      print(f"FILES={files}")
+      assert files is not None
+      assert len(files) == 1
+      for fyl in files:
+        assert str(fyl).endswith(REPORTS_EXT)
+        fpath = os.path.join(tmpdir, fyl)
+        fsize = os.path.getsize(fpath)
+        print(f"FSIZE={fsize}")
+        assert fsize >= len(self.html_text)
+
+
+  def test_write_html_to_file_filename(self):
+    with tempfile.TemporaryDirectory() as tmpdir:
+      print(f"tmpdir={tmpdir}")
+      qmu.write_html_to_file(self.html_text, 'happy.html', tmpdir)
+      files = os.listdir(tmpdir)
+      print(f"FILES={files}")
+      assert files is not None
+      assert len(files) == 1
+      for fyl in files:
+        assert 'happy' in str(fyl)
+        assert str(fyl).endswith(REPORTS_EXT)
+        fpath = os.path.join(tmpdir, fyl)
+        fsize = os.path.getsize(fpath)
+        print(f"FSIZE={fsize}")
+        assert fsize >= len(self.html_text)
