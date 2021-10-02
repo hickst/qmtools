@@ -9,7 +9,7 @@ import tempfile
 from pathlib import Path
 
 from qmtools import BIDS_DATA_EXT, INPUT_FILE_EXIT_CODE
-from qmtools import REPORTS_DIR_EXIT_CODE, REPORTS_DIR, REPORTS_EXT
+from qmtools import REPORTS_DIR, REPORTS_EXT
 import qmtools.qmview.traffic_light_cli as cli
 from tests import TEST_RESOURCES_DIR
 

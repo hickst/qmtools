@@ -1,6 +1,6 @@
 # Methods to create IQM violin plots from two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/3/2021.
-#   Last Modified: Close each figure in a Seaborn plot when done with it.
+#   Last Modified: Refactor write_html_to_file method to qm_utils.
 #
 import os
 
@@ -115,7 +115,7 @@ def make_html_report (modality, args, plot_info):
 
   # generate the HTML and write it to a file in the current report directory
   html_text = genh.gen_html(modality, plot_info)
-  write_html(html_text, report_dirpath)
+  qmu.write_html_to_file(html_text, DEFAULT_HTML_FILENAME, report_dirpath)
 
   # copy the required report support files to the current report directory
   copy_tree(genh.AUX_DIR_PATH, report_dirpath)
@@ -140,13 +140,3 @@ def select_iqms_to_plot (modality, plot_iqms=None):
 
   # return the validated and sorted list of iqms:
   return iqms_to_plot
-
-
-def write_html (html_text, dirpath, filename=DEFAULT_HTML_FILENAME):
-  """
-  Write the given html text string to the named file in the given directory path.
-  """
-  filepath = os.path.join(dirpath, filename)
-  with open(filepath, 'w', newline='') as htmlfile:
-    written = htmlfile.write(html_text)
-  return written

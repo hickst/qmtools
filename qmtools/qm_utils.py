@@ -1,6 +1,6 @@
 # Shared utilities for the QMTools programs.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Remove unused imports.
+#   Last Modified: Refactor write_html_to_file method here.
 #
 import datetime
 import os
@@ -87,3 +87,13 @@ def write_figure_to_file (fig, filename, dirpath=REPORTS_DIR):
   """
   filepath = os.path.join(dirpath, filename)
   fig.savefig(filepath, bbox_inches='tight')    # .png is default
+
+
+def write_html_to_file (html_text, filename, dirpath=REPORTS_DIR):
+  """
+  Write the given html text string to the named file in the given directory path.
+  """
+  filepath = os.path.join(dirpath, filename)
+  with open(filepath, 'w', newline='') as htmlfile:
+    written = htmlfile.write(html_text)
+  return written
