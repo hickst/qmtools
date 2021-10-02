@@ -1,11 +1,12 @@
 # Tests of the IMQ Violin plotting modules.
 #   Written by: Tom Hicks and Dianne Patterson. 9/7/2021.
-#   Last Modified: Add real test for vplot.
+#   Last Modified: Update for refactoring of write_html_to_file.
 #
 import os
 import pytest
 import tempfile
 
+import qmtools.qm_utils as qmu
 import qmtools.qmviolin.violin as violin
 from qmtools import PLOT_EXT, REPORTS_EXT
 from tests import TEST_RESOURCES_DIR
@@ -161,10 +162,10 @@ class TestViolin(object):
       assert len(files) == len(iqms)
 
 
-  def test_write_html_default(self):
+  def test_write_html_to_file_default(self):
     with tempfile.TemporaryDirectory() as tmpdir:
       print(f"tmpdir={tmpdir}")
-      violin.write_html(self.html_text, tmpdir)
+      qmu.write_html_to_file(self.html_text, violin.DEFAULT_HTML_FILENAME, tmpdir)
       files = os.listdir(tmpdir)
       print(f"FILES={files}")
       assert files is not None
@@ -177,10 +178,10 @@ class TestViolin(object):
         assert fsize >= len(self.html_text)
 
 
-  def test_write_html_filename(self):
+  def test_write_html_to_file_filename(self):
     with tempfile.TemporaryDirectory() as tmpdir:
       print(f"tmpdir={tmpdir}")
-      violin.write_html(self.html_text, tmpdir, filename='happy.html')
+      qmu.write_html_to_file(self.html_text, 'happy.html', tmpdir)
       files = os.listdir(tmpdir)
       print(f"FILES={files}")
       assert files is not None

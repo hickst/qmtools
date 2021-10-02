@@ -1,6 +1,6 @@
 # Tests of the traffic-light table code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/19/2021.
-#   Last Modified: Update dumb min size test for updated libs.
+#   Last Modified: Update dumb min size test for generated HTML.
 #
 import os
 import tempfile
@@ -21,7 +21,7 @@ class TestTrafficLight(object):
   bold_test_fyl  = f"{TEST_RESOURCES_DIR}/bold_test.tsv"
   struct_test_fyl  = f"{TEST_RESOURCES_DIR}/struct_test.tsv"
 
-  html_min_size = 9000          # min bytes for all HTML report files
+  html_min_size = 1000          # min bytes for all HTML report files
   legend_min_size = 6000        # min bytes for legend in a .png file
   tsv_min_size = 1700           # min bytes for all TSV report files
   df_cell_count = 855           # size of test zscore dataframe
@@ -62,9 +62,9 @@ class TestTrafficLight(object):
       files = os.listdir(tmpdir)
       print(f"FILES={files}")
       assert files is not None
-      assert len(files) == 4
-      # count how many files of each type written (expect: 2 html, 2 tsv)
-      assert 2 == len(list(filter(lambda f: str(f).endswith(REPORTS_EXT),files)))
+      # count how many files of each type written (expect: 3 html, 2 tsv, 0 png)
+      assert len(files) == 5
+      assert 3 == len(list(filter(lambda f: str(f).endswith(REPORTS_EXT),files)))
       assert 2 == len(list(filter(lambda f: str(f).endswith(BIDS_DATA_EXT),files)))
       for fyl in files:
         fpath = os.path.join(tmpdir, fyl)
@@ -84,9 +84,9 @@ class TestTrafficLight(object):
       files = os.listdir(tmpdir)
       print(f"FILES={files}")
       assert files is not None
-      assert len(files) == 4
-      # count how many files of each type written (expect: 2 html, 2 tsv)
-      assert 2 == len(list(filter(lambda f: str(f).endswith(REPORTS_EXT),files)))
+      # count how many files of each type written (expect: 3 html, 2 tsv, 0 png)
+      assert len(files) == 5
+      assert 3 == len(list(filter(lambda f: str(f).endswith(REPORTS_EXT),files)))
       assert 2 == len(list(filter(lambda f: str(f).endswith(BIDS_DATA_EXT),files)))
       for fyl in files:
         fpath = os.path.join(tmpdir, fyl)

@@ -1,6 +1,6 @@
 # Tests of the traffic-light CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/27/2021.
-#   Last Modified: Add and use popdir fixture.
+#   Last Modified: Update dumb number of files test for generated HTML.
 #
 import os
 import pytest
@@ -113,9 +113,9 @@ class TestTrafficLightCLI(object):
       files = os.listdir(os.path.join(tmpdir, REPORTS_DIR))
       print(f"FILES={files}")
       assert files is not None
-      assert len(files) == 6
+      assert len(files) == 7
       # count how many files of each type written (expect: 2 html, 2 tsv, 2 png)
-      assert 2 == len(list(filter(lambda f: str(f).endswith(REPORTS_EXT),files)))
+      assert 3 == len(list(filter(lambda f: str(f).endswith(REPORTS_EXT),files)))
       assert 2 == len(list(filter(lambda f: str(f).endswith(BIDS_DATA_EXT),files)))
       assert 2 == len(list(filter(lambda f: str(f).endswith('.png'),files)))
 
