@@ -1,6 +1,6 @@
 # CLI program to produce a report with violin plots comparing two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/1/2021.
-#   Last Modified: Make main return args.
+#   Last Modified: Make main NOT return args: use sys.exit instead.
 #
 import argparse
 import os
@@ -112,8 +112,6 @@ def main (argv=None):
     print(f"({PROG_NAME}): Comparing MRIQC records with modality '{modality}'.",
           file=sys.stderr)
 
-  # print(f"ARGS={args}", file=sys.stderr)  # REMOVE LATER
-
   # read data, merge records, and create the violin plots:
   plot_info = violin.vplot(modality, args)
 
@@ -127,8 +125,7 @@ def main (argv=None):
       print(f"({PROG_NAME}): Produced violin report to '{report_dirpath}'.",
             file=sys.stderr)
 
-  # return the arguments that this program used: mostly for use in tests
-  return args
+  sys.exit(0)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 # Tests of the violin CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 9/18/21.
-#   Last Modified: Cleanup reports subdir using args returned from main.
+#   Last Modified: Update test of main for not returning args.
 #
 import os
 import pytest
@@ -8,8 +8,8 @@ import shutil
 import sys
 from pathlib import Path
 
-from qmtools import BIDS_DATA_EXT, INPUT_FILE_EXIT_CODE
-from qmtools import REPORTS_DIR_EXIT_CODE, REPORTS_DIR, REPORTS_EXT
+from qmtools import INPUT_FILE_EXIT_CODE, REPORTS_DIR
+import qmtools.qm_utils as qmu
 import qmtools.qmviolin.violin_cli as cli
 import qmtools.qmviolin.violin as violin
 from tests import TEST_RESOURCES_DIR
@@ -34,6 +34,12 @@ class MockViolin:
     pass  # normally works by side-effect: so nothing needs to be done
 
 
+  # mock make_html_report to do nothing and succeed
+  @staticmethod
+  def ensure_reports_dir(program_name, report_dirpath):
+    pass  # normally works by side-effect: so nothing needs to be done
+
+
 @pytest.fixture
 def mock_violin(monkeypatch):
   # return an instance of MockViolin with noop methods
@@ -42,6 +48,7 @@ def mock_violin(monkeypatch):
 
   monkeypatch.setattr(violin, "vplot", violin_mock)
   monkeypatch.setattr(violin, "make_html_report", violin_mock)
+  monkeypatch.setattr(qmu, "ensure_reports_dir", violin_mock)
 
 
 
@@ -150,16 +157,12 @@ class TestViolinCLI(object):
 
 
   def test_main(self, capsys, clear_argv, mock_violin):
-    print(f"TEST_MAIN: in {os.getcwd()}", file=sys.stderr)  # REMOVE LATER
-    sys.argv = ['qmviolin', '-v', 'bold', self.fetch_test_fyl, self.bold_test_fyl]
-    args = cli.main()
-    print(f"ARGS={args}")
+    with pytest.raises(SystemExit) as se:
+      sys.argv = ['qmviolin', '-v', 'bold', self.fetch_test_fyl, self.bold_test_fyl]
+      cli.main()
     sysout, syserr = capsys.readouterr()
     print(f"CAPTURED SYS.OUT:\n{sysout}")
     print(f"CAPTURED SYS.ERR:\n{syserr}")
     assert "Comparing MRIQC records with modality 'bold'" in syserr
     assert "Compared group records against fetched records" in syserr
     assert "Produced violin report to 'reports/bold_" in syserr
-    report_dirpath = args.get('report_dirpath')
-    if (report_dirpath):
-      shutil.rmtree(report_dirpath, ignore_errors=True)
