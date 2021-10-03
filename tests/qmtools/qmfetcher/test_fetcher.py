@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher library code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/7/2021.
-# Last Modified: Move do query tests to test fetcher main module.
+#   Last Modified: Begin to redo for rewritten query parsing.
 #
 import json
 import os
@@ -185,11 +185,11 @@ class TestFetcher(object):
 
 
   def test_build_query_qps(self):
-    qparams = {
-      'dummy_trs': '==0',
-      'bids_meta.Manufacturer': '=="Siemens"',
-      'bids_meta.MultibandAccelerationFactor': '>3'
-    }
+    qparams = [
+      ['dummy_trs', '==0'],
+      ['bids_meta.Manufacturer', '=="Siemens"'],
+      ['bids_meta.MultibandAccelerationFactor', '>3']
+    ]
     query = fetch.build_query('bold', {'query_params': qparams})
     print(f"QUERY={query}")
     assert 'max_results=' in query
