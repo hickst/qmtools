@@ -1,6 +1,6 @@
 # Tests of the module to read and parse a query parameters file.
 #   Written by: Tom Hicks and Dianne Patterson. 8/17/2021.
-#   Last Modified: Begin to redo for rewritten query parsing.
+#   Last Modified: Continue redo for rewritten query parsing.
 #
 import pytest
 
@@ -15,7 +15,7 @@ class TestQueryParser(object):
 
   empty_query_fyl = f"{TEST_RESOURCES_DIR}/empty.qp"
   nospace_query_fyl = f"{TEST_RESOURCES_DIR}/nospace.qp"
-  noparams_query_fyl = f"{TEST_RESOURCES_DIR}/noparams.qp"
+  justcomment_query_fyl = f"{TEST_RESOURCES_DIR}/justcomment.qp"
   comments_query_fyl = f"{TEST_RESOURCES_DIR}/withcomments.qp"
   nosec_query_fyl = f"{TEST_RESOURCES_DIR}/nosec.qp"
   params_query_fyl = f"{TEST_RESOURCES_DIR}/manmaf.qp"
@@ -61,8 +61,8 @@ class TestQueryParser(object):
     assert 'size_x' in str(pd)
 
 
-  def test_load_criteria_from_file_noparams(self):
-    pd = qp.load_criteria_from_file(self.noparams_query_fyl, self.TEST_NAME)
+  def test_load_criteria_from_file_justcomment(self):
+    pd = qp.load_criteria_from_file(self.justcomment_query_fyl, self.TEST_NAME)
     print(pd)
     assert pd is not None
     assert type(pd) is list
