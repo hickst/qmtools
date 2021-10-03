@@ -1,6 +1,6 @@
 # Methods to query the MRIQC server and download query result records.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Remove unused imports.
+#   Last Modified: Rewrite to do our own parsing.
 #
 import csv
 import json
@@ -38,10 +38,10 @@ def build_query (modality, args, page_num=1):
   if (not args.get('use_oldest', False)):   # uses most recent by default
     url_str = f"{url_str}&sort=-_created"
 
-  # add any content query parameters in the "special" where clause
+  # add any content query parameters to the URL in the "special" WHERE clause
   query_params = args.get('query_params')
-  if (query_params is not None):
-    pairs = [f"{key}{val}" for key, val in query_params.items()]
+  if (query_params):
+    pairs = [f"{key}{val}" for key, val in query_params]
     qps = '%20and%20'.join(pairs)
     url_str = f"{url_str}&where={qps}"
 

@@ -1,15 +1,11 @@
 #
 # Module with methods to read and parse a query parameters file.
 #   Written by: Tom Hicks. 8/17/2021.
-#   Last Modified: Rethought design: removed control section.
+#   Last Modified: Rewrite to do our own parsing.
 #
 import sys
-import configparser as cp
-from configparser import MissingSectionHeaderError, ParsingError
 from qmtools import STRUCTURAL_MODALITIES
 from config.mriqc_keywords import BOLD_KEYWORDS, STRUCTURAL_KEYWORDS
-
-QUERY_SECTION = 'query'                # name of the query section in parameters file
 
 
 def parse_query_from_file (modality, query_file, prog_name=''):
@@ -17,43 +13,78 @@ def parse_query_from_file (modality, query_file, prog_name=''):
   Load and validate a set of query parameters from the given query parameters file.
   Return a dictionary of valid query parameters or raise exceptions.
   """
-  query_params = load_query_from_file(query_file, prog_name)
-  validate_query_params(modality, query_params, prog_name)
+  criteria = load_criteria_from_file(query_file, prog_name)
+  query_params = parse_criteria(modality, criteria, prog_name)
   return query_params
 
 
-def load_query_from_file (query_file, prog_name=''):
+def is_criteria_line (line):
+  "Strip the given line and return it if it is not empty and not a comment, else return None."
+  aline = line.strip()
+  if ((not aline) or aline.startswith('#')):  # if empty line or comment line
+    return None
+  else:
+    return aline
+
+
+def keep (fn, collection):
   """
-  Load query parameters from sections of the given query parameters file.
-  Return those parameters in a dictionary OR raise FileNotFound and ValueError
-  exceptions for various loading problems.
-  NB: This loading process strips whitespace from both keys and values!
+  Returns a list of the non-None results of (fn item). Note, this means False
+  return values will be included. The function should be free of side-effects.
+  """
+  for val in collection:
+    res = fn(val)
+    if (res is not None):
+      yield res
+
+
+def load_criteria_from_file (query_file, prog_name=''):
+  """
+  Load query criteria lines from the given query parameters file.
+  Returns a list of non-blank, non-comment lines (i.e., lines assumed to be criteria lines).
   """
   sys.tracebacklimit = 0
   try:
-    config = cp.ConfigParser(strict=False, empty_lines_in_values=False)
-    config.optionxform = lambda option: option
-    config.read_file(open(query_file))
+    with open(query_file) as qp:
+      return list(keep(is_criteria_line, qp.readlines()))
+
   except FileNotFoundError as fnf:
     errMsg = "({}): ERROR: {} Exiting...".format(prog_name,
       f"Query parameters file '{query_file}' not found or not readable.")
     raise FileNotFoundError(errMsg)
-  except MissingSectionHeaderError as mse:
-    errMsg = "({}): ERROR: {} Exiting...".format(prog_name,
-      f"A '{QUERY_SECTION}' section header must be included in the query parameters file.")
-    raise ValueError(errMsg)
-  except ParsingError as pe:
-    errMsg = "({}): ERROR: {} Exiting...".format(prog_name, pe)
-    raise ValueError(errMsg)
 
-  try:
-    qparams = dict(config[QUERY_SECTION])
-  except KeyError as ke:
-    errMsg = "({}): ERROR: {} Exiting...".format(prog_name,
-      f"No section named '{QUERY_SECTION}' found in query parameters file.")
-    raise ValueError(errMsg)
 
-  return qparams
+def parse_criteria (modality, criteria, prog_name=''):
+  """
+  For each criterion of the query, parse the criterion string into a keyword and a
+  comparison part; composed of a valid operator and the value to query for.
+  Return a (possibly empty) list of lists of keywords and comparison strings.
+  """
+  query_params = []
+  for crit in criteria:
+    key, value = parse_key_and_value(modality, crit, prog_name)
+    comparison = parse_value(value, prog_name)
+    query_params.append([key, comparison])
+  return query_params
+
+
+def parse_key_and_value (modality, crit, prog_name):
+  """
+  Find and validate the keyword which begins the given criterion string.
+  Return a tuple containing the keyword and the trimmed, rest of the criterion string.
+  May throw a ValueError if the keyword found is not valid.
+  """
+  sp_pos = crit.find(' ')
+  if (sp_pos < 0):
+    errMsg = "({}): ERROR: {} Exiting...".format(prog_name,
+      f"Spaces must separate the parts of a query parameter line: '{crit}'")
+    raise ValueError(errMsg)
+  else:                                # must be at least one non-space character
+    keyword = (crit[:sp_pos]).strip()
+    validate_keyword(modality, keyword, prog_name)
+
+  rest = (crit[sp_pos:]).strip()
+  return (keyword, rest)
 
 
 def parse_value (val, prog_name=''):
@@ -100,17 +131,3 @@ def validate_keyword (modality, key, prog_name=''):
   errMsg = "({}): ERROR: {} Exiting...".format(prog_name,
            f"Keyword '{key}' is not a valid {modality} keyword.")
   raise ValueError(errMsg)
-
-
-def validate_query_params (modality, query_params, prog_name=''):
-  """
-  For each query parameter: validate the keyword by modality, validate
-  the comparison operator, and then clean the comparison value. Concatenate
-  the cleaned and validated comparison operator and value and re-store it
-  back into the query_params dictionary under the validated key.
-  Raises ValueError if any validation step fails.
-  """
-  for key, value in query_params.items():
-    validate_keyword(modality, key, prog_name)
-    comparison = parse_value(value, prog_name)
-    query_params[key] = comparison
