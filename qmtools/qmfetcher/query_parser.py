@@ -58,6 +58,7 @@ def parse_criteria (modality, criteria, prog_name=''):
   """
   For each criterion of the query, parse the criterion string into a keyword and a
   comparison part; composed of a valid operator and the value to query for.
+  Note that the criteria strings are assumed to have been already stripped (upon reading).
   Return a (possibly empty) list of lists of keywords and comparison strings.
   """
   query_params = []
