@@ -1,11 +1,10 @@
 # Functional tests of the MRIQC data fetcher code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/24/2021.
-#   Last Modified: Inject popdir fixture last.
+#   Last Modified: Fix test which relied on query_params structure.
 #
 import os
 import pytest
 import requests as req
-import sys
 import tempfile
 
 from qmtools import FETCHED_DIR
@@ -43,8 +42,7 @@ class TestFetcherMain(object):
 
 
   def test_get_n_records_norecs(self):
-    qparams = { 'dummy_trs': '==999' }
-    args = {'num_recs': 2, 'query_params': qparams}
+    args = {'num_recs': 2, 'query_params': [['dummy_trs', '==999']] }
     recs = fetch.get_n_records('bold', args)
     print(recs)
     assert recs is not None
