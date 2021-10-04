@@ -1,6 +1,6 @@
 # CLI program to produce a report with violin plots comparing two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/1/2021.
-#   Last Modified: Make main NOT return args: use sys.exit instead.
+#   Last Modified: Add instruction to open report.
 #
 import argparse
 import os
@@ -123,6 +123,8 @@ def main (argv=None):
           file=sys.stderr)
     if (report_dir is not None):
       print(f"({PROG_NAME}): Produced violin report to '{report_dirpath}'.",
+            file=sys.stderr)
+      print(f"({PROG_NAME}): To see the report: open '{report_dirpath}/violin.html' in a browser.",
             file=sys.stderr)
 
   sys.exit(0)
