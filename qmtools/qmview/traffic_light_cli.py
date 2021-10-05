@@ -1,7 +1,7 @@
 # CLI program to convert an MRIQC file to normalized scores
 # for representation in an HTML "traffic-light" report.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Add instruction to open report.
+# Last Modified: Minor doc/naming cleanups.
 #
 import argparse
 import sys
@@ -12,7 +12,7 @@ from qmtools.file_utils import good_file_path
 from qmtools.qm_utils import ensure_reports_dir, validate_modality
 import qmtools.qmview.traffic_light as traf
 
-PROG_NAME = 'qmview'
+PROG_NAME = 'qmtraffic'
 
 
 def check_input_file (input_file):
@@ -30,7 +30,7 @@ def check_input_file (input_file):
 def main (argv=None):
   """
   The main method for the QMView. This method is called from the command line,
-  processes the command line arguments and calls into the qmview library to do
+  processes the command line arguments and calls into the traffic_light module to do
   its work.
   This main method takes no arguments so it can be called by setuptools but
   the program expects two arguments from the command line:

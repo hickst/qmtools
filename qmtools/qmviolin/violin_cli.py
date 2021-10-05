@@ -1,6 +1,6 @@
 # CLI program to produce a report with violin plots comparing two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/1/2021.
-#   Last Modified: Add instruction to open report.
+# Last Modified: Minor doc/naming cleanups.
 #
 import argparse
 import os
@@ -29,7 +29,7 @@ def check_input_file (input_file, msg='A readable input file must be specified.'
 def main (argv=None):
   """
   The main method for the QMViolin. This method is called from the command line,
-  processes the command line arguments and calls into the qmview library to do
+  processes the command line arguments and calls into the violin module to do
   its work.
   This main method takes no arguments so it can be called by setuptools but
   the program expects various arguments from the command line:

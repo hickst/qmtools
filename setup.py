@@ -4,7 +4,7 @@ setup(
     name='QMTools',
     version='1.0.0',
     packages=find_packages(),
-    package_data={'qmtools': ['qmtools/qmviolin/static/*', 'qmtools/qmview/static/*']},
+    package_data={'qmtools': ['qmtools/qmviolin/static/*']},
     include_package_data=True,
     install_requires=[],
     entry_points={

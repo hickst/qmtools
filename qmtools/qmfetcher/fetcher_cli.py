@@ -1,7 +1,7 @@
 # CLI program to query the MRIQC server and download query result records into
 # a file for further processing.
 #   Written by: Tom Hicks and Dianne Patterson.
-# Last Modified: Remove unhelpful try/catch.
+# Last Modified: Minor doc/naming cleanups.
 #
 import argparse
 import os
@@ -47,7 +47,7 @@ def check_num_recs (num_recs):
 def main (argv=None):
   """
   The main method for the QMView. This method is called from the command line,
-  processes the command line arguments and calls into the qmview library to do
+  processes the command line arguments and calls into the fetcher module to do
   its work.
   This main method takes no arguments so it can be called by setuptools but
   the program takes arguments from the command line:

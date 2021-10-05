@@ -1,11 +1,8 @@
 # Methods to generate an HTML report to display a table of Z-score normalized IQM data.
 #   Written by: Tom Hicks and Dianne Patterson. 10/1/2021.
-#   Last Modified: Embed CSS in generated HTML.
+#   Last Modified: Remove unused static path constant.
 #
 from jinja2 import Template
-
-# directory containing style and/or script files used by the generated HTML:
-AUX_DIR_PATH = 'qmtools/qmview/static'
 
 # the Jinja template string for generating the HTML page:
 PAGE_TEMPLATE = """
