@@ -1,10 +1,11 @@
 # Functional tests of the MRIQC data fetcher code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/24/2021.
-#   Last Modified: Fix test which relied on query_params structure.
+#   Last Modified: Fix: restore missing sys import.
 #
 import os
 import pytest
 import requests as req
+import sys
 import tempfile
 
 from qmtools import FETCHED_DIR
