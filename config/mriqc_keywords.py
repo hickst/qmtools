@@ -4,7 +4,7 @@
 #     https://github.com/poldracklab/mriqcwebapi/blob/master/dockereve-master/eve-app/settings.py
 #
 #   Written by: Tom Hicks. 8/19/2021.
-#   Last Modified: Add missing fber to structural IQMs.
+#   Last Modified: Remove rating fields.
 #
 BIDS_KEYWORDS = set([
   'bids_meta.modality',
@@ -132,10 +132,6 @@ BOLD_KEYWORDS = set([
   'provenance.settings.testing',
   'provenance.mriqc_pred',
   'provenance.email',
-  'rating.rating',
-  'rating.name',
-  'rating.comment',
-  'rating.md5sum',
   'bids_meta.TaskName'                 # special case: bold modality only
 ])
 

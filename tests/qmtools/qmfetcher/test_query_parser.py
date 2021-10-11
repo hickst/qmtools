@@ -1,6 +1,6 @@
 # Tests of the module to read and parse a query parameters file.
 #   Written by: Tom Hicks and Dianne Patterson. 8/17/2021.
-#   Last Modified: Add tests for remaining functions.
+#   Last Modified: Update for removal of rating.
 #
 import pytest
 
@@ -209,7 +209,7 @@ class TestQueryParser(object):
     assert qp.validate_keyword('bold', 'dummy_trs', self.TEST_NAME)
     assert qp.validate_keyword('bold', 'bids_meta.subject_id', self.TEST_NAME)
     assert qp.validate_keyword('bold', 'provenance.md5sum', self.TEST_NAME)
-    assert qp.validate_keyword('bold', 'rating.name', self.TEST_NAME)
+    assert qp.validate_keyword('bold', 'provenance.settings.fd_thres', self.TEST_NAME)
     assert qp.validate_keyword('bold', 'bids_meta.TaskName', self.TEST_NAME)
 
 
