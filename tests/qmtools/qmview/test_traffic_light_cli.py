@@ -1,6 +1,6 @@
 # Tests of the traffic-light CLI code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/27/2021.
-#   Last Modified: Update dumb number of files test for generated HTML.
+#   Last Modified: Update for reports subdir refactoring.
 #
 import os
 import pytest
@@ -108,13 +108,13 @@ class TestTrafficLightCLI(object):
     with tempfile.TemporaryDirectory() as tmpdir:
       os.chdir(tmpdir)
       print(f"tmpdir={tmpdir}")
-      sys.argv = ['qmtools', 'bold', self.bold_test_fyl]
+      sys.argv = ['qmtools', 'bold', self.bold_test_fyl, '-r', 'testdir']
       cli.main()
-      files = os.listdir(os.path.join(tmpdir, REPORTS_DIR))
+      files = os.listdir(os.path.join(tmpdir, REPORTS_DIR, 'testdir'))
       print(f"FILES={files}")
       assert files is not None
       assert len(files) == 7
-      # count how many files of each type written (expect: 2 html, 2 tsv, 2 png)
+      # count how many files of each type written (expect: 3 html, 2 tsv, 2 png)
       assert 3 == len(list(filter(lambda f: str(f).endswith(REPORTS_EXT),files)))
       assert 2 == len(list(filter(lambda f: str(f).endswith(BIDS_DATA_EXT),files)))
       assert 2 == len(list(filter(lambda f: str(f).endswith('.png'),files)))

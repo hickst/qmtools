@@ -1,7 +1,7 @@
 # To convert an mriqc output file to normalized scores for representation in
 # a traffic-light table.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Embed CSS in generated HTML.
+#   Last Modified: Update for reports subdir refactoring.
 #
 import os
 import numpy as np
@@ -22,7 +22,7 @@ TURNIP8_COLORMAP = cm.get_cmap('PiYG', 8)
 TURNIP8_COLORMAP_R = cm.get_cmap('PiYG_r', 8)
 
 
-def make_traffic_light_table (tsvfile, modality, dirpath=REPORTS_DIR):
+def make_traffic_light_table (modality, tsvfile, report_dirpath):
   """
   Given a TSV file of QM metrics, generate and save two traffic light HTML
   tables: one for positive values better and another for negative values better.
@@ -32,36 +32,36 @@ def make_traffic_light_table (tsvfile, modality, dirpath=REPORTS_DIR):
   modality = qmu.validate_modality(modality)
   qm_df = qmu.load_tsv(tsvfile)
   (pos_good_df, pos_bad_df) = pos_neg_split(qm_df, modality)
-  gen_traffic_light_table(pos_good_df, True, f"pos_good_{modality}", dirpath)
-  gen_traffic_light_table(pos_bad_df, False, f"pos_bad_{modality}", dirpath)
+  gen_traffic_light_table(pos_good_df, True, f"pos_good_{modality}", report_dirpath)
+  gen_traffic_light_table(pos_bad_df, False, f"pos_bad_{modality}", report_dirpath)
 
   # generate the HTML and write it to a file in the current report directory
   html_text = genh.gen_html(modality)
-  qmu.write_html_to_file(html_text, f"{modality}.html", dirpath)
+  qmu.write_html_to_file(html_text, f"{modality}.html", report_dirpath)
 
 
-def gen_traffic_light_table (qm_df, iam_hi_good, outfilename, dirpath=REPORTS_DIR):
+def gen_traffic_light_table (qm_df, iam_hi_good, outfilename, report_dirpath=REPORTS_DIR):
   """
   Normalize to Z-scores, stylize, and write the given QM dataframe
   as an HTML table, in the named output file.
   """
   norm_df = normalize_to_zscores(qm_df)
-  write_table_to_tsv(norm_df, outfilename, dirpath)
+  write_table_to_tsv(norm_df, outfilename, report_dirpath)
   which_cmap = TURNIP8_COLORMAP if iam_hi_good else TURNIP8_COLORMAP_R
   styler = style_table_by_std_deviations(norm_df, cmap=which_cmap)
-  write_table_to_html(styler, outfilename, dirpath)
+  write_table_to_html(styler, outfilename, report_dirpath)
 
 
-def make_legends (dirpath=REPORTS_DIR):
+def make_legends (report_dirpath=REPORTS_DIR):
   """
   Generate and save a positive-good legend and a positive-bad legend
   as plot files (default: PNG) in the reports directory.
   """
-  make_a_legend(f"pos_good{PLOT_EXT}", TURNIP8_COLORMAP, dirpath)
-  make_a_legend(f"pos_bad{PLOT_EXT}", TURNIP8_COLORMAP_R, dirpath)
+  make_a_legend(f"pos_good{PLOT_EXT}", TURNIP8_COLORMAP, report_dirpath)
+  make_a_legend(f"pos_bad{PLOT_EXT}", TURNIP8_COLORMAP_R, report_dirpath)
 
 
-def make_a_legend (filename, colormap, dirpath=REPORTS_DIR):
+def make_a_legend (filename, colormap, report_dirpath=REPORTS_DIR):
   """
   Make a legend with the given colormap and save it with the given filename
   in the optionally specified reports directory.
@@ -69,7 +69,7 @@ def make_a_legend (filename, colormap, dirpath=REPORTS_DIR):
   fig = plt.figure()
   ax = fig.add_axes([0, 0, 1, 1])
   make_legend_on_axis(ax, colormap)
-  qmu.write_figure_to_file(fig, filename, dirpath)
+  qmu.write_figure_to_file(fig, filename, report_dirpath)
   plt.close(fig)                       # close the figure when done with it
 
 
@@ -133,20 +133,20 @@ def style_table_by_std_deviations (norm_df, cmap=TURNIP8_COLORMAP):
   return styler
 
 
-def write_table_to_tsv (norm_df, filename, dirpath=REPORTS_DIR):
+def write_table_to_tsv (norm_df, filename, report_dirpath=REPORTS_DIR):
   """
   Write the given normalized dataframe into the named TSV file
   in the optionally specified directory.
   """
-  filepath = os.path.join(dirpath, f"{filename}{BIDS_DATA_EXT}")
+  filepath = os.path.join(report_dirpath, f"{filename}{BIDS_DATA_EXT}")
   norm_df.to_csv(filepath, index=False, sep='\t')
 
 
-def write_table_to_html (styler, filename, dirpath=REPORTS_DIR):
+def write_table_to_html (styler, filename, report_dirpath=REPORTS_DIR):
   """
   Render the given pandas.io.formats.style.Styler object as
   HTML and write the HTML to the given filepath.
   """
-  filepath = os.path.join(dirpath, f"{filename}{REPORTS_EXT}")
+  filepath = os.path.join(report_dirpath, f"{filename}{REPORTS_EXT}")
   with open(filepath, "w") as outfyl:
     outfyl.writelines(styler.render())

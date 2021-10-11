@@ -1,15 +1,16 @@
 # CLI program to convert an MRIQC file to normalized scores
 # for representation in an HTML "traffic-light" report.
 #   Written by: Tom Hicks and Dianne Patterson.
-# Last Modified: Minor doc/naming cleanups.
+# Last Modified: Add optional reports subdir.
 #
 import argparse
+import os
 import sys
 
 from qmtools import ( ALLOWED_MODALITIES, BIDS_DATA_EXT, INPUT_FILE_EXIT_CODE,
                       REPORTS_DIR, REPORTS_EXT )
 from qmtools.file_utils import good_file_path
-from qmtools.qm_utils import ensure_reports_dir, validate_modality
+import qmtools.qm_utils as qmu
 import qmtools.qmview.traffic_light as traf
 
 PROG_NAME = 'qmtraffic'
@@ -36,6 +37,7 @@ def main (argv=None):
   the program expects two arguments from the command line:
     1) required modality of the MRIQC group file (one of 'bold', 'T1w', or 'T2w')
     2) required path to the MRIQC group file (in TSV format) to visualize.
+    3) optional name of output report file in the reports directory.
   """
   # the main method takes no arguments so it can be called by setuptools
   if (argv is None):                   # if called by setuptools
@@ -64,31 +66,50 @@ def main (argv=None):
     help=f"Path to an MRIQC group file ({BIDS_DATA_EXT}) to visualize."
   )
 
+  parser.add_argument(
+    '-r', '--report-dir', dest='report_dir',
+    default=argparse.SUPPRESS,
+    help='Optional name of report subdirectory in main reports directory [default: none].'
+  )
+
   # actually parse the arguments from the command line
   args = vars(parser.parse_args(argv))
 
   # check modality for validity: assumes arg parse provides valid value
-  modality = validate_modality(args.get('modality'))
+  modality = qmu.validate_modality(args.get('modality'))
 
   # if input file path given, check the file path for validity
   group_file = args.get('group_file')
   check_input_file(group_file)   # if check fails exits here does not return!
 
   # check if the reports directory exists and is writeable or try to create it
-  ensure_reports_dir(PROG_NAME)  # may exit here if unable to create dir
+  qmu.ensure_reports_dir(PROG_NAME)  # may exit here if unable to create dir
+
+  # use given output subdirectory name or generate one
+  report_dir = args.get('report_dir')
+  if (not report_dir):            # if none provided, generate an output dirname
+    report_dir = qmu.gen_output_name(modality)
+    args['report_dir'] = report_dir
+
+  # create the path to the report subdirectory in the main reports directory
+  report_dirpath = os.path.join(REPORTS_DIR, report_dir)
+  args['report_dirpath'] = report_dirpath
+
+  # check if the reports directory exists and is writeable or try to create it
+  qmu.ensure_reports_dir(PROG_NAME, report_dirpath)  # may exit here if unable to create dir
 
   if (args.get('verbose')):
     print(f"({PROG_NAME}): Processing MRIQC group file '{group_file}' with modality '{modality}'.",
       file=sys.stderr)
 
   # generate the various files for the traffic light report
-  traf.make_legends()
-  traf.make_traffic_light_table(group_file, modality)
+  traf.make_legends(report_dirpath)
+  traf.make_traffic_light_table(modality, group_file, report_dirpath)
 
   if (args.get('verbose')):
-    print(f"({PROG_NAME}): Produced reports in reports directory '{REPORTS_DIR}'.",
+    print(f"({PROG_NAME}): Produced reports in reports directory '{report_dirpath}'.",
       file=sys.stderr)
-    print(f"({PROG_NAME}): To see the report: open '{REPORTS_DIR}/{modality}{REPORTS_EXT}' in a browser.",
+    print(f"({PROG_NAME}): To see the report: open '{report_dirpath}/{modality}{REPORTS_EXT}' in a browser.",
       file=sys.stderr)
 
 

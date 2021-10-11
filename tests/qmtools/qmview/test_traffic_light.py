@@ -1,6 +1,6 @@
 # Tests of the traffic-light table code.
 #   Written by: Tom Hicks and Dianne Patterson. 7/19/2021.
-#   Last Modified: Update dumb min size test for generated HTML.
+#   Last Modified: Update for reports subdir refactoring.
 #
 import os
 import tempfile
@@ -57,7 +57,7 @@ class TestTrafficLight(object):
     with tempfile.TemporaryDirectory() as tmpdir:
       print(f"type(tmpdir)={type(tmpdir)}")
       print(f"tmpdir={tmpdir}")
-      traf.make_traffic_light_table(self.bold_test_fyl, 'bold', tmpdir)
+      traf.make_traffic_light_table('bold', self.bold_test_fyl, tmpdir)
       # os.system(f"ls -lH {tmpdir} >/tmp/DEBUG")
       files = os.listdir(tmpdir)
       print(f"FILES={files}")
@@ -79,7 +79,7 @@ class TestTrafficLight(object):
     with tempfile.TemporaryDirectory() as tmpdir:
       print(f"type(tmpdir)={type(tmpdir)}")
       print(f"tmpdir={tmpdir}")
-      traf.make_traffic_light_table(self.struct_test_fyl, 'T1w', tmpdir)
+      traf.make_traffic_light_table('T1w', self.struct_test_fyl, tmpdir)
       # os.system(f"ls -lH {tmpdir} >/tmp/DEBUG")
       files = os.listdir(tmpdir)
       print(f"FILES={files}")
@@ -161,7 +161,7 @@ class TestTrafficLight(object):
       print(f"tmpdir={tmpdir}")
       qm_df = qmu.load_tsv(self.bold_test_fyl)
       norm_df = traf.normalize_to_zscores(qm_df)
-      traf.write_table_to_tsv(norm_df, "table", dirpath=tmpdir)
+      traf.write_table_to_tsv(norm_df, "table", report_dirpath=tmpdir)
       files = os.listdir(tmpdir)
       print(f"FILES={files}")
       assert files is not None
@@ -178,7 +178,7 @@ class TestTrafficLight(object):
       qm_df = qmu.load_tsv(self.bold_test_fyl)
       norm_df = traf.normalize_to_zscores(qm_df)
       styler = traf.style_table_by_std_deviations(norm_df)
-      traf.write_table_to_html(styler, "table", dirpath=tmpdir)
+      traf.write_table_to_html(styler, "table", report_dirpath=tmpdir)
       files = os.listdir(tmpdir)
       print(f"FILES={files}")
       assert files is not None
