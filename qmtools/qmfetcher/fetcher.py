@@ -1,6 +1,6 @@
 # Methods to query the MRIQC server and download query result records.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Rewrite to do our own parsing.
+#   Last Modified: Encode some characters in value strings.
 #
 import csv
 import json
@@ -41,11 +41,18 @@ def build_query (modality, args, page_num=1):
   # add any content query parameters to the URL in the "special" WHERE clause
   query_params = args.get('query_params')
   if (query_params):
-    pairs = [f"{key}{val}" for key, val in query_params]
+    pairs = [f"{key}{clean_field(val)}" for key, val in query_params]
     qps = '%20and%20'.join(pairs)
     url_str = f"{url_str}&where={qps}"
 
   return url_str
+
+
+def clean_field (field):
+  """
+  Return a copy of the given string with a few special characters URL encoded.
+  """
+  return field.replace(' ', '%20').replace('+', '%2B')
 
 
 def clean_records (json_recs, args=None):

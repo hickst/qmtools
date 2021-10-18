@@ -1,6 +1,6 @@
 # Tests of the MRIQC data fetcher library code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/7/2021.
-#   Last Modified: Begin to redo for rewritten query parsing.
+#   Last Modified: Add test for some characters encoded in value strings.
 #
 import json
 import os
@@ -190,14 +190,33 @@ class TestFetcher(object):
       ['bids_meta.Manufacturer', '=="Siemens"'],
       ['bids_meta.MultibandAccelerationFactor', '>3']
     ]
-    query = fetch.build_query('bold', {'query_params': qparams})
-    print(f"QUERY={query}")
-    assert 'max_results=' in query
-    assert 'sort=-_created' in query
-    assert 'where=' in query
-    assert 'dummy_trs==0' in query
-    assert 'bids_meta.Manufacturer=="Siemens"'
-    assert 'bids_meta.MultibandAccelerationFactor>3'
+    qstr = fetch.build_query('bold', {'query_params': qparams})
+    print(f"QUERY={qstr}")
+    assert 'max_results=' in qstr
+    assert 'sort=-_created' in qstr
+    assert 'where=' in qstr
+    assert 'dummy_trs==0' in qstr
+    assert 'bids_meta.Manufacturer=="Siemens"' in qstr
+    assert 'bids_meta.MultibandAccelerationFactor>3' in qstr
+
+
+  def test_build_query_chars(self):
+    qparams = [
+      ['bids_meta.ScanOptions', '=="Fred+Ginger Dancers.Actors"'],
+      ['bids_meta.Manufacturer', '=="Siemens Inc"'],
+      ['bids_meta.TaskName', '==" Sp\tTab"']
+    ]
+    qstr = fetch.build_query('bold', {'query_params': qparams})
+    print(f"QUERY={qstr}")
+    assert 'max_results=' in qstr
+    assert 'sort=-_created' in qstr
+    assert 'where=' in qstr
+    assert 'bids_meta.ScanOptions' in qstr
+    assert '"Fred%2BGinger%20Dancers.Actors"' in qstr
+    assert 'bids_meta.Manufacturer' in qstr
+    assert '"Siemens%20Inc"' in qstr
+    assert 'bids_meta.TaskName' in qstr
+    assert '"%20Sp\tTab"' in qstr
 
 
   def test_clean_records_empty(self):
