@@ -1,7 +1,7 @@
 #
 # Module to provide general file utility functions.
 #   Written by: Tom Hicks. 1/29/2020.
-#   Last Modified: Add copy_tree method.
+#   Last Modified: Add get_permissions method.
 #
 import os
 import shutil
@@ -42,6 +42,11 @@ def gen_file_paths (root_dir):
         for fyl in files:
             file_path = os.path.join(root, fyl)
             yield file_path
+
+
+def get_permissions(file_path):
+  "Return the file OS status mode for the given filepath."
+  return os.stat(file_path).st_mode
 
 
 def good_dir_path (apath, writeable=False):
