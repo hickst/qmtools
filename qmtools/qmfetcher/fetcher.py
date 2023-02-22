@@ -1,6 +1,6 @@
 # Methods to query the MRIQC server and download query result records.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Encode some characters in value strings.
+#   Last Modified: Subdivide default timeout into connection timeout and read timeout.
 #
 import csv
 import json
@@ -10,7 +10,7 @@ from copy import deepcopy
 
 from config.mriqc_keywords import BOLD_KEYWORDS, STRUCTURAL_KEYWORDS
 from qmtools import STRUCTURAL_MODALITIES
-from qmtools.qmfetcher import REQUEST_TIMEOUT, SERVER_PAGE_SIZE
+from qmtools.qmfetcher import CONNECTION_TIMEOUT, READ_TIMEOUT, SERVER_PAGE_SIZE
 from qmtools.qm_utils import validate_modality
 
 SERVER_URL = "https://mriqc.nimh.nih.gov/api/v1"
@@ -103,13 +103,14 @@ def is_not_duplicate (record, chksums):
     return True
 
 
-def do_query (query_str, timeout=REQUEST_TIMEOUT):
+def do_query (query_str, connection_timeout=CONNECTION_TIMEOUT, read_timeout=READ_TIMEOUT):
   """
   Query the server with the given query string, waiting for the specified
   or default time, then return the parsed JSON data if successful, otherwise
  raise a RequestException.
   """
-  resp = req.get(query_str, timeout=timeout)
+  time_tuple = (connection_timeout, read_timeout)
+  resp = req.get(query_str, timeout=time_tuple)
   if (resp.status_code == req.codes.ok):
     json_query_result = json.loads(resp.text)
     return json_query_result

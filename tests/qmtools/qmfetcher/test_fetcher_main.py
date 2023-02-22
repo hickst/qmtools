@@ -1,6 +1,6 @@
 # Functional tests of the MRIQC data fetcher code.
 #   Written by: Tom Hicks and Dianne Patterson. 8/24/2021.
-#   Last Modified: Fix: restore missing sys import.
+#   Last Modified: Update test for renamed timeout keyword parameters.
 #
 import os
 import pytest
@@ -28,7 +28,7 @@ class TestFetcherMain(object):
   def test_do_query_bad_url(self):
     bad_url = 'https://mriqc.nimh.nih.gov/badjunk?max_records=1'
     with pytest.raises(req.RequestException) as re:
-      fetch.do_query(bad_url, timeout=5)
+      fetch.do_query(bad_url, connection_timeout=2)
     print(re)
 
 
