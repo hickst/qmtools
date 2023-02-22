@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='QMTools',
-    version='1.0.0',
+    version='1.5.0',
     packages=find_packages(),
     package_data={'qmtools': ['qmtools/qmviolin/static/*']},
     include_package_data=True,

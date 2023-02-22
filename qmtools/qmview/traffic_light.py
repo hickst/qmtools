@@ -1,14 +1,13 @@
 # To convert an mriqc output file to normalized scores for representation in
 # a traffic-light table.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Update for reports subdir refactoring.
+#   Last Modified: Update for get_cmap refactoring in matplotlib, to_html in pandas.
 #
 import os
 import numpy as np
 import pandas as pd
 import scipy.stats as stats
 
-from matplotlib import cm
 from matplotlib import pyplot as plt
 
 from config.mriqc_keywords import (STRUCT_HI_GOOD_COLUMNS, STRUCT_LO_GOOD_COLUMNS,
@@ -18,8 +17,8 @@ import qmtools.qm_utils as qmu
 import qmtools.qmview.gen_html as genh
 
 # create our own small color maps for positive good and positive bad
-TURNIP8_COLORMAP = cm.get_cmap('PiYG', 8)
-TURNIP8_COLORMAP_R = cm.get_cmap('PiYG_r', 8)
+TURNIP8_COLORMAP = plt.get_cmap('PiYG', 8)
+TURNIP8_COLORMAP_R = plt.get_cmap('PiYG_r', 8)
 
 
 def make_traffic_light_table (modality, tsvfile, report_dirpath):
@@ -149,4 +148,4 @@ def write_table_to_html (styler, filename, report_dirpath=REPORTS_DIR):
   """
   filepath = os.path.join(report_dirpath, f"{filename}{REPORTS_EXT}")
   with open(filepath, "w") as outfyl:
-    outfyl.writelines(styler.render())
+    styler.to_html(buf=outfyl)
