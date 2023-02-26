@@ -1,6 +1,6 @@
 # Shared utilities for the QMTools programs.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Refactor write_html_to_file method here.
+#   Last Modified: Trivial doc fix.
 #
 import datetime
 import os
@@ -71,8 +71,7 @@ def validate_modality (modality):
   """
    Check the validity of the given modality string which must be one
    of the elements of the ALLOWED_MODALITIES list.
-   Returns the canonicalized modality string or raises ValueError if
-   given an invalid modality string.
+   Returns the modality string or raises ValueError if given an invalid modality string.
   """
   if (modality in ALLOWED_MODALITIES):
     return modality

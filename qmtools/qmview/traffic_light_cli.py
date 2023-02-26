@@ -1,7 +1,7 @@
 # CLI program to convert an MRIQC file to normalized scores
 # for representation in an HTML "traffic-light" report.
 #   Written by: Tom Hicks and Dianne Patterson.
-# Last Modified: Add optional reports subdir.
+# Last Modified: Minor error message change.
 #
 import argparse
 import os
@@ -23,7 +23,7 @@ def check_input_file (input_file):
   """
   if (input_file is None or (not good_file_path(input_file))):
     errMsg = "({}): ERROR: {} Exiting...".format(PROG_NAME,
-      f"A readable, MRIQC group file ({BIDS_DATA_EXT}) must be specified.")
+      f"A path to a readable, MRIQC group file ({BIDS_DATA_EXT}) must be specified.")
     print(errMsg, file=sys.stderr)
     sys.exit(INPUT_FILE_EXIT_CODE)
 
