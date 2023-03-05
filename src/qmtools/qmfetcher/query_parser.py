@@ -1,11 +1,12 @@
 #
 # Module with methods to read and parse a query parameters file.
 #   Written by: Tom Hicks. 8/17/2021.
-#   Last Modified: Rewrite to do our own parsing.
+#   Last Modified: Major refactor.
 #
 import sys
+
 from qmtools import STRUCTURAL_MODALITIES
-from config.mriqc_keywords import BOLD_KEYWORDS, STRUCTURAL_KEYWORDS
+from qmtools.mriqc_keywords import BOLD_KEYWORDS, STRUCTURAL_KEYWORDS
 
 
 def parse_query_from_file (modality, query_file, prog_name=''):

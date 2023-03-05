@@ -1,6 +1,6 @@
 import os
 
-from config.settings import APP_ROOT
+APP_ROOT = '/qmtools'
 
 TEST_DIR = None
 TEST_DBCONFIG_FILEPATH = None

@@ -8,8 +8,8 @@ import requests as req
 
 from copy import deepcopy
 
-from config.mriqc_keywords import BOLD_KEYWORDS, STRUCTURAL_KEYWORDS
 from qmtools import STRUCTURAL_MODALITIES
+from qmtools.mriqc_keywords import BOLD_KEYWORDS, STRUCTURAL_KEYWORDS
 from qmtools.qmfetcher import CONNECTION_TIMEOUT, READ_TIMEOUT, SERVER_PAGE_SIZE
 from qmtools.qm_utils import validate_modality
 

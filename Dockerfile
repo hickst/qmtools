@@ -2,7 +2,7 @@ FROM python:3.11.2
 
 LABEL maintainer="Tom Hicks hickst@arizona.edu"
 
-ARG TESTS=notests
+ARG TESTS=src/notests
 
 ENV RUNNING_IN_CONTAINER True
 ENV INSTALL_PATH /qmtools
@@ -17,11 +17,10 @@ RUN pip install -r requirements.txt
 
 COPY setup.py setup.py
 COPY .bash_env /etc/trhenv
-COPY qmtools qmtools
-COPY config config
+COPY src src
 COPY $TESTS $TESTS
 
-# following line runs setup.py to setup CLI scripts:
+# Run setup.py to build & install packages and CLI scripts:
 RUN pip install .
 
 ENTRYPOINT [ "run_traffic" ]

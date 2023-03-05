@@ -1,17 +1,18 @@
 # Methods to create IQM violin plots from two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/3/2021.
-#   Last Modified: Refactor write_html_to_file method to qm_utils.
+#   Last Modified: Major refactor.
 #
 import os
+import importlib.resources as impres
 
 import pandas as pd
 import seaborn as sb
 from matplotlib import pyplot as plt
 
-from config.mriqc_keywords import (BOLD_HI_GOOD_COLUMNS, BOLD_LO_GOOD_COLUMNS,
-                                   STRUCT_HI_GOOD_COLUMNS, STRUCT_LO_GOOD_COLUMNS)
 from qmtools import PLOT_EXT, REPORTS_DIR, STRUCTURAL_MODALITIES
 from qmtools.file_utils import copy_tree
+from qmtools.mriqc_keywords import (BOLD_HI_GOOD_COLUMNS, BOLD_LO_GOOD_COLUMNS,
+                                    STRUCT_HI_GOOD_COLUMNS, STRUCT_LO_GOOD_COLUMNS)
 import qmtools.qm_utils as qmu
 import qmtools.qmviolin.gen_html as genh
 
@@ -118,7 +119,9 @@ def make_html_report (modality, args, plot_info):
   qmu.write_html_to_file(html_text, DEFAULT_HTML_FILENAME, report_dirpath)
 
   # copy the required report support files to the current report directory
-  copy_tree(genh.AUX_DIR_PATH, report_dirpath)
+  pkg = impres.files("qmtools")
+  rpts_aux_dir = pkg / "qmviolin" / "static"
+  copy_tree(rpts_aux_dir, report_dirpath)
 
 
 def select_iqms_to_plot (modality, plot_iqms=None):

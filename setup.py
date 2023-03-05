@@ -1,12 +1,11 @@
-from setuptools import setup, find_packages
+from setuptools import setup, find_namespace_packages
 
 setup(
-    name='QMTools',
+    name='qmtools',
     version='1.5.0',
-    packages=find_packages(),
-    package_data={'qmtools': ['qmtools/qmviolin/static/*']},
-    include_package_data=True,
-    install_requires=[],
+    packages=find_namespace_packages(where="src"),
+    package_dir={"": "src"},
+    package_data={"qmtools.qmviolin.static": ["*.css", "*.png"]},
     entry_points={
         'console_scripts': [
             'qmtraffic = qmtools.qmview.traffic_light_cli:main',

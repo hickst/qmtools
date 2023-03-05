@@ -1,16 +1,13 @@
 # Methods to generate an HTML report to display IMQ violin plots comparing two MRIQC datasets.
 #   Written by: Tom Hicks and Dianne Patterson. 9/13/2021.
-#   Last Modified: Add doc strings.
+#   Last Modified: Major refactor.
 #
 from jinja2 import Template
 
-from config.iqms_doc import IQMS_DOC_DICT
-from config.mriqc_keywords import (BOLD_HI_GOOD_COLUMNS, BOLD_LO_GOOD_COLUMNS,
-                                   STRUCT_HI_GOOD_COLUMNS, STRUCT_LO_GOOD_COLUMNS)
+from qmtools.iqms_doc import IQMS_DOC_DICT
+from qmtools.mriqc_keywords import (BOLD_HI_GOOD_COLUMNS, BOLD_LO_GOOD_COLUMNS,
+                                    STRUCT_HI_GOOD_COLUMNS, STRUCT_LO_GOOD_COLUMNS)
 
-
-# directory containing style and/or script files used by the generated HTML:
-AUX_DIR_PATH = 'qmtools/qmviolin/static'
 
 # the Jinja template string for generating the HTML page:
 PAGE_TEMPLATE = """

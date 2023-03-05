@@ -1,7 +1,7 @@
 # To convert an mriqc output file to normalized scores for representation in
 # a traffic-light table.
 #   Written by: Tom Hicks and Dianne Patterson.
-#   Last Modified: Update for get_cmap refactoring in matplotlib, to_html in pandas.
+#   Last Modified: Major refactor.
 #
 import os
 import numpy as np
@@ -10,9 +10,9 @@ import scipy.stats as stats
 
 from matplotlib import pyplot as plt
 
-from config.mriqc_keywords import (STRUCT_HI_GOOD_COLUMNS, STRUCT_LO_GOOD_COLUMNS,
-                                   BOLD_HI_GOOD_COLUMNS, BOLD_LO_GOOD_COLUMNS)
 from qmtools import BIDS_DATA_EXT, PLOT_EXT, REPORTS_DIR, REPORTS_EXT, STRUCTURAL_MODALITIES
+from qmtools.mriqc_keywords import (STRUCT_HI_GOOD_COLUMNS, STRUCT_LO_GOOD_COLUMNS,
+                                    BOLD_HI_GOOD_COLUMNS, BOLD_LO_GOOD_COLUMNS)
 import qmtools.qm_utils as qmu
 import qmtools.qmview.gen_html as genh
 

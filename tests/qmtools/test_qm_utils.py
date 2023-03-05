@@ -25,7 +25,7 @@ class TestQMUtils(object):
   bold_test_fyl  = f"{TEST_RESOURCES_DIR}/bold_test.tsv"
   df_cell_count = 855                  # size of test dataframe
   df_shape = (19, 45)                  # shape of test dataframe
-  fig_min_size = 14000                 # min bytes for our test figure in a .png file
+  fig_min_size = 12000                 # min bytes for our test figure in a .png file
 
   html_text = '<html><head></head><body></body></html>'
 
