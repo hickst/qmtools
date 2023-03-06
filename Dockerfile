@@ -8,7 +8,7 @@ ENV RUNNING_IN_CONTAINER True
 ENV INSTALL_PATH /qmtools
 
 # create mount points inside container
-RUN mkdir -p $INSTALL_PATH
+RUN mkdir -p $INSTALL_PATH /fetched /inputs /reports
 
 WORKDIR $INSTALL_PATH
 
@@ -23,5 +23,10 @@ COPY $TESTS $TESTS
 # Run setup.py to build & install packages and CLI scripts:
 RUN pip install .
 
-ENTRYPOINT [ "run_traffic" ]
+# Remove the source code used by the build
+RUN rm -rf $INSTALL_PATH
+
+WORKDIR /
+
+ENTRYPOINT [ "qmviolin" ]
 CMD [ "-v", "-h" ]

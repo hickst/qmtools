@@ -6,10 +6,10 @@ RPTS=${TOPLVL}/reports
 TESTDIR=${TOPLVL}/tests
 
 ARGS=
-APP_ROOT=/qmtools
-CONFETCHED=${APP_ROOT}/fetched
-CONINPUTS=${APP_ROOT}/inputs
-CONRPTS=${APP_ROOT}/reports
+APP_ROOT=/
+CONFETCHED=/fetched
+CONINPUTS=/inputs
+CONRPTS=/reports
 ENVLOC=/etc/trhenv
 EP=/bin/bash
 IGNORE=tests/qmtools/qmfetcher/test_fetcher_main.py
