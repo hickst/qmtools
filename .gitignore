@@ -132,8 +132,8 @@ test_data/*
 # project local excludes:
 EXTRAS/
 .vscode/
-fetched/
-inputs/
-notebooks/
-reports/
+/fetched/
+/inputs/
+/notebooks/
+/reports/
 /*.qp

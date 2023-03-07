@@ -1,0 +1,4 @@
+bids_meta.Manufacturer == "Siemens"
+bids_meta.MultibandAccelerationFactor < 3
+bids_meta.MagneticFieldStrength >= 3
+bids_meta.ManufacturersModelName == "Skyra"
