@@ -68,7 +68,7 @@ dockert:
 	docker build -t ${TSTIMG} .
 
 sif:
-	apptainer pull docker://${IMG} ${IMGSIF}
+	apptainer pull ${IMGSIF} docker://${IMG}
 
 sift:
 	apptainer build ${TSTIMGSIF} docker-daemon:${TSTIMG}
