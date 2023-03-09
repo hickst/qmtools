@@ -5,7 +5,7 @@
 #
 # echo "ARGS=$*"
 
-IMG=qmtools:test
+TSTIMG=qmtools:test
 PROG=$0
 
-docker run -it --rm --name qmtools -u $UID --entrypoint qmtools ${IMG} -v $@
+docker run -it --rm --name qmtools -u $UID --entrypoint qmtools ${TSTIMG} -v $@
