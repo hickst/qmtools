@@ -5,8 +5,9 @@
 #
 # echo "ARGS=$*"
 
-TSTIMG=qmtools:test
 PROG=$0
+
+TSTIMG=qmtools:test
 
 if [ $# -lt 2  -o "$1" = "-h" -o "$1" = "--help" ]
 then
