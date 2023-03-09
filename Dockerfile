@@ -6,6 +6,7 @@ ARG TESTS=src/notests
 
 ENV RUNNING_IN_CONTAINER True
 ENV INSTALL_PATH /qmtools
+ENV MPLCONFIGDIR /tmp
 
 # create mount points inside container
 RUN mkdir -p $INSTALL_PATH /fetched /inputs /queries /reports
