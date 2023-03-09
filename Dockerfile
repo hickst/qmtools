@@ -29,5 +29,4 @@ RUN rm -rf $INSTALL_PATH
 
 WORKDIR /
 
-ENTRYPOINT [ "qmviolin" ]
-CMD [ "-v", "-h" ]
+ENTRYPOINT [ "qmtools" ]
