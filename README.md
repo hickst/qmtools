@@ -6,9 +6,9 @@ This is a public code repository of the [Translational Bioimaging Resource–MRI
 
 **About**: This project provides several programs to visualize, compare, and review the image quality metrics (IQMs) produced by the [MRIQC program](https://github.com/poldracklab/mriqc). MRIQC extracts no-reference IQMs from structural (T1w and T2w) and functional (BOLD) MRI data.
 
-## Using QMTools via Docker
+## Using QMTools via Docker (or Apptainer)
 
-The easiest way to use the QMTools is via the publicly available [Docker container](https://hub.docker.com/repository/docker/hickst/qmtools). With this approach, the QMTools, located in the Docker container, are called by auxiliary Bash scripts to process data from input and output directories which the scripts make available to the container. Scripts, examples, and documentation which support and simplify this process are available in the [QMTools Support project on GitHub](https://github.com/hickst/qmtools-support). Since this approach requires only **Docker**, **git** and the **bash shell** to be installed on your local computer, it has a minimal "footprint".
+The easiest way to use the QMTools is via the publicly available [Docker container](https://hub.docker.com/repository/docker/hickst/qmtools) or an Apptainer container derived from the Docker image. With this approach, the QMTools, located in the container, are called by auxiliary Bash scripts to process data from input and output directories which the scripts make available to the container. Scripts, examples, and documentation which support and simplify this process are available in the [QMTools Support project on GitHub](https://github.com/hickst/qmtools-support). Since this approach requires only **Docker** or **Apptainer** and the **bash shell** to be installed on your local computer, it has a minimal "footprint".
 
 ***Note**: For documentation on the individual tools and how to use the tools via Docker, please see the [QMTools Support project](https://github.com/hickst/qmtools-support).*
 
